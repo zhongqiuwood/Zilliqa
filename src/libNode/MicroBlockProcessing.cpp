@@ -167,9 +167,8 @@ bool Node::ComposeMicroBlock()
     TxnHash txRootHash;
     uint32_t numTxs = 0;
     const PubKey & minerPubKey = m_mediator.m_selfKey.second;
-    uint256_t dsBlockNum = (uint256_t)m_mediator.m_currentEpochNum;
-    BlockHash dsBlockHeader;
-    fill(dsBlockHeader.asArray().begin(), dsBlockHeader.asArray().end(), 0x11);
+    uint256_t dsBlockNum = m_mediator.m_dsBlockChain.GetLastBlock().GetHeader().GetBlockNum();
+    const BlockHash & dsBlockPrevHash = m_mediator.m_dsBlockChain.GetLastBlock().GetHeader().GetPrevHash();
 
     // TxBlock
     array<unsigned char, BLOCK_SIG_SIZE> signature;
@@ -209,7 +208,7 @@ bool Node::ComposeMicroBlock()
         new MicroBlock
         (
             MicroBlockHeader(type, version, gasLimit, gasUsed, prevHash, blockNum, timestamp, 
-                             txRootHash, numTxs, minerPubKey, dsBlockNum, dsBlockHeader),
+                             txRootHash, numTxs, minerPubKey, dsBlockNum, dsBlockPrevHash),
             signature,
             tranHashes
         )
@@ -474,10 +473,54 @@ bool Node::CheckMicroBlockTxnRootHash()
     return true;      
 }
 
+bool Node::CheckMicroBlockMinerPubKey()
+{
+    const PubKey & actual = m_microblock->GetHeader().GetMinerPubKey();
+    const PubKey & expected = m_myShardMembersPubKeys.at(m_consensusLeaderID);
+
+    // Check pubkey (must be valid and = shard leader)
+    if (actual != expected)
+    {
+        LOG_MESSAGE("Error: Miner pubkey check failed. Expected: " << expected << " Actual: " << actual);
+        return false;
+    }
+
+    return true;
+}
+
+bool Node::CheckMicroBlockDSBlockHash()
+{
+    const BlockHash & actual = m_microblock->GetHeader().GetDSBlockHeader();
+    const BlockHash & expected = m_mediator.m_dsBlockChain.GetLastBlock().GetHeader().GetPrevHash();
+
+    // Check parent DS hash (must be = digest of last DS block header in the DS blockchain)
+    if (actual != expected)
+    {
+        LOG_MESSAGE("Error: Parent DS block hash check failed. Expected: 0x" << expected << " Actual: 0x" << actual);
+        return false;
+    }
+
+    return true;
+}
+
+bool Node::CheckMicroBlockDSBlockNumber()
+{
+    const uint256_t & actual = m_microblock->GetHeader().GetDSBlockNum();
+    const uint256_t & expected = m_mediator.m_dsBlockChain.GetLastBlock().GetHeader().GetBlockNum();
+
+    // Check parent DS block number (must be = block number of last DS block header in the DS blockchain)
+    if (actual != expected)
+    {
+        LOG_MESSAGE("Error: Parent DS block number check failed. Expected: " << expected << " Actual: 0x" << actual);
+        return false;
+    }
+
+    return true;
+}
+
 bool Node::MicroBlockValidator(const vector<unsigned char> & microblock)
 {
     LOG_MARKER();
-
 
     // [TODO] To put in the logic
     m_microblock = make_shared<MicroBlock>(MicroBlock(microblock, 0));
@@ -486,8 +529,14 @@ bool Node::MicroBlockValidator(const vector<unsigned char> & microblock)
 
     do
     {
-        if (!CheckBlockTypeIsMicro() || !CheckMicroBlockVersion() || !CheckMicroBlockTimestamp() || 
-            !CheckMicroBlockHashes() || !CheckMicroBlockTxnRootHash())
+        if (!CheckBlockTypeIsMicro() ||
+            !CheckMicroBlockVersion() ||
+            !CheckMicroBlockTimestamp() ||
+            !CheckMicroBlockHashes() ||
+            !CheckMicroBlockTxnRootHash() ||
+            !CheckMicroBlockMinerPubKey() ||
+            !CheckMicroBlockDSBlockHash() ||
+            !CheckMicroBlockDSBlockNumber())
         {
             break;
         }
@@ -495,11 +544,6 @@ bool Node::MicroBlockValidator(const vector<unsigned char> & microblock)
         // Check gas limit (must satisfy some equations)
         // Check gas used (must be <= gas limit)
         // Check state root (TBD)
-        // Check pubkey (must be valid and = shard leader)
-        // Check parent DS hash (must be = digest of last DS block header in the DS blockchain)
-        // Need some rework to be able to access DS blockchain (or we switch to using the persistent storage lib)
-        // Check parent DS block number (must be = block number of last DS block header in the DS blockchain)
-        // Need some rework to be able to access DS blockchain (or we switch to using the persistent storage lib)
 
         valid = true;
     } while (false);
