@@ -228,6 +228,9 @@ class DirectoryService : public Executable, public Broadcastable
     bool CheckFinalBlockNumber();
     bool CheckFinalBlockTimestamp();
     bool CheckMicroBlockHashesAndRoot();
+    bool CheckFinalBlockMinerPubKey();
+    bool CheckFinalBlockDSBlockHash();
+    bool CheckFinalBlockDSBlockNumber();
     void SaveTxnBodySharingAssignment(const vector<unsigned char> & finalblock, 
                                       unsigned int & curr_offset);
 
