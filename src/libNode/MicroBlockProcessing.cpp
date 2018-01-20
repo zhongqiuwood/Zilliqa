@@ -167,8 +167,15 @@ bool Node::ComposeMicroBlock()
     TxnHash txRootHash;
     uint32_t numTxs = 0;
     const PubKey & minerPubKey = m_mediator.m_selfKey.second;
-    uint256_t dsBlockNum = m_mediator.m_dsBlockChain.GetLastBlock().GetHeader().GetBlockNum();
-    const BlockHash & dsBlockPrevHash = m_mediator.m_dsBlockChain.GetLastBlock().GetHeader().GetPrevHash();
+    const DSBlock & lastDSBlock = m_mediator.m_dsBlockChain.GetLastBlock();
+    const uint256_t & lastDSBlockNum = lastDSBlock.GetHeader().GetBlockNum();
+    SHA2<HASH_TYPE::HASH_VARIANT_256> sha2;
+    vector<unsigned char> vec;
+    lastDSBlock.GetHeader().Serialize(vec, 0);
+    sha2.Update(vec);
+    vector<unsigned char> hashVec = sha2.Finalize();
+    BlockHash dsBlockHeader;
+    copy(hashVec.begin(), hashVec.end(), dsBlockHeader.asArray().begin());
 
     // TxBlock
     array<unsigned char, BLOCK_SIG_SIZE> signature;
@@ -208,7 +215,7 @@ bool Node::ComposeMicroBlock()
         new MicroBlock
         (
             MicroBlockHeader(type, version, gasLimit, gasUsed, prevHash, blockNum, timestamp, 
-                             txRootHash, numTxs, minerPubKey, dsBlockNum, dsBlockPrevHash),
+                             txRootHash, numTxs, minerPubKey, lastDSBlockNum, dsBlockHeader),
             signature,
             tranHashes
         )
@@ -491,7 +498,15 @@ bool Node::CheckMicroBlockMinerPubKey()
 bool Node::CheckMicroBlockDSBlockHash()
 {
     const BlockHash & actual = m_microblock->GetHeader().GetDSBlockHeader();
-    const BlockHash & expected = m_mediator.m_dsBlockChain.GetLastBlock().GetHeader().GetPrevHash();
+
+    const DSBlock & lastDSBlock = m_mediator.m_dsBlockChain.GetLastBlock();
+    SHA2<HASH_TYPE::HASH_VARIANT_256> sha2;
+    vector<unsigned char> vec;
+    lastDSBlock.GetHeader().Serialize(vec, 0);
+    sha2.Update(vec);
+    vector<unsigned char> hashVec = sha2.Finalize();
+    BlockHash expected;
+    copy(hashVec.begin(), hashVec.end(), expected.asArray().begin());
 
     // Check parent DS hash (must be = digest of last DS block header in the DS blockchain)
     if (actual != expected)
