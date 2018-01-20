@@ -114,8 +114,8 @@ void DirectoryService::ComposeFinalBlockCore()
 
     assert(m_mediator.m_dsBlockChain.GetBlockCount() > 0);
   
-    DSBlock lastDSBlock = m_mediator.m_dsBlockChain.GetLastBlock();
-    uint256_t lastDSBlockNum = lastDSBlock.GetHeader().GetBlockNum();
+    const DSBlock & lastDSBlock = m_mediator.m_dsBlockChain.GetLastBlock();
+    const uint256_t & lastDSBlockNum = lastDSBlock.GetHeader().GetBlockNum();
     SHA2<HASH_TYPE::HASH_VARIANT_256> sha2;
     vector<unsigned char> vec;
     lastDSBlock.GetHeader().Serialize(vec, 0);
@@ -509,14 +509,74 @@ bool DirectoryService::CheckMicroBlockHashesAndRoot()
     return true;
 }
 
+bool DirectoryService::CheckFinalBlockMinerPubKey()
+{
+    const PubKey & actual = m_finalBlock->GetHeader().GetMinerPubKey();
+    const PubKey & expected = m_mediator.m_DSCommitteePubKeys.at(m_consensusLeaderID);
+
+    // Check pubkey (must be valid and = shard leader)
+    if (actual != expected)
+    {
+        LOG_MESSAGE("Error: Miner pubkey check failed. Expected: " << expected << " Actual: " << actual);
+        return false;
+    }
+
+    return true;
+}
+
+bool DirectoryService::CheckFinalBlockDSBlockHash()
+{
+    const BlockHash & actual = m_finalBlock->GetHeader().GetDSBlockHeader();
+
+    const DSBlock & lastDSBlock = m_mediator.m_dsBlockChain.GetLastBlock();
+    SHA2<HASH_TYPE::HASH_VARIANT_256> sha2;
+    vector<unsigned char> vec;
+    lastDSBlock.GetHeader().Serialize(vec, 0);
+    sha2.Update(vec);
+    vector<unsigned char> hashVec = sha2.Finalize();
+    BlockHash expected;
+    copy(hashVec.begin(), hashVec.end(), expected.asArray().begin());
+
+    // Check parent DS hash (must be = digest of last DS block header in the DS blockchain)
+    if (actual != expected)
+    {
+        LOG_MESSAGE("Error: Parent DS block hash check failed. Expected: 0x" << expected << " Actual: 0x" << actual);
+        return false;
+    }
+
+    return true;
+}
+
+bool DirectoryService::CheckFinalBlockDSBlockNumber()
+{
+    const uint256_t & actual = m_finalBlock->GetHeader().GetDSBlockNum();
+    const uint256_t & expected = m_mediator.m_dsBlockChain.GetLastBlock().GetHeader().GetBlockNum();
+
+    // Check parent DS block number (must be = block number of last DS block header in the DS blockchain)
+    if (actual != expected)
+    {
+        LOG_MESSAGE("Error: Parent DS block number check failed. Expected: " << expected << " Actual: 0x" << actual);
+        return false;
+    }
+
+    return true;
+}
+
 bool DirectoryService::CheckFinalBlockValidity()
 {
     bool valid = false;
 
     do
     {
-        if(!CheckBlockTypeIsFinal() || !CheckFinalBlockVersion() || !CheckFinalBlockNumber() ||
-            !CheckPreviousFinalBlockHash() || !CheckFinalBlockTimestamp() || !CheckMicroBlockHashesAndRoot())
+        if (!CheckBlockTypeIsFinal() ||
+            !CheckFinalBlockVersion() ||
+            !CheckFinalBlockNumber() ||
+            !CheckPreviousFinalBlockHash() ||
+            !CheckFinalBlockTimestamp() ||
+            !CheckMicroBlockHashesAndRoot() ||
+            !CheckFinalBlockMinerPubKey() ||
+            !CheckFinalBlockDSBlockHash() ||
+            !CheckFinalBlockDSBlockNumber())
         {
             break;
         }
@@ -524,9 +584,6 @@ bool DirectoryService::CheckFinalBlockValidity()
         // TODO: Check gas limit (must satisfy some equations)
         // TODO: Check gas used (must be <= gas limit)        
         // TODO: Check state root (TBD)
-        // TODO: Check pubkey (must be valid and = shard leader)
-        // TODO: Check parent DS hash (must be = digest of last DS block header in the DS blockchain)
-        // TODO: Check parent DS block number (must be = block number of last DS block header in the DS blockchain)
 
         valid = true;
     } 
