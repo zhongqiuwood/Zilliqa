@@ -413,6 +413,11 @@ bool PubKey::operator==(const PubKey & r) const
     return (m_initialized && r.m_initialized && (EC_POINT_cmp(Schnorr::GetInstance().GetCurve().m_group.get(), m_P.get(), r.m_P.get(), ctx.get()) == 0));
 }
 
+bool PubKey::operator!=(const PubKey & r) const
+{
+    return !(this->operator==(r));
+}
+
 Signature::Signature() : m_r(BN_new(), BN_clear_free), m_s(BN_new(), BN_clear_free), m_initialized(false)
 {
     if ((m_r == nullptr) || (m_s == nullptr))

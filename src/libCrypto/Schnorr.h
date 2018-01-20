@@ -147,6 +147,9 @@ struct PubKey : public Serializable
     /// Equality operator.
     bool operator==(const PubKey & r) const;
 
+    /// Inequality operator.
+    bool operator!=(const PubKey & r) const;
+
     /// Utility std::string conversion function for public key info.
     explicit operator std::string() const
     {
