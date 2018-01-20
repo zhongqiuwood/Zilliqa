@@ -44,10 +44,10 @@ public:
     boost::multiprecision::uint256_t GetBlockCount();
 
     /// Returns the last stored block.
-    DSBlock GetLastBlock();
+    const DSBlock & GetLastBlock();
 
     /// Returns the block at the specified block number.
-    DSBlock GetBlock(const boost::multiprecision::uint256_t & blocknum);
+    const DSBlock & GetBlock(const boost::multiprecision::uint256_t & blocknum);
 
     /// Adds a block to the chain.
     int AddBlock(const DSBlock & block);

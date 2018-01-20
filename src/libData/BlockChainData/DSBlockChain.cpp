@@ -36,13 +36,13 @@ uint256_t DSBlockChain::GetBlockCount()
     return m_dsBlocks.size();
 }
 
-DSBlock DSBlockChain::GetLastBlock()
+const DSBlock & DSBlockChain::GetLastBlock()
 {
     lock_guard<mutex> g(m_mutexDSBlocks);
     return m_dsBlocks.back();
 }
 
-DSBlock DSBlockChain::GetBlock(const uint256_t & blockNum)
+const DSBlock & DSBlockChain::GetBlock(const uint256_t & blockNum)
 {
     lock_guard<mutex> g(m_mutexDSBlocks);
 
