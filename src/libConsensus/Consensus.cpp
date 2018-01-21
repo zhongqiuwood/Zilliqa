@@ -16,6 +16,7 @@
 
 
 #include "Consensus.h"
+#include "common/BitVector.h"
 #include "common/Constants.h"
 #include "common/Messages.h"
 #include "libUtils/Logger.h"
@@ -23,62 +24,6 @@
 #include "libNetwork/P2PComm.h"
 
 using namespace std;
-
-static unsigned int GetBitVectorLengthInBytes(unsigned int length_in_bits)
-{
-    return (((length_in_bits & 0x07) > 0) ? (length_in_bits >> 3) + 1 : length_in_bits >> 3);
-}
-
-static vector<bool> GetBitVector(const vector<unsigned char> & src, unsigned int offset, unsigned int expected_length)
-{
-    vector<bool> result;
-    unsigned int actual_length = 0;
-    unsigned int actual_length_bytes = 0;
-
-    if ((src.size() - offset) >= 2)
-    {
-        actual_length = (src.at(offset) << 8) + src.at(offset + 1);
-        actual_length_bytes = GetBitVectorLengthInBytes(actual_length);
-    }
-
-    if ((actual_length_bytes == expected_length) && ((src.size() - offset - 2) >= actual_length_bytes))
-    {
-        result.reserve(actual_length);
-        for (unsigned int index = 0; index < actual_length; index++)
-        {
-            result.push_back(src.at(offset + 2 + (index >> 3)) & (1 << (7 - (index & 0x07))));
-        }
-    }
-
-    return result;
-}
-
-static unsigned int SetBitVector(vector<unsigned char> & dst, unsigned int offset, const vector<bool> & value)
-{
-    const unsigned int length_available = dst.size() - offset;
-    const unsigned int length_needed = 2 + GetBitVectorLengthInBytes(value.size());
-
-    if (length_available < length_needed)
-    {
-        dst.resize(dst.size() + length_needed - length_available);
-    }
-    fill(dst.begin() + offset, dst.begin() + offset + length_needed, 0x00);
-
-    dst.at(offset) = value.size() >> 8;
-    dst.at(offset + 1) = value.size();
-
-    unsigned int index = 0;
-    for (bool b : value)
-    {
-        if (b)
-        {
-            dst.at(offset + 2 + (index >> 3)) |= (1 << (7 - (index & 0x07)));
-        }
-        index++;
-    }
-
-    return length_needed;
-}
 
 ConsensusCommon::ConsensusCommon
 (
@@ -129,7 +74,7 @@ bool ConsensusCommon::VerifyMessage(const vector<unsigned char> & msg, unsigned 
     return result;
 }
 
-PubKey ConsensusCommon::AggregateKeys(const vector<bool> peer_map)
+PubKey ConsensusCommon::AggregateKeys(const vector<bool> & peer_map)
 {
     LOG_MARKER();
 
@@ -228,7 +173,7 @@ uint16_t ConsensusCommon::RetrieveCollectiveSigBitmap(vector<unsigned char> & ds
         return 0;
     }
 
-    return SetBitVector(dst, offset, m_responseMap);
+    return BitVector::SetBitVector(dst, offset, m_responseMap);
 }
 
 bool ConsensusLeader::CheckState(Action action)
@@ -991,7 +936,7 @@ bool ConsensusLeader::GenerateCollectiveSigMessage(vector<unsigned char> & colle
     curr_offset += sizeof(uint16_t);
 
     // N-byte bitmap
-    curr_offset += SetBitVector(collectivesig, curr_offset, m_responseMap);
+    curr_offset += BitVector::SetBitVector(collectivesig, curr_offset, m_responseMap);
 
     // 64-byte collective signature
     m_collectiveSig.Serialize(collectivesig, curr_offset);
@@ -1038,7 +983,7 @@ ConsensusLeader::ConsensusLeader
 
     m_state = INITIAL;
 
-    m_numForConsensus = pubkeys.size() - (pubkeys.size() - 1) / 3;
+    m_numForConsensus = ConsensusCommon::NumForConsensus(pubkeys.size());
 
     LOG_MESSAGE("TOLERANCE_FRACTION " << TOLERANCE_FRACTION << " pubkeys.size() " << pubkeys.size() << " m_numForConsensus " << m_numForConsensus);
 }
@@ -1690,7 +1635,7 @@ bool ConsensusBackup::ProcessMessageCollectiveSigCore(const vector<unsigned char
     // Note on N-byte bitmap: N = number of bytes needed to represent all nodes (1 bit = 1 node) + 2 (length indicator)
 
     const unsigned int length_available = collectivesig.size() - offset;
-    const unsigned int length_needed = sizeof(uint32_t) + BLOCK_HASH_SIZE + sizeof(uint16_t) + SIGNATURE_CHALLENGE_SIZE + SIGNATURE_RESPONSE_SIZE + GetBitVectorLengthInBytes(m_pubKeys.size()) + 2 + SIGNATURE_CHALLENGE_SIZE + SIGNATURE_RESPONSE_SIZE;
+    const unsigned int length_needed = sizeof(uint32_t) + BLOCK_HASH_SIZE + sizeof(uint16_t) + SIGNATURE_CHALLENGE_SIZE + SIGNATURE_RESPONSE_SIZE + BitVector::GetBitVectorLengthInBytes(m_pubKeys.size()) + 2 + SIGNATURE_CHALLENGE_SIZE + SIGNATURE_RESPONSE_SIZE;
 
     if (length_needed > length_available)
     {
@@ -1733,8 +1678,8 @@ bool ConsensusBackup::ProcessMessageCollectiveSigCore(const vector<unsigned char
     }
 
     // N-byte bitmap
-    m_responseMap = GetBitVector(collectivesig, curr_offset, GetBitVectorLengthInBytes(m_pubKeys.size()));
-    curr_offset += GetBitVectorLengthInBytes(m_pubKeys.size()) + 2;
+    m_responseMap = BitVector::GetBitVector(collectivesig, curr_offset, BitVector::GetBitVectorLengthInBytes(m_pubKeys.size()));
+    curr_offset += BitVector::GetBitVectorLengthInBytes(m_pubKeys.size()) + 2;
 
     // Check the bitmap
     if (m_responseMap.empty())

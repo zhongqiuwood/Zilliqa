@@ -117,7 +117,6 @@ void MicroBlockHeader::Deserialize(const vector<unsigned char> & src, unsigned i
     m_numTxs = GetNumber<uint32_t>(src, curOffset, sizeof(uint32_t));
     curOffset += sizeof(uint32_t);
     m_minerPubKey.Deserialize(src, curOffset);
-
     curOffset += PUB_KEY_SIZE;
     m_dsBlockNum = GetNumber<uint256_t>(src, curOffset, UINT256_SIZE);
     curOffset += UINT256_SIZE;
@@ -198,8 +197,7 @@ bool MicroBlockHeader::operator==(const MicroBlockHeader & header) const
             (m_txRootHash == header.m_txRootHash) &&
             (m_numTxs == header.m_numTxs) &&
             (m_minerPubKey == header.m_minerPubKey) &&
-            (m_dsBlockHeader == header.m_dsBlockHeader) &&
-            (m_dsBlockHeader == m_dsBlockHeader)
+            (m_dsBlockHeader == header.m_dsBlockHeader)
         );
 }
 
@@ -222,6 +220,14 @@ bool MicroBlockHeader::operator<(const MicroBlockHeader & header) const
         return false;
     }
     else if (m_gasLimit < header.m_gasLimit)
+    {
+        return true;
+    }
+    else if (m_gasLimit > header.m_gasLimit)
+    {
+        return false;
+    }
+    else if (m_gasUsed < header.m_gasUsed)
     {
         return true;
     }

@@ -178,7 +178,6 @@ bool Node::ComposeMicroBlock()
     copy(hashVec.begin(), hashVec.end(), dsBlockHeader.asArray().begin());
 
     // TxBlock
-    array<unsigned char, BLOCK_SIG_SIZE> signature;
     vector<TxnHash> tranHashes;
 
     unsigned int index = 0;
@@ -209,6 +208,10 @@ bool Node::ComposeMicroBlock()
         }
     }
 
+    // Collective signature and bitmap
+    const Signature & collectiveSig = m_consensusObject->RetrieveCollectiveSig();
+    const vector<bool> & collectiveSigBitmap = m_consensusObject->RetrieveCollectiveSigBitmap();
+
     LOG_MESSAGE2(to_string(m_mediator.m_currentEpochNum).c_str(), "Creating new micro block.")
     m_microblock.reset
     (
@@ -216,7 +219,8 @@ bool Node::ComposeMicroBlock()
         (
             MicroBlockHeader(type, version, gasLimit, gasUsed, prevHash, blockNum, timestamp, 
                              txRootHash, numTxs, minerPubKey, lastDSBlockNum, dsBlockHeader),
-            signature,
+            collectiveSig,
+            collectiveSigBitmap,
             tranHashes
         )
     );

@@ -25,21 +25,22 @@
 #include "common/Serializable.h"
 #include "common/Constants.h"
 #include "libCrypto/Schnorr.h"
+#include "libConsensus/ConsensusCommon.h"
 
 class MicroBlockHeader : public BlockHeaderBase
 {
-    uint8_t m_type;                                             // 0: microblock proposed by a committee, 1: final tx block
+    uint8_t m_type;                                // 0: microblock proposed by a committee, 1: final tx block
     uint32_t m_version;
     boost::multiprecision::uint256_t m_gasLimit;
     boost::multiprecision::uint256_t m_gasUsed;
-    BlockHash m_prevHash;                                       // Hash of the previous block
-    boost::multiprecision::uint256_t m_blockNum;                // Block index, starting from 0 in the genesis block
+    BlockHash m_prevHash;                          // Hash of the previous block
+    boost::multiprecision::uint256_t m_blockNum;   // Block index, starting from 0 in the genesis block
     boost::multiprecision::uint256_t m_timestamp;
-    TxnHash m_txRootHash;                                       // Tx merkle tree root hash
-    uint32_t m_numTxs;                                          // Total number of txs included in the block
-    PubKey m_minerPubKey;                                       // Leader of the committee who proposed this block
-    boost::multiprecision::uint256_t m_dsBlockNum;              // DS Block index at the time this Tx Block was proposed
-    BlockHash m_dsBlockHeader;                                  // DS Block hash
+    TxnHash m_txRootHash;                          // Tx merkle tree root hash
+    uint32_t m_numTxs;                             // Total number of txs included in the block
+    PubKey m_minerPubKey;                          // Leader of the committee who proposed this block
+    boost::multiprecision::uint256_t m_dsBlockNum; // DS Block index at the time this Tx Block was proposed
+    BlockHash m_dsBlockHeader;                     // DS Block hash
 
 public:
     

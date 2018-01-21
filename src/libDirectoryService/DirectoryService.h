@@ -219,6 +219,7 @@ class DirectoryService : public Executable, public Broadcastable
                                     boost::multiprecision::uint256_t & allGasUsed, 
                                     uint32_t & numTxs, 
                                     uint32_t & numMicroBlocks) const;
+    bool VerifyMicroblockCoSignature(const MicroBlock & microBlock, uint32_t shardId);
 
     // FinalBlockValidator functions
     bool CheckFinalBlockValidity();

@@ -30,14 +30,6 @@
 
 typedef std::function<bool(const std::vector<unsigned char> &)> MsgContentValidatorFunc;
 
-unsigned int GetBitVectorLengthInBytes(unsigned int length_in_bits);
-vector<bool> GetBitVector(const vector<unsigned char> & src, 
-                            unsigned int offset, 
-                            unsigned int expected_length);
-unsigned int SetBitVector(vector<unsigned char> & dst, 
-                            unsigned int offset, 
-                            const vector<bool> & value);
-
 class ConsensusCommon
 {
 public:
@@ -106,7 +98,7 @@ protected:
 
     Signature SignMessage(const std::vector<unsigned char> & msg, unsigned int offset, unsigned int size);
     bool VerifyMessage(const std::vector<unsigned char> & msg, unsigned int offset, unsigned int size, const Signature & toverify, uint16_t peer_id);
-    PubKey AggregateKeys(const std::vector<bool> peer_map);
+    PubKey AggregateKeys(const std::vector<bool> & peer_map);
     CommitPoint AggregateCommits(const std::vector<CommitPoint> & commits);
     Response AggregateResponses(const std::vector<Response> & responses);
     Signature AggregateSign(const Challenge & challenge, const Response & aggregated_response);
@@ -125,6 +117,10 @@ public:
     // Functions to retrieve the final collective signature and bit map
     bool RetrieveCollectiveSig(std::vector<unsigned char> & dst, unsigned int offset);
     uint16_t RetrieveCollectiveSigBitmap(std::vector<unsigned char> & dst, unsigned int offset);
+    const Signature & RetrieveCollectiveSig() const;
+    const std::vector<bool> & RetrieveCollectiveSigBitmap() const;
+
+    static unsigned int NumForConsensus(unsigned int shardSize);
 };
 
 #endif // __CONSENSUSCOMMON_H__
