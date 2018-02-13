@@ -16,6 +16,7 @@ var searchData=
   ['sha3',['SHA3',['../class_s_h_a3.html#a75eac59d26562616364ceac96d386fbf',1,'SHA3']]],
   ['sign',['Sign',['../class_schnorr.html#aca54fe7d6322240ad4209941a3ce49a6',1,'Schnorr::Sign(const std::vector&lt; unsigned char &gt; &amp;message, const PrivKey &amp;privkey, const PubKey &amp;pubkey, Signature &amp;result)'],['../class_schnorr.html#a70e5ae949990ccc4d2eee694008031c5',1,'Schnorr::Sign(const std::vector&lt; unsigned char &gt; &amp;message, unsigned int offset, unsigned int size, const PrivKey &amp;privkey, const PubKey &amp;pubkey, Signature &amp;result)']]],
   ['signature',['Signature',['../struct_signature.html#aacfc092d01d1efd7008c027caaa9203c',1,'Signature::Signature()'],['../struct_signature.html#a47d604fb8d6abf01c15dd21cd0c401dd',1,'Signature::Signature(const std::vector&lt; unsigned char &gt; &amp;src, unsigned int offset)'],['../struct_signature.html#a7a59e10239c1e46bdc5b9830bb72b773',1,'Signature::Signature(const Signature &amp;)']]],
+  ['signmessage',['SignMessage',['../class_consensus_common.html#a20696e33f8d8af11f98487ae05bcf2b3',1,'ConsensusCommon']]],
   ['size',['size',['../class_circular_array.html#a2529f6ade8406457993660fa89f462bf',1,'CircularArray']]],
   ['startconsensus',['StartConsensus',['../class_consensus_leader.html#ada23a796bf8bfe8a0dc859d5ed22c744',1,'ConsensusLeader']]],
   ['startmessagepump',['StartMessagePump',['../class_p2_p_comm.html#ad093613e4ad1ce4929a4e124b4c62199',1,'P2PComm']]],

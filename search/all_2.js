@@ -10,8 +10,8 @@ var searchData=
   ['commitsecret',['CommitSecret',['../struct_commit_secret.html',1,'CommitSecret'],['../struct_commit_secret.html#aefb096e6ebb7d1b04b65294c26c6c5fc',1,'CommitSecret::CommitSecret()'],['../struct_commit_secret.html#a9ee02f1ed9c88de7fbb7561d22b117f9',1,'CommitSecret::CommitSecret(const std::vector&lt; unsigned char &gt; &amp;src, unsigned int offset)'],['../struct_commit_secret.html#aea8345110587f79db29a2654f3c26a12',1,'CommitSecret::CommitSecret(const CommitSecret &amp;src)']]],
   ['compress',['Compress',['../class_block_storage.html#a65f8911910506ae2930cb99623b24fe6',1,'BlockStorage']]],
   ['consensusbackup',['ConsensusBackup',['../class_consensus_backup.html',1,'ConsensusBackup'],['../class_consensus_backup.html#acaaa2c7e0198642112c1e3622bcce8a8',1,'ConsensusBackup::ConsensusBackup()']]],
-  ['consensuscommon',['ConsensusCommon',['../class_consensus_common.html',1,'']]],
-  ['consensusleader',['ConsensusLeader',['../class_consensus_leader.html',1,'ConsensusLeader'],['../class_consensus_leader.html#a9b3241f42e600e4887d96093b9c70222',1,'ConsensusLeader::ConsensusLeader()']]],
+  ['consensuscommon',['ConsensusCommon',['../class_consensus_common.html',1,'ConsensusCommon'],['../class_consensus_common.html#aa6fe8c90f422cb80c5adf903a7db45b7',1,'ConsensusCommon::ConsensusCommon()']]],
+  ['consensusleader',['ConsensusLeader',['../class_consensus_leader.html',1,'ConsensusLeader'],['../class_consensus_leader.html#a68badeb74ffe12bc606785590cc6fa3c',1,'ConsensusLeader::ConsensusLeader()']]],
   ['consensususer',['ConsensusUser',['../class_consensus_user.html',1,'']]],
   ['curve',['Curve',['../struct_curve.html',1,'Curve'],['../struct_curve.html#acf7a848ad3b0e6a7931bf962941594bc',1,'Curve::Curve()']]]
 ];

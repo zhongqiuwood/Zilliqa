@@ -65,6 +65,11 @@ $(function() {
 <div class="title">Lookup Class Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
+
+<p>Processes requests pertaining to network, transaction, or block information.  
+ <a href="class_lookup.html#details">More...</a></p>
+
+<p><code>#include &lt;<a class="el" href="_lookup_8h_source.html">Lookup.h</a>&gt;</code></p>
 <div class="dynheader">
 Inheritance diagram for Lookup:</div>
 <div class="dyncontent">
@@ -85,8 +90,13 @@ Collaboration diagram for Lookup:</div>
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:ab7eeed2769c80281573f722754148cac"><td class="memItemLeft" align="right" valign="top"><a id="ab7eeed2769c80281573f722754148cac"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><b>Lookup</b> (<a class="el" href="class_mediator.html">Mediator</a> &amp;mediator)</td></tr>
+&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_lookup.html#ab7eeed2769c80281573f722754148cac">Lookup</a> (<a class="el" href="class_mediator.html">Mediator</a> &amp;mediator)</td></tr>
+<tr class="memdesc:ab7eeed2769c80281573f722754148cac"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor. <br /></td></tr>
 <tr class="separator:ab7eeed2769c80281573f722754148cac"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1bdfb50de5b6befb5dd6b1eed50670fb"><td class="memItemLeft" align="right" valign="top"><a id="a1bdfb50de5b6befb5dd6b1eed50670fb"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_lookup.html#a1bdfb50de5b6befb5dd6b1eed50670fb">~Lookup</a> ()</td></tr>
+<tr class="memdesc:a1bdfb50de5b6befb5dd6b1eed50670fb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destructor. <br /></td></tr>
+<tr class="separator:a1bdfb50de5b6befb5dd6b1eed50670fb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad489b0d0257b6c1822962ece79f544ef"><td class="memItemLeft" align="right" valign="top"><a id="ad489b0d0257b6c1822962ece79f544ef"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>SetLookupNodes</b> ()</td></tr>
 <tr class="separator:ad489b0d0257b6c1822962ece79f544ef"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -141,6 +151,9 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><b>ProcessGetTxBlockFrom
 <tr class="memitem:ab397cf39e16e66296fd145e0e6505c4f"><td class="memItemLeft" align="right" valign="top"><a id="ab397cf39e16e66296fd145e0e6505c4f"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><b>ProcessGetTxBodyFromSeed</b> (const std::vector&lt; unsigned char &gt; &amp;message, unsigned int offset, const <a class="el" href="struct_peer.html">Peer</a> &amp;from)</td></tr>
 <tr class="separator:ab397cf39e16e66296fd145e0e6505c4f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a92b9580bfff4abc3c30ea42d13378e44"><td class="memItemLeft" align="right" valign="top"><a id="a92b9580bfff4abc3c30ea42d13378e44"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>ProcessGetNetworkId</b> (const std::vector&lt; unsigned char &gt; &amp;message, unsigned int offset, const <a class="el" href="struct_peer.html">Peer</a> &amp;from)</td></tr>
+<tr class="separator:a92b9580bfff4abc3c30ea42d13378e44"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af57efdae07f98b8d1e51c8065af77dd7"><td class="memItemLeft" align="right" valign="top"><a id="af57efdae07f98b8d1e51c8065af77dd7"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><b>ProcessSetSeedPeersFromLookup</b> (const std::vector&lt; unsigned char &gt; &amp;message, unsigned int offset, const <a class="el" href="struct_peer.html">Peer</a> &amp;from)</td></tr>
 <tr class="separator:af57efdae07f98b8d1e51c8065af77dd7"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -166,7 +179,9 @@ virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c
 <tr class="memdesc:aadea1f1a8dc6cf50a493d8666b041754 inherit pub_methods_class_executable"><td class="mdescLeft">&#160;</td><td class="mdescRight">Virtual destructor. <br /></td></tr>
 <tr class="separator:aadea1f1a8dc6cf50a493d8666b041754 inherit pub_methods_class_executable"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<hr/>The documentation for this class was generated from the following files:<ul>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><p>Processes requests pertaining to network, transaction, or block information. </p>
+</div><hr/>The documentation for this class was generated from the following files:<ul>
 <li>src/libLookup/<a class="el" href="_lookup_8h_source.html">Lookup.h</a></li>
 <li>src/libLookup/Lookup.cpp</li>
 </ul>

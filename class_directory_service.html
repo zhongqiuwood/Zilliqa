@@ -68,6 +68,9 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 
+<p>Implements Directory Service functionality including PoW verification, DS, Tx Block Consensus and sharding management.  
+ <a href="class_directory_service.html#details">More...</a></p>
+
 <p><code>#include &lt;<a class="el" href="_directory_service_8h_source.html">DirectoryService.h</a>&gt;</code></p>
 <div class="dynheader">
 Inheritance diagram for DirectoryService:</div>
@@ -162,13 +165,19 @@ virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
+<tr class="memitem:ab7a833a03ae41eb30f1a0d9af0bbc075"><td class="memItemLeft" align="right" valign="top"><a id="ab7a833a03ae41eb30f1a0d9af0bbc075"></a>
+uint32_t&#160;</td><td class="memItemRight" valign="bottom"><b>m_consensusID</b></td></tr>
+<tr class="separator:ab7a833a03ae41eb30f1a0d9af0bbc075"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a49cb0747961158253e43765606e5ec15"><td class="memItemLeft" align="right" valign="top"><a id="a49cb0747961158253e43765606e5ec15"></a>
+uint16_t&#160;</td><td class="memItemRight" valign="bottom"><b>m_consensusLeaderID</b></td></tr>
+<tr class="separator:a49cb0747961158253e43765606e5ec15"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab43bbf6b20c1f95442ae89ec921a833a"><td class="memItemLeft" align="right" valign="top"><a id="ab43bbf6b20c1f95442ae89ec921a833a"></a>
 std::atomic&lt; Mode &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_directory_service.html#ab43bbf6b20c1f95442ae89ec921a833a">m_mode</a></td></tr>
 <tr class="memdesc:ab43bbf6b20c1f95442ae89ec921a833a"><td class="mdescLeft">&#160;</td><td class="mdescRight">The current role of this <a class="el" href="class_zilliqa.html" title="Main Zilliqa class. ">Zilliqa</a> instance within the directory service committee. <br /></td></tr>
 <tr class="separator:ab43bbf6b20c1f95442ae89ec921a833a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab8297617a294919686c9f130b9d017fc"><td class="memItemLeft" align="right" valign="top"><a id="ab8297617a294919686c9f130b9d017fc"></a>
 std::atomic&lt; DirState &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_directory_service.html#ab8297617a294919686c9f130b9d017fc">m_state</a></td></tr>
-<tr class="memdesc:ab8297617a294919686c9f130b9d017fc"><td class="mdescLeft">&#160;</td><td class="mdescRight">The current internal state of this <a class="el" href="class_directory_service.html">DirectoryService</a> instance. <br /></td></tr>
+<tr class="memdesc:ab8297617a294919686c9f130b9d017fc"><td class="mdescLeft">&#160;</td><td class="mdescRight">The current internal state of this <a class="el" href="class_directory_service.html" title="Implements Directory Service functionality including PoW verification, DS, Tx Block Consensus and sha...">DirectoryService</a> instance. <br /></td></tr>
 <tr class="separator:ab8297617a294919686c9f130b9d017fc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5a17eaab9c6a1d6e39caf7535e76befb"><td class="memItemLeft" align="right" valign="top"><a id="a5a17eaab9c6a1d6e39caf7535e76befb"></a>
 uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_directory_service.html#a5a17eaab9c6a1d6e39caf7535e76befb">m_consensusMyID</a></td></tr>

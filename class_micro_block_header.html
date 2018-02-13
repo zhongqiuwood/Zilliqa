@@ -66,13 +66,16 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 
+<p>Stores information on the header part of the microblock.  
+ <a href="class_micro_block_header.html#details">More...</a></p>
+
 <p><code>#include &lt;<a class="el" href="_micro_block_header_8h_source.html">MicroBlockHeader.h</a>&gt;</code></p>
 <div class="dynheader">
 Inheritance diagram for MicroBlockHeader:</div>
 <div class="dyncontent">
 <div class="center"><img src="class_micro_block_header__inherit__graph.png" border="0" usemap="#_micro_block_header_inherit__map" alt="Inheritance graph"/></div>
 <map name="_micro_block_header_inherit__map" id="_micro_block_header_inherit__map">
-<area shape="rect" id="node2" href="class_block_header_base.html" title="BlockHeaderBase" alt="" coords="6,79,134,104"/>
+<area shape="rect" id="node2" href="class_block_header_base.html" title="[TODO] Base class for all supported block header types " alt="" coords="6,79,134,104"/>
 <area shape="rect" id="node3" href="class_serializable.html" title="Specifies the interface required for classes that are byte serializable. " alt="" coords="25,5,116,31"/>
 </map>
 <center><span class="legend">[<a href="graph_legend.html">legend</a>]</span></center></div>
@@ -81,26 +84,32 @@ Collaboration diagram for MicroBlockHeader:</div>
 <div class="dyncontent">
 <div class="center"><img src="class_micro_block_header__coll__graph.png" border="0" usemap="#_micro_block_header_coll__map" alt="Collaboration graph"/></div>
 <map name="_micro_block_header_coll__map" id="_micro_block_header_coll__map">
-<area shape="rect" id="node2" href="class_block_header_base.html" title="BlockHeaderBase" alt="" coords="6,79,134,104"/>
+<area shape="rect" id="node2" href="class_block_header_base.html" title="[TODO] Base class for all supported block header types " alt="" coords="6,79,134,104"/>
 <area shape="rect" id="node3" href="class_serializable.html" title="Specifies the interface required for classes that are byte serializable. " alt="" coords="25,5,116,31"/>
 </map>
 <center><span class="legend">[<a href="graph_legend.html">legend</a>]</span></center></div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
+<tr class="memitem:a7ee3e9847a072043a1cc0cfad12492c0"><td class="memItemLeft" align="right" valign="top"><a id="a7ee3e9847a072043a1cc0cfad12492c0"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_micro_block_header.html#a7ee3e9847a072043a1cc0cfad12492c0">MicroBlockHeader</a> ()</td></tr>
+<tr class="memdesc:a7ee3e9847a072043a1cc0cfad12492c0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Default constructor. <br /></td></tr>
+<tr class="separator:a7ee3e9847a072043a1cc0cfad12492c0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab24905f382abbdaab1a3b13ccc08e319"><td class="memItemLeft" align="right" valign="top"><a id="ab24905f382abbdaab1a3b13ccc08e319"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><b>MicroBlockHeader</b> (const std::vector&lt; unsigned char &gt; &amp;src, unsigned int offset)</td></tr>
+&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_micro_block_header.html#ab24905f382abbdaab1a3b13ccc08e319">MicroBlockHeader</a> (const std::vector&lt; unsigned char &gt; &amp;src, unsigned int offset)</td></tr>
+<tr class="memdesc:ab24905f382abbdaab1a3b13ccc08e319"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor for loading existing microblock header from a byte stream. <br /></td></tr>
 <tr class="separator:ab24905f382abbdaab1a3b13ccc08e319"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:adc3da5f716dbd30ddf40cf38f83d1fc8"><td class="memItemLeft" align="right" valign="top"><a id="adc3da5f716dbd30ddf40cf38f83d1fc8"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><b>MicroBlockHeader</b> (const uint8_t type, const uint32_t version, const boost::multiprecision::uint256_t &amp;gasLimit, const boost::multiprecision::uint256_t &amp;gasUsed, const BlockHash &amp;prevHash, const boost::multiprecision::uint256_t &amp;blockNum, const boost::multiprecision::uint256_t &amp;timestamp, const TxnHash &amp;txRootHash, const uint32_t numTxs, const <a class="el" href="struct_pub_key.html">PubKey</a> &amp;minerPubKey, const boost::multiprecision::uint256_t &amp;dsBlockNum, const BlockHash &amp;dsBlockHeader)</td></tr>
+&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_micro_block_header.html#adc3da5f716dbd30ddf40cf38f83d1fc8">MicroBlockHeader</a> (const uint8_t type, const uint32_t version, const boost::multiprecision::uint256_t &amp;gasLimit, const boost::multiprecision::uint256_t &amp;gasUsed, const BlockHash &amp;prevHash, const boost::multiprecision::uint256_t &amp;blockNum, const boost::multiprecision::uint256_t &amp;timestamp, const TxnHash &amp;txRootHash, const uint32_t numTxs, const <a class="el" href="struct_pub_key.html">PubKey</a> &amp;minerPubKey, const boost::multiprecision::uint256_t &amp;dsBlockNum, const BlockHash &amp;dsBlockHeader)</td></tr>
+<tr class="memdesc:adc3da5f716dbd30ddf40cf38f83d1fc8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor with predefined member values. <br /></td></tr>
 <tr class="separator:adc3da5f716dbd30ddf40cf38f83d1fc8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af1905e7fefd8e908a3942f0349ce9624"><td class="memItemLeft" align="right" valign="top"><a id="af1905e7fefd8e908a3942f0349ce9624"></a>
 unsigned int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_micro_block_header.html#af1905e7fefd8e908a3942f0349ce9624">Serialize</a> (std::vector&lt; unsigned char &gt; &amp;dst, unsigned int offset) const</td></tr>
-<tr class="memdesc:af1905e7fefd8e908a3942f0349ce9624"><td class="mdescLeft">&#160;</td><td class="mdescRight">Serializes internal state to destination byte stream. <br /></td></tr>
+<tr class="memdesc:af1905e7fefd8e908a3942f0349ce9624"><td class="mdescLeft">&#160;</td><td class="mdescRight">Implements the Serialize function inherited from <a class="el" href="class_serializable.html" title="Specifies the interface required for classes that are byte serializable. ">Serializable</a>. <br /></td></tr>
 <tr class="separator:af1905e7fefd8e908a3942f0349ce9624"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a14c58c3c7e4ff90dcd577f83ccbd7561"><td class="memItemLeft" align="right" valign="top"><a id="a14c58c3c7e4ff90dcd577f83ccbd7561"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_micro_block_header.html#a14c58c3c7e4ff90dcd577f83ccbd7561">Deserialize</a> (const std::vector&lt; unsigned char &gt; &amp;src, unsigned int offset)</td></tr>
-<tr class="memdesc:a14c58c3c7e4ff90dcd577f83ccbd7561"><td class="mdescLeft">&#160;</td><td class="mdescRight">Deserializes source byte stream into internal state. <br /></td></tr>
+<tr class="memdesc:a14c58c3c7e4ff90dcd577f83ccbd7561"><td class="mdescLeft">&#160;</td><td class="mdescRight">Implements the Deserialize function inherited from <a class="el" href="class_serializable.html" title="Specifies the interface required for classes that are byte serializable. ">Serializable</a>. <br /></td></tr>
 <tr class="separator:a14c58c3c7e4ff90dcd577f83ccbd7561"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:acb33259a89de88e662aa9b1ded773574"><td class="memItemLeft" align="right" valign="top"><a id="acb33259a89de88e662aa9b1ded773574"></a>
 const uint8_t &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>GetType</b> () const</td></tr>
@@ -168,7 +177,8 @@ BlockHash&#160;</td><td class="memItemRight" valign="bottom"><b>m_prevHash</b></
 <tr class="separator:aebf6615d0a6d0be042d74de5ba342be7 inherit pro_attribs_class_block_header_base"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>Copyright (c) 2018 <a class="el" href="class_zilliqa.html" title="Main Zilliqa class. ">Zilliqa</a> This source code is being disclosed to you solely for the purpose of your participation in testing <a class="el" href="class_zilliqa.html" title="Main Zilliqa class. ">Zilliqa</a>. You may view, compile and run the code for that purpose and pursuant to the protocols and algorithms that are programmed into, and intended by, the code. You may not do anything else with the code without express permission from <a class="el" href="class_zilliqa.html" title="Main Zilliqa class. ">Zilliqa</a> Research Pte. Ltd., including modifying or publishing the code (or any part of it), and developing or forming another public or private blockchain network. This source code is provided ‘as is’ and no warranties are given as to title or non-infringement, merchantability or fitness for purpose and, to the extent permitted by law, all liability for your use of the code is disclaimed. Some programs in this code are governed by the GNU General Public License v3.0 (available at <a href="https://www.gnu.org/licenses/gpl-3.0.en.html">https://www.gnu.org/licenses/gpl-3.0.en.html</a>) (‘GPLv3’). The programs that are governed by GPLv3.0 are those programs that are located in the folders src/depends and tests/depends and which include a reference to GPLv3 in their program files. </p>
+<div class="textblock"><p>Stores information on the header part of the microblock. </p>
+<p>Copyright (c) 2018 <a class="el" href="class_zilliqa.html" title="Main Zilliqa class. ">Zilliqa</a> This source code is being disclosed to you solely for the purpose of your participation in testing <a class="el" href="class_zilliqa.html" title="Main Zilliqa class. ">Zilliqa</a>. You may view, compile and run the code for that purpose and pursuant to the protocols and algorithms that are programmed into, and intended by, the code. You may not do anything else with the code without express permission from <a class="el" href="class_zilliqa.html" title="Main Zilliqa class. ">Zilliqa</a> Research Pte. Ltd., including modifying or publishing the code (or any part of it), and developing or forming another public or private blockchain network. This source code is provided ‘as is’ and no warranties are given as to title or non-infringement, merchantability or fitness for purpose and, to the extent permitted by law, all liability for your use of the code is disclaimed. Some programs in this code are governed by the GNU General Public License v3.0 (available at <a href="https://www.gnu.org/licenses/gpl-3.0.en.html">https://www.gnu.org/licenses/gpl-3.0.en.html</a>) (‘GPLv3’). The programs that are governed by GPLv3.0 are those programs that are located in the folders src/depends and tests/depends and which include a reference to GPLv3 in their program files. </p>
 </div><hr/>The documentation for this class was generated from the following files:<ul>
 <li>src/libData/BlockData/BlockHeader/<a class="el" href="_micro_block_header_8h_source.html">MicroBlockHeader.h</a></li>
 <li>src/libData/BlockData/BlockHeader/MicroBlockHeader.cpp</li>

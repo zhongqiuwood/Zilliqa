@@ -76,7 +76,7 @@ Inheritance diagram for TxBlock:</div>
 <div class="dyncontent">
 <div class="center"><img src="class_tx_block__inherit__graph.png" border="0" usemap="#_tx_block_inherit__map" alt="Inheritance graph"/></div>
 <map name="_tx_block_inherit__map" id="_tx_block_inherit__map">
-<area shape="rect" id="node2" href="class_block_base.html" title="BlockBase" alt="" coords="8,79,93,104"/>
+<area shape="rect" id="node2" href="class_block_base.html" title="[TODO] Base class for all supported block data types " alt="" coords="8,79,93,104"/>
 <area shape="rect" id="node3" href="class_serializable.html" title="Specifies the interface required for classes that are byte serializable. " alt="" coords="5,5,96,31"/>
 </map>
 <center><span class="legend">[<a href="graph_legend.html">legend</a>]</span></center></div>
@@ -85,7 +85,7 @@ Collaboration diagram for TxBlock:</div>
 <div class="dyncontent">
 <div class="center"><img src="class_tx_block__coll__graph.png" border="0" usemap="#_tx_block_coll__map" alt="Collaboration graph"/></div>
 <map name="_tx_block_coll__map" id="_tx_block_coll__map">
-<area shape="rect" id="node2" href="class_block_base.html" title="BlockBase" alt="" coords="8,79,93,104"/>
+<area shape="rect" id="node2" href="class_block_base.html" title="[TODO] Base class for all supported block data types " alt="" coords="8,79,93,104"/>
 <area shape="rect" id="node3" href="class_serializable.html" title="Specifies the interface required for classes that are byte serializable. " alt="" coords="5,5,96,31"/>
 </map>
 <center><span class="legend">[<a href="graph_legend.html">legend</a>]</span></center></div>
@@ -100,14 +100,20 @@ Public Member Functions</h2></td></tr>
 &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_tx_block.html#a9eef1f3b35587ee5a56b39ed2ef43bda">TxBlock</a> (const std::vector&lt; unsigned char &gt; &amp;src, unsigned int offset)</td></tr>
 <tr class="memdesc:a9eef1f3b35587ee5a56b39ed2ef43bda"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor for loading Tx block information from a byte stream. <br /></td></tr>
 <tr class="separator:a9eef1f3b35587ee5a56b39ed2ef43bda"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a81c636c111676ffdb338af2e1681faac"><td class="memItemLeft" align="right" valign="top"><a id="a81c636c111676ffdb338af2e1681faac"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_tx_block.html#a81c636c111676ffdb338af2e1681faac">TxBlock</a> (const <a class="el" href="class_tx_block_header.html">TxBlockHeader</a> &amp;header, const std::array&lt; unsigned char, BLOCK_SIG_SIZE &gt; &amp;signature, const std::vector&lt; TxnHash &gt; &amp;microBlockHashes)</td></tr>
-<tr class="memdesc:a81c636c111676ffdb338af2e1681faac"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor with specified Tx block parameters. <br /></td></tr>
-<tr class="separator:a81c636c111676ffdb338af2e1681faac"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a182a91c2765ddecaa151ca103b1977ce"><td class="memItemLeft" align="right" valign="top"><a id="a182a91c2765ddecaa151ca103b1977ce"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_tx_block.html#a182a91c2765ddecaa151ca103b1977ce">TxBlock</a> (const <a class="el" href="class_tx_block_header.html">TxBlockHeader</a> &amp;header, const std::array&lt; unsigned char, BLOCK_SIG_SIZE &gt; &amp;signature, const std::vector&lt; bool &gt; &amp;isMicroBlockEmpty, const std::vector&lt; TxnHash &gt; &amp;microBlockHashes)</td></tr>
+<tr class="memdesc:a182a91c2765ddecaa151ca103b1977ce"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor with specified Tx block parameters. <br /></td></tr>
+<tr class="separator:a182a91c2765ddecaa151ca103b1977ce"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a564f74c9bcb50994009b98a3393415eb"><td class="memItemLeft" align="right" valign="top"><a id="a564f74c9bcb50994009b98a3393415eb"></a>
+uint32_t&#160;</td><td class="memItemRight" valign="bottom"><b>SerializeIsMicroBlockEmpty</b> () const</td></tr>
+<tr class="separator:a564f74c9bcb50994009b98a3393415eb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad81f160700f7169eb57d8212556bf2f4"><td class="memItemLeft" align="right" valign="top"><a id="ad81f160700f7169eb57d8212556bf2f4"></a>
 unsigned int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_tx_block.html#ad81f160700f7169eb57d8212556bf2f4">Serialize</a> (std::vector&lt; unsigned char &gt; &amp;dst, unsigned int offset) const</td></tr>
 <tr class="memdesc:ad81f160700f7169eb57d8212556bf2f4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Implements the Serialize function inherited from <a class="el" href="class_serializable.html" title="Specifies the interface required for classes that are byte serializable. ">Serializable</a>. <br /></td></tr>
 <tr class="separator:ad81f160700f7169eb57d8212556bf2f4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2c92f5f8f9da68cdc9b7c761085b75a8"><td class="memItemLeft" align="right" valign="top"><a id="a2c92f5f8f9da68cdc9b7c761085b75a8"></a>
+std::vector&lt; bool &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>DeserializeIsMicroBlockEmpty</b> (uint32_t arg)</td></tr>
+<tr class="separator:a2c92f5f8f9da68cdc9b7c761085b75a8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a297a6b117c73860495354805484e823f"><td class="memItemLeft" align="right" valign="top"><a id="a297a6b117c73860495354805484e823f"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_tx_block.html#a297a6b117c73860495354805484e823f">Deserialize</a> (const std::vector&lt; unsigned char &gt; &amp;src, unsigned int offset)</td></tr>
 <tr class="memdesc:a297a6b117c73860495354805484e823f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Implements the Deserialize function inherited from <a class="el" href="class_serializable.html" title="Specifies the interface required for classes that are byte serializable. ">Serializable</a>. <br /></td></tr>
@@ -124,6 +130,10 @@ const <a class="el" href="class_tx_block_header.html">TxBlockHeader</a> &amp;&#1
 const std::array&lt; unsigned char, BLOCK_SIG_SIZE &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_tx_block.html#a7af1ddb21f12af88404272ba68ee6ca6">GetHeaderSig</a> () const</td></tr>
 <tr class="memdesc:a7af1ddb21f12af88404272ba68ee6ca6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the signature part of the Tx block. <br /></td></tr>
 <tr class="separator:a7af1ddb21f12af88404272ba68ee6ca6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a16a3e7e68e5a23e266b9570b3eeaaeaf"><td class="memItemLeft" align="right" valign="top"><a id="a16a3e7e68e5a23e266b9570b3eeaaeaf"></a>
+const std::vector&lt; bool &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_tx_block.html#a16a3e7e68e5a23e266b9570b3eeaaeaf">GetIsMicroBlockEmpty</a> () const</td></tr>
+<tr class="memdesc:a16a3e7e68e5a23e266b9570b3eeaaeaf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the vector of isMicroBlockEmpty. <br /></td></tr>
+<tr class="separator:a16a3e7e68e5a23e266b9570b3eeaaeaf"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a46f3f82ada291b9665316f95c1cbfaaa"><td class="memItemLeft" align="right" valign="top"><a id="a46f3f82ada291b9665316f95c1cbfaaa"></a>
 const std::vector&lt; TxnHash &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_tx_block.html#a46f3f82ada291b9665316f95c1cbfaaa">GetMicroBlockHashes</a> () const</td></tr>
 <tr class="memdesc:a46f3f82ada291b9665316f95c1cbfaaa"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the list of MicroBlockHashes. <br /></td></tr>

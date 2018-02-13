@@ -100,6 +100,8 @@ Public Types</h2></td></tr>
 <br />
 &#160;&#160;<b>TX_SUBMISSION</b>, 
 <br />
+&#160;&#160;<b>TX_SUBMISSION_BUFFER</b>, 
+<br />
 &#160;&#160;<b>MICROBLOCK_CONSENSUS_PREP</b>, 
 <br />
 &#160;&#160;<b>MICROBLOCK_CONSENSUS</b>, 
@@ -115,7 +117,7 @@ Public Types</h2></td></tr>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:a22d2432da1d77e18e167bd2e03df8150"><td class="memItemLeft" align="right" valign="top"><a id="a22d2432da1d77e18e167bd2e03df8150"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_node.html#a22d2432da1d77e18e167bd2e03df8150">Node</a> (<a class="el" href="class_mediator.html">Mediator</a> &amp;mediator)</td></tr>
-<tr class="memdesc:a22d2432da1d77e18e167bd2e03df8150"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor. Requires mediator reference to access <a class="el" href="class_directory_service.html">DirectoryService</a> and other global members. <br /></td></tr>
+<tr class="memdesc:a22d2432da1d77e18e167bd2e03df8150"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor. Requires mediator reference to access <a class="el" href="class_directory_service.html" title="Implements Directory Service functionality including PoW verification, DS, Tx Block Consensus and sha...">DirectoryService</a> and other global members. <br /></td></tr>
 <tr class="separator:a22d2432da1d77e18e167bd2e03df8150"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa0840c3cb5c7159be6d992adecd2097c"><td class="memItemLeft" align="right" valign="top"><a id="aa0840c3cb5c7159be6d992adecd2097c"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_node.html#aa0840c3cb5c7159be6d992adecd2097c">~Node</a> ()</td></tr>
@@ -138,11 +140,11 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>StartSynchronization<
 <tr class="separator:ae0b5c36ffc679f0768fb572512eb3ad3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7034d193cc41b8938a2cfe1982d7a108"><td class="memItemLeft" align="right" valign="top"><a id="a7034d193cc41b8938a2cfe1982d7a108"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_node.html#a7034d193cc41b8938a2cfe1982d7a108">ActOnFinalBlock</a> (uint8_t tx_sharing_mode, const vector&lt; <a class="el" href="struct_peer.html">Peer</a> &gt; &amp;nodes)</td></tr>
-<tr class="memdesc:a7034d193cc41b8938a2cfe1982d7a108"><td class="mdescLeft">&#160;</td><td class="mdescRight">Called from <a class="el" href="class_directory_service.html">DirectoryService</a> during FINALBLOCK processing. <br /></td></tr>
+<tr class="memdesc:a7034d193cc41b8938a2cfe1982d7a108"><td class="mdescLeft">&#160;</td><td class="mdescRight">Called from <a class="el" href="class_directory_service.html" title="Implements Directory Service functionality including PoW verification, DS, Tx Block Consensus and sha...">DirectoryService</a> during FINALBLOCK processing. <br /></td></tr>
 <tr class="separator:a7034d193cc41b8938a2cfe1982d7a108"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a424a7c1aaaceff9553930ca37d358431"><td class="memItemLeft" align="right" valign="top"><a id="a424a7c1aaaceff9553930ca37d358431"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_node.html#a424a7c1aaaceff9553930ca37d358431">StartPoW1</a> (const boost::multiprecision::uint256_t &amp;block_num, uint8_t difficulty, const std::array&lt; unsigned char, UINT256_SIZE &gt; &amp;rand1, const std::array&lt; unsigned char, UINT256_SIZE &gt; &amp;rand2)</td></tr>
-<tr class="memdesc:a424a7c1aaaceff9553930ca37d358431"><td class="mdescLeft">&#160;</td><td class="mdescRight">Performs PoW mining and submission for <a class="el" href="class_directory_service.html">DirectoryService</a> committee membership. <br /></td></tr>
+<tr class="memdesc:a424a7c1aaaceff9553930ca37d358431"><td class="mdescLeft">&#160;</td><td class="mdescRight">Performs PoW mining and submission for <a class="el" href="class_directory_service.html" title="Implements Directory Service functionality including PoW verification, DS, Tx Block Consensus and sha...">DirectoryService</a> committee membership. <br /></td></tr>
 <tr class="separator:a424a7c1aaaceff9553930ca37d358431"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a679655f480a4c8d0e980a6f0f05e736f"><td class="memItemLeft" align="right" valign="top"><a id="a679655f480a4c8d0e980a6f0f05e736f"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_node.html#a679655f480a4c8d0e980a6f0f05e736f">StartPoW2</a> (const boost::multiprecision::uint256_t block_num, uint8_t difficulty, array&lt; unsigned char, 32 &gt; rand1, array&lt; unsigned char, 32 &gt; rand2)</td></tr>
@@ -161,6 +163,27 @@ virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
+<tr class="memitem:a3c79fe7ec7dfe97ffaf93a5008005d10"><td class="memItemLeft" align="right" valign="top"><a id="a3c79fe7ec7dfe97ffaf93a5008005d10"></a>
+std::condition_variable&#160;</td><td class="memItemRight" valign="bottom"><b>m_cvAllMicroBlocksRecvd</b></td></tr>
+<tr class="separator:a3c79fe7ec7dfe97ffaf93a5008005d10"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a811dc20939539961c72744c6f27d69d9"><td class="memItemLeft" align="right" valign="top"><a id="a811dc20939539961c72744c6f27d69d9"></a>
+std::mutex&#160;</td><td class="memItemRight" valign="bottom"><b>m_mutexAllMicroBlocksRecvd</b></td></tr>
+<tr class="separator:a811dc20939539961c72744c6f27d69d9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae0b1ed3adffd358451a6b108883677fe"><td class="memItemLeft" align="right" valign="top"><a id="ae0b1ed3adffd358451a6b108883677fe"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>m_allMicroBlocksRecvd</b> = true</td></tr>
+<tr class="separator:ae0b1ed3adffd358451a6b108883677fe"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a75880b02eecbc5dd5bb7b5f9e59ab046"><td class="memItemLeft" align="right" valign="top"><a id="a75880b02eecbc5dd5bb7b5f9e59ab046"></a>
+std::mutex&#160;</td><td class="memItemRight" valign="bottom"><b>m_mutexUnavailableMicroBlocks</b></td></tr>
+<tr class="separator:a75880b02eecbc5dd5bb7b5f9e59ab046"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab3647756cf3fa65ea35ebd5beab49787"><td class="memItemLeft" align="right" valign="top"><a id="ab3647756cf3fa65ea35ebd5beab49787"></a>
+std::unordered_map&lt; boost::multiprecision::uint256_t, std::unordered_set&lt; TxnHash &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>m_unavailableMicroBlocks</b></td></tr>
+<tr class="separator:ab3647756cf3fa65ea35ebd5beab49787"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad683795f96642e61f10c216ea1181266"><td class="memItemLeft" align="right" valign="top"><a id="ad683795f96642e61f10c216ea1181266"></a>
+uint32_t&#160;</td><td class="memItemRight" valign="bottom"><b>m_consensusID</b></td></tr>
+<tr class="separator:ad683795f96642e61f10c216ea1181266"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a58aaf5e985641e7852f5046ad94fe19e"><td class="memItemLeft" align="right" valign="top"><a id="a58aaf5e985641e7852f5046ad94fe19e"></a>
+std::atomic&lt; uint32_t &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>m_consensusLeaderID</b></td></tr>
+<tr class="separator:a58aaf5e985641e7852f5046ad94fe19e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab219685a0992fe93cf141a17ed057e5a"><td class="memItemLeft" align="right" valign="top"><a id="ab219685a0992fe93cf141a17ed057e5a"></a>
 std::atomic&lt; NodeState &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_node.html#ab219685a0992fe93cf141a17ed057e5a">m_state</a></td></tr>
 <tr class="memdesc:ab219685a0992fe93cf141a17ed057e5a"><td class="mdescLeft">&#160;</td><td class="mdescRight">The current internal state of this <a class="el" href="class_node.html" title="Implements PoW submission and sharding node functionality. ">Node</a> instance. <br /></td></tr>

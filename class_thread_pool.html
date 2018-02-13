@@ -66,161 +66,41 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 
+<p>Simple thread pool that creates <code>threadCount</code> threads upon its creation, and pulls from a queue to get new jobs.  
+ <a href="class_thread_pool.html#details">More...</a></p>
+
 <p><code>#include &lt;<a class="el" href="_thread_pool_8h_source.html">ThreadPool.h</a>&gt;</code></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:a816fa0f51ff4c10b81dce7bd91f77735"><td class="memItemLeft" align="right" valign="top"><a id="a816fa0f51ff4c10b81dce7bd91f77735"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><b>ThreadPool</b> (const unsigned int threadCount)</td></tr>
+&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_thread_pool.html#a816fa0f51ff4c10b81dce7bd91f77735">ThreadPool</a> (const unsigned int threadCount)</td></tr>
+<tr class="memdesc:a816fa0f51ff4c10b81dce7bd91f77735"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor. <br /></td></tr>
 <tr class="separator:a816fa0f51ff4c10b81dce7bd91f77735"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a44d3d2ab618970605e684efc216655eb"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_thread_pool.html#a44d3d2ab618970605e684efc216655eb">~ThreadPool</a> ()</td></tr>
+<tr class="memitem:a44d3d2ab618970605e684efc216655eb"><td class="memItemLeft" align="right" valign="top"><a id="a44d3d2ab618970605e684efc216655eb"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_thread_pool.html#a44d3d2ab618970605e684efc216655eb">~ThreadPool</a> ()</td></tr>
+<tr class="memdesc:a44d3d2ab618970605e684efc216655eb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destructor (JoinAll on deconstruction). <br /></td></tr>
 <tr class="separator:a44d3d2ab618970605e684efc216655eb"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa8175ce18f7653d49131896f77fd1b1a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_thread_pool.html#aa8175ce18f7653d49131896f77fd1b1a">AddJob</a> (const std::function&lt; void()&gt; &amp;job)</td></tr>
+<tr class="memitem:aa8175ce18f7653d49131896f77fd1b1a"><td class="memItemLeft" align="right" valign="top"><a id="aa8175ce18f7653d49131896f77fd1b1a"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_thread_pool.html#aa8175ce18f7653d49131896f77fd1b1a">AddJob</a> (const std::function&lt; void()&gt; &amp;job)</td></tr>
+<tr class="memdesc:aa8175ce18f7653d49131896f77fd1b1a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Adds a new job to the pool. If there are no jobs in the queue, a thread is woken up to take the job. If all threads are busy, the job is added to the end of the queue. <br /></td></tr>
 <tr class="separator:aa8175ce18f7653d49131896f77fd1b1a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9d1831230accaa34a7877828e187657e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_thread_pool.html#a9d1831230accaa34a7877828e187657e">JoinAll</a> ()</td></tr>
+<tr class="memitem:a9d1831230accaa34a7877828e187657e"><td class="memItemLeft" align="right" valign="top"><a id="a9d1831230accaa34a7877828e187657e"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_thread_pool.html#a9d1831230accaa34a7877828e187657e">JoinAll</a> ()</td></tr>
+<tr class="memdesc:a9d1831230accaa34a7877828e187657e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Joins with all threads. Blocks until all threads have completed. The queue may be filled after this call, but the threads will be done. After invoking JoinAll, the pool can no longer be used. <br /></td></tr>
 <tr class="separator:a9d1831230accaa34a7877828e187657e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8a7f68837cd8b060a9ca1a3a0c9517ab"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_thread_pool.html#a8a7f68837cd8b060a9ca1a3a0c9517ab">WaitAll</a> ()</td></tr>
+<tr class="memitem:a8a7f68837cd8b060a9ca1a3a0c9517ab"><td class="memItemLeft" align="right" valign="top"><a id="a8a7f68837cd8b060a9ca1a3a0c9517ab"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_thread_pool.html#a8a7f68837cd8b060a9ca1a3a0c9517ab">WaitAll</a> ()</td></tr>
+<tr class="memdesc:a8a7f68837cd8b060a9ca1a3a0c9517ab"><td class="mdescLeft">&#160;</td><td class="mdescRight">Waits for the pool to empty before continuing. This does not call <code>std::thread::join</code>, it only waits until all jobs have finished executing. <br /></td></tr>
 <tr class="separator:a8a7f68837cd8b060a9ca1a3a0c9517ab"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3386547e0fcb2a8895e6e58f487ff5fb"><td class="memItemLeft" align="right" valign="top">std::vector&lt; std::thread &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_thread_pool.html#a3386547e0fcb2a8895e6e58f487ff5fb">GetThreads</a> ()</td></tr>
+<tr class="memitem:a3386547e0fcb2a8895e6e58f487ff5fb"><td class="memItemLeft" align="right" valign="top"><a id="a3386547e0fcb2a8895e6e58f487ff5fb"></a>
+std::vector&lt; std::thread &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_thread_pool.html#a3386547e0fcb2a8895e6e58f487ff5fb">GetThreads</a> ()</td></tr>
+<tr class="memdesc:a3386547e0fcb2a8895e6e58f487ff5fb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the vector of threads themselves, in order to set the affinity, or anything else you might want to do. <br /></td></tr>
 <tr class="separator:a3386547e0fcb2a8895e6e58f487ff5fb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>Simple <a class="el" href="class_thread_pool.html">ThreadPool</a> that creates <code>threadCount</code> threads upon its creation, and pulls from a queue to get new jobs.</p>
-<p>This class requires a number of c++11 features be present in your compiler. </p>
-</div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a id="a44d3d2ab618970605e684efc216655eb"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a44d3d2ab618970605e684efc216655eb">&#9670;&nbsp;</a></span>~ThreadPool()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">ThreadPool::~ThreadPool </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>JoinAll on deconstruction </p>
-
-</div>
-</div>
-<h2 class="groupheader">Member Function Documentation</h2>
-<a id="aa8175ce18f7653d49131896f77fd1b1a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa8175ce18f7653d49131896f77fd1b1a">&#9670;&nbsp;</a></span>AddJob()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void ThreadPool::AddJob </td>
-          <td>(</td>
-          <td class="paramtype">const std::function&lt; void()&gt; &amp;&#160;</td>
-          <td class="paramname"><em>job</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>Add a new job to the pool. If there are no jobs in the queue, a thread is woken up to take the job. If all threads are busy, the job is added to the end of the queue. </p>
-
-</div>
-</div>
-<a id="a3386547e0fcb2a8895e6e58f487ff5fb"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a3386547e0fcb2a8895e6e58f487ff5fb">&#9670;&nbsp;</a></span>GetThreads()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">std::vector&lt;std::thread&gt;&amp; ThreadPool::GetThreads </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>Get the vector of threads themselves, in order to set the affinity, or anything else you might want to do </p>
-
-</div>
-</div>
-<a id="a9d1831230accaa34a7877828e187657e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a9d1831230accaa34a7877828e187657e">&#9670;&nbsp;</a></span>JoinAll()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void ThreadPool::JoinAll </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>Join with all threads. Block until all threads have completed. The queue may be filled after this call, but the threads will be done. After invoking <code><a class="el" href="class_thread_pool.html#a9d1831230accaa34a7877828e187657e">ThreadPool::JoinAll</a></code>, the pool can no longer be used. </p>
-
-</div>
-</div>
-<a id="a8a7f68837cd8b060a9ca1a3a0c9517ab"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a8a7f68837cd8b060a9ca1a3a0c9517ab">&#9670;&nbsp;</a></span>WaitAll()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void ThreadPool::WaitAll </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>Wait for the pool to empty before continuing. This does not call <code>std::thread::join</code>, it only waits until all jobs have finished executing. </p>
-
-</div>
-</div>
-<hr/>The documentation for this class was generated from the following file:<ul>
+<div class="textblock"><p>Simple thread pool that creates <code>threadCount</code> threads upon its creation, and pulls from a queue to get new jobs. </p>
+</div><hr/>The documentation for this class was generated from the following file:<ul>
 <li>src/libUtils/<a class="el" href="_thread_pool_8h_source.html">ThreadPool.h</a></li>
 </ul>
 </div><!-- contents -->

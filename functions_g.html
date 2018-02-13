@@ -106,6 +106,9 @@ $(function() {
 , <a class="el" href="class_node.html#adb704f6c3cad90882b3397ab992c4d0a">Node</a>
 , <a class="el" href="class_peer_manager.html#ae20f974c00d418866fda6a271ce3675e">PeerManager</a>
 </li>
+<li>GetChallenge()
+: <a class="el" href="class_consensus_common.html#ab13c9e937179b53c7e26326d9a0df92b">ConsensusCommon</a>
+</li>
 <li>GetCurve()
 : <a class="el" href="class_schnorr.html#a3ed8c6dff5ee4f888c277f1f96c3906b">Schnorr</a>
 </li>
@@ -135,16 +138,21 @@ $(function() {
 </li>
 <li>GetHeader()
 : <a class="el" href="class_d_s_block.html#ad22dd4191053c5a4b27fa98b4784d56b">DSBlock</a>
+, <a class="el" href="class_micro_block.html#a7f7465236b8d0b7bb725f4f4863b7a2f">MicroBlock</a>
 , <a class="el" href="class_tx_block.html#a28bec843c77dc4888af895c21ca693f4">TxBlock</a>
 </li>
 <li>GetHeaderSig()
-: <a class="el" href="class_tx_block.html#a7af1ddb21f12af88404272ba68ee6ca6">TxBlock</a>
+: <a class="el" href="class_micro_block.html#a7919bfd7e0a8cfdb05b689a5248eac5c">MicroBlock</a>
+, <a class="el" href="class_tx_block.html#a7af1ddb21f12af88404272ba68ee6ca6">TxBlock</a>
 </li>
 <li>GetInstance()
 : <a class="el" href="class_account_store.html#a1d4e06cc09904bb734b6528984730515">AccountStore</a>
 , <a class="el" href="class_p2_p_comm.html#ad0acebc67dd150ec865b61840cdf18aa">P2PComm</a>
 , <a class="el" href="class_p_o_w.html#a932bd1a4e44a7acb5518e314911d7887">POW</a>
 , <a class="el" href="class_schnorr.html#a2605c3d5de38f4e579ff36c31a7e7490">Schnorr</a>
+</li>
+<li>GetIsMicroBlockEmpty()
+: <a class="el" href="class_tx_block.html#a16a3e7e68e5a23e266b9570b3eeaaeaf">TxBlock</a>
 </li>
 <li>GetLastBlock()
 : <a class="el" href="class_d_s_block_chain.html#a11551f6e3c6612427a1a2324eccb30ef">DSBlockChain</a>
@@ -164,7 +172,8 @@ $(function() {
 , <a class="el" href="class_tx_block_header.html#a6bf27464c6cdcc743df5994464fdbc52">TxBlockHeader</a>
 </li>
 <li>GetMinSize()
-: <a class="el" href="class_tx_block.html#a0df83ee29c3f50bc740167f0374c58a3">TxBlock</a>
+: <a class="el" href="class_micro_block.html#a99cc97232bfdd0e6a1fd15bdd18d35df">MicroBlock</a>
+, <a class="el" href="class_tx_block.html#a0df83ee29c3f50bc740167f0374c58a3">TxBlock</a>
 </li>
 <li>GetNonce()
 : <a class="el" href="class_account.html#adc300e7dfba84f91da660caa1480c6da">Account</a>
@@ -197,6 +206,7 @@ $(function() {
 </li>
 <li>GetSerializedSize()
 : <a class="el" href="class_d_s_block.html#ad378e330494c6196fa03e8d3f74c9f65">DSBlock</a>
+, <a class="el" href="class_micro_block.html#ab6a489287f933fa5c515f115f32de674">MicroBlock</a>
 , <a class="el" href="class_transaction.html#ac83650e1b5342c8efa37574544ed516a">Transaction</a>
 , <a class="el" href="class_tx_block.html#aba89c415110eaf84336e5be2351516ca">TxBlock</a>
 </li>
@@ -207,8 +217,14 @@ $(function() {
 : <a class="el" href="class_d_s_block.html#a6087224c2066a00761da050a066d6ba9">DSBlock</a>
 , <a class="el" href="class_transaction.html#ab2deeec5ffc621a31255cdbe39edec45">Transaction</a>
 </li>
+<li>GetState()
+: <a class="el" href="class_consensus_common.html#a2ca711313ffc2ea478562a7bc58acd39">ConsensusCommon</a>
+</li>
 <li>GetStateLogger()
 : <a class="el" href="class_logger.html#ada0641e841f7591980d0ed23426cbdff">Logger</a>
+</li>
+<li>GetStateRootHash()
+: <a class="el" href="class_tx_block_header.html#aaa843484e8e89a1e341df57048cc3a4d">TxBlockHeader</a>
 </li>
 <li>GetStore()
 : <a class="el" href="class_peer_store.html#a766954e558fd2ffae3007a612779d913">PeerStore</a>
@@ -222,6 +238,9 @@ $(function() {
 </li>
 <li>GetToAddr()
 : <a class="el" href="class_transaction.html#a863c7c8b3d67605dd3d5a2dffe99344d">Transaction</a>
+</li>
+<li>GetTranHashes()
+: <a class="el" href="class_micro_block.html#a341ca3516cbb4ba5e276f801ba5cee39">MicroBlock</a>
 </li>
 <li>GetTranID()
 : <a class="el" href="class_transaction.html#a44fdde2f1a86b4bc657e5b02224d6be3">Transaction</a>

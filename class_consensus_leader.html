@@ -75,7 +75,7 @@ Inheritance diagram for ConsensusLeader:</div>
 <div class="dyncontent">
 <div class="center"><img src="class_consensus_leader__inherit__graph.png" border="0" usemap="#_consensus_leader_inherit__map" alt="Inheritance graph"/></div>
 <map name="_consensus_leader_inherit__map" id="_consensus_leader_inherit__map">
-<area shape="rect" id="node2" href="class_consensus_common.html" title="ConsensusCommon" alt="" coords="5,5,147,31"/>
+<area shape="rect" id="node2" href="class_consensus_common.html" title="Implements base functionality shared between all consensus committee members. " alt="" coords="5,5,147,31"/>
 </map>
 <center><span class="legend">[<a href="graph_legend.html">legend</a>]</span></center></div>
 <div class="dynheader">
@@ -83,7 +83,7 @@ Collaboration diagram for ConsensusLeader:</div>
 <div class="dyncontent">
 <div class="center"><img src="class_consensus_leader__coll__graph.png" border="0" usemap="#_consensus_leader_coll__map" alt="Collaboration graph"/></div>
 <map name="_consensus_leader_coll__map" id="_consensus_leader_coll__map">
-<area shape="rect" id="node2" href="class_consensus_common.html" title="ConsensusCommon" alt="" coords="16,167,158,192"/>
+<area shape="rect" id="node2" href="class_consensus_common.html" title="Implements base functionality shared between all consensus committee members. " alt="" coords="16,167,158,192"/>
 <area shape="rect" id="node3" href="struct_priv_key.html" title="Stores information on an EC&#45;Schnorr private key. " alt="" coords="5,80,73,105"/>
 <area shape="rect" id="node4" href="class_serializable.html" title="Specifies the interface required for classes that are byte serializable. " alt="" coords="42,5,132,31"/>
 <area shape="rect" id="node5" href="struct_signature.html" title="Stores information on an EC&#45;Schnorr signature. " alt="" coords="101,80,180,105"/>
@@ -92,10 +92,10 @@ Collaboration diagram for ConsensusLeader:</div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a9b3241f42e600e4887d96093b9c70222"><td class="memItemLeft" align="right" valign="top"><a id="a9b3241f42e600e4887d96093b9c70222"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_consensus_leader.html#a9b3241f42e600e4887d96093b9c70222">ConsensusLeader</a> (uint32_t consensus_id, const std::vector&lt; unsigned char &gt; &amp;block_hash, uint16_t node_id, const <a class="el" href="struct_priv_key.html">PrivKey</a> &amp;privkey, const std::deque&lt; <a class="el" href="struct_pub_key.html">PubKey</a> &gt; &amp;pubkeys, const std::deque&lt; <a class="el" href="struct_peer.html">Peer</a> &gt; &amp;peer_info, unsigned char class_byte, unsigned char ins_byte)</td></tr>
-<tr class="memdesc:a9b3241f42e600e4887d96093b9c70222"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor. <br /></td></tr>
-<tr class="separator:a9b3241f42e600e4887d96093b9c70222"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a68badeb74ffe12bc606785590cc6fa3c"><td class="memItemLeft" align="right" valign="top"><a id="a68badeb74ffe12bc606785590cc6fa3c"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_consensus_leader.html#a68badeb74ffe12bc606785590cc6fa3c">ConsensusLeader</a> (uint32_t consensus_id, const std::vector&lt; unsigned char &gt; &amp;block_hash, uint16_t node_id, const <a class="el" href="struct_priv_key.html">PrivKey</a> &amp;privkey, const std::deque&lt; <a class="el" href="struct_pub_key.html">PubKey</a> &gt; &amp;pubkeys, const std::deque&lt; <a class="el" href="struct_peer.html">Peer</a> &gt; &amp;peer_info, unsigned char class_byte, unsigned char ins_byte, NodeCommitFailureHandlerFunc nodeCommitFailureHandlerFunc, ShardCommitFailureHandlerFunc shardCommitFailureHandlerFunc)</td></tr>
+<tr class="memdesc:a68badeb74ffe12bc606785590cc6fa3c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor. <br /></td></tr>
+<tr class="separator:a68badeb74ffe12bc606785590cc6fa3c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a164d9b1cdc03b15b00a172319971108e"><td class="memItemLeft" align="right" valign="top"><a id="a164d9b1cdc03b15b00a172319971108e"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_consensus_leader.html#a164d9b1cdc03b15b00a172319971108e">~ConsensusLeader</a> ()</td></tr>
 <tr class="memdesc:a164d9b1cdc03b15b00a172319971108e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destructor. <br /></td></tr>
@@ -104,19 +104,22 @@ Public Member Functions</h2></td></tr>
 bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_consensus_leader.html#ada23a796bf8bfe8a0dc859d5ed22c744">StartConsensus</a> (const std::vector&lt; unsigned char &gt; &amp;message)</td></tr>
 <tr class="memdesc:ada23a796bf8bfe8a0dc859d5ed22c744"><td class="mdescLeft">&#160;</td><td class="mdescRight">Triggers the start of consensus on a particular message (e.g., DS block). <br /></td></tr>
 <tr class="separator:ada23a796bf8bfe8a0dc859d5ed22c744"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab40faeacbc265872156530982f0e023c"><td class="memItemLeft" align="right" valign="top"><a id="ab40faeacbc265872156530982f0e023c"></a>
-bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_consensus_leader.html#ab40faeacbc265872156530982f0e023c">ProcessMessage</a> (const std::vector&lt; unsigned char &gt; &amp;message, unsigned int offset)</td></tr>
-<tr class="memdesc:ab40faeacbc265872156530982f0e023c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Function to process any consensus message received. <br /></td></tr>
-<tr class="separator:ab40faeacbc265872156530982f0e023c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4a8216efecb2d536ef1f89c90b26afb0"><td class="memItemLeft" align="right" valign="top"><a id="a4a8216efecb2d536ef1f89c90b26afb0"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_consensus_leader.html#a4a8216efecb2d536ef1f89c90b26afb0">ProcessMessage</a> (const std::vector&lt; unsigned char &gt; &amp;message, unsigned int offset, const <a class="el" href="struct_peer.html">Peer</a> &amp;from)</td></tr>
+<tr class="memdesc:a4a8216efecb2d536ef1f89c90b26afb0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Function to process any consensus message received. <br /></td></tr>
+<tr class="separator:a4a8216efecb2d536ef1f89c90b26afb0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_methods_class_consensus_common"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_class_consensus_common')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="class_consensus_common.html">ConsensusCommon</a></td></tr>
 <tr class="memitem:a2ca711313ffc2ea478562a7bc58acd39 inherit pub_methods_class_consensus_common"><td class="memItemLeft" align="right" valign="top"><a id="a2ca711313ffc2ea478562a7bc58acd39"></a>
-State&#160;</td><td class="memItemRight" valign="bottom"><b>GetState</b> () const</td></tr>
+State&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_consensus_common.html#a2ca711313ffc2ea478562a7bc58acd39">GetState</a> () const</td></tr>
+<tr class="memdesc:a2ca711313ffc2ea478562a7bc58acd39 inherit pub_methods_class_consensus_common"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the state of the active consensus session. <br /></td></tr>
 <tr class="separator:a2ca711313ffc2ea478562a7bc58acd39 inherit pub_methods_class_consensus_common"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a28dd4afc8c3c61a337d72ae5bff748e3 inherit pub_methods_class_consensus_common"><td class="memItemLeft" align="right" valign="top"><a id="a28dd4afc8c3c61a337d72ae5bff748e3"></a>
-bool&#160;</td><td class="memItemRight" valign="bottom"><b>RetrieveCollectiveSig</b> (std::vector&lt; unsigned char &gt; &amp;dst, unsigned int offset)</td></tr>
+bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_consensus_common.html#a28dd4afc8c3c61a337d72ae5bff748e3">RetrieveCollectiveSig</a> (std::vector&lt; unsigned char &gt; &amp;dst, unsigned int offset)</td></tr>
+<tr class="memdesc:a28dd4afc8c3c61a337d72ae5bff748e3 inherit pub_methods_class_consensus_common"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the final collective signature. <br /></td></tr>
 <tr class="separator:a28dd4afc8c3c61a337d72ae5bff748e3 inherit pub_methods_class_consensus_common"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3e4b01599bcb0b911d985fcd56486382 inherit pub_methods_class_consensus_common"><td class="memItemLeft" align="right" valign="top"><a id="a3e4b01599bcb0b911d985fcd56486382"></a>
-uint16_t&#160;</td><td class="memItemRight" valign="bottom"><b>RetrieveCollectiveSigBitmap</b> (std::vector&lt; unsigned char &gt; &amp;dst, unsigned int offset)</td></tr>
+uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_consensus_common.html#a3e4b01599bcb0b911d985fcd56486382">RetrieveCollectiveSigBitmap</a> (std::vector&lt; unsigned char &gt; &amp;dst, unsigned int offset)</td></tr>
+<tr class="memdesc:a3e4b01599bcb0b911d985fcd56486382 inherit pub_methods_class_consensus_common"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the response map for the generated final collective signature. <br /></td></tr>
 <tr class="separator:a3e4b01599bcb0b911d985fcd56486382 inherit pub_methods_class_consensus_common"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="inherited"></a>
@@ -165,82 +168,109 @@ Additional Inherited Members</h2></td></tr>
 <br />
 &#160;&#160;<b>FINALRESPONSE</b> = 0x07, 
 <br />
-&#160;&#160;<b>FINALCOLLECTIVESIG</b> = 0x8
+&#160;&#160;<b>FINALCOLLECTIVESIG</b> = 0x08, 
+<br />
+&#160;&#160;<b>COMMITFAILURE</b> = 0x09, 
+<br />
+&#160;&#160;<b>CONSENSUSFAILURE</b> = 0x10
 <br />
  }</td></tr>
 <tr class="separator:adc2bbf9b6d4ef26b5bd6522d0487572f inherit pro_types_class_consensus_common"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pro_methods_class_consensus_common"><td colspan="2" onclick="javascript:toggleInherit('pro_methods_class_consensus_common')"><img src="closed.png" alt="-"/>&#160;Protected Member Functions inherited from <a class="el" href="class_consensus_common.html">ConsensusCommon</a></td></tr>
 <tr class="memitem:aa6fe8c90f422cb80c5adf903a7db45b7 inherit pro_methods_class_consensus_common"><td class="memItemLeft" align="right" valign="top"><a id="aa6fe8c90f422cb80c5adf903a7db45b7"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><b>ConsensusCommon</b> (uint32_t consensus_id, const std::vector&lt; unsigned char &gt; &amp;block_hash, uint16_t my_id, const <a class="el" href="struct_priv_key.html">PrivKey</a> &amp;privkey, const std::deque&lt; <a class="el" href="struct_pub_key.html">PubKey</a> &gt; &amp;pubkeys, const std::deque&lt; <a class="el" href="struct_peer.html">Peer</a> &gt; &amp;peer_info, unsigned char class_byte, unsigned char ins_byte)</td></tr>
+&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_consensus_common.html#aa6fe8c90f422cb80c5adf903a7db45b7">ConsensusCommon</a> (uint32_t consensus_id, const std::vector&lt; unsigned char &gt; &amp;block_hash, uint16_t my_id, const <a class="el" href="struct_priv_key.html">PrivKey</a> &amp;privkey, const std::deque&lt; <a class="el" href="struct_pub_key.html">PubKey</a> &gt; &amp;pubkeys, const std::deque&lt; <a class="el" href="struct_peer.html">Peer</a> &gt; &amp;peer_info, unsigned char class_byte, unsigned char ins_byte)</td></tr>
+<tr class="memdesc:aa6fe8c90f422cb80c5adf903a7db45b7 inherit pro_methods_class_consensus_common"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor. <br /></td></tr>
 <tr class="separator:aa6fe8c90f422cb80c5adf903a7db45b7 inherit pro_methods_class_consensus_common"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abdccfadd93ffd3dc28ec20e504356223 inherit pro_methods_class_consensus_common"><td class="memItemLeft" align="right" valign="top"><a id="abdccfadd93ffd3dc28ec20e504356223"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_consensus_common.html#abdccfadd93ffd3dc28ec20e504356223">~ConsensusCommon</a> ()</td></tr>
+<tr class="memdesc:abdccfadd93ffd3dc28ec20e504356223 inherit pro_methods_class_consensus_common"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destructor. <br /></td></tr>
+<tr class="separator:abdccfadd93ffd3dc28ec20e504356223 inherit pro_methods_class_consensus_common"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a20696e33f8d8af11f98487ae05bcf2b3 inherit pro_methods_class_consensus_common"><td class="memItemLeft" align="right" valign="top"><a id="a20696e33f8d8af11f98487ae05bcf2b3"></a>
-<a class="el" href="struct_signature.html">Signature</a>&#160;</td><td class="memItemRight" valign="bottom"><b>SignMessage</b> (const std::vector&lt; unsigned char &gt; &amp;msg, unsigned int offset, unsigned int size)</td></tr>
+<a class="el" href="struct_signature.html">Signature</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_consensus_common.html#a20696e33f8d8af11f98487ae05bcf2b3">SignMessage</a> (const std::vector&lt; unsigned char &gt; &amp;msg, unsigned int offset, unsigned int size)</td></tr>
+<tr class="memdesc:a20696e33f8d8af11f98487ae05bcf2b3 inherit pro_methods_class_consensus_common"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generates the signature over a consensus message. <br /></td></tr>
 <tr class="separator:a20696e33f8d8af11f98487ae05bcf2b3 inherit pro_methods_class_consensus_common"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a82db27c37ae7bf955ab02c38dc472517 inherit pro_methods_class_consensus_common"><td class="memItemLeft" align="right" valign="top"><a id="a82db27c37ae7bf955ab02c38dc472517"></a>
-bool&#160;</td><td class="memItemRight" valign="bottom"><b>VerifyMessage</b> (const std::vector&lt; unsigned char &gt; &amp;msg, unsigned int offset, unsigned int size, const <a class="el" href="struct_signature.html">Signature</a> &amp;toverify, uint16_t peer_id)</td></tr>
+bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_consensus_common.html#a82db27c37ae7bf955ab02c38dc472517">VerifyMessage</a> (const std::vector&lt; unsigned char &gt; &amp;msg, unsigned int offset, unsigned int size, const <a class="el" href="struct_signature.html">Signature</a> &amp;toverify, uint16_t peer_id)</td></tr>
+<tr class="memdesc:a82db27c37ae7bf955ab02c38dc472517 inherit pro_methods_class_consensus_common"><td class="mdescLeft">&#160;</td><td class="mdescRight">Verifies the signature attached to a consensus message. <br /></td></tr>
 <tr class="separator:a82db27c37ae7bf955ab02c38dc472517 inherit pro_methods_class_consensus_common"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1e82027ca446cb255e4a508372f5ac12 inherit pro_methods_class_consensus_common"><td class="memItemLeft" align="right" valign="top"><a id="a1e82027ca446cb255e4a508372f5ac12"></a>
-<a class="el" href="struct_pub_key.html">PubKey</a>&#160;</td><td class="memItemRight" valign="bottom"><b>AggregateKeys</b> (const std::vector&lt; bool &gt; peer_map)</td></tr>
+<a class="el" href="struct_pub_key.html">PubKey</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_consensus_common.html#a1e82027ca446cb255e4a508372f5ac12">AggregateKeys</a> (const std::vector&lt; bool &gt; peer_map)</td></tr>
+<tr class="memdesc:a1e82027ca446cb255e4a508372f5ac12 inherit pro_methods_class_consensus_common"><td class="mdescLeft">&#160;</td><td class="mdescRight">Aggregates public keys according to the response map. <br /></td></tr>
 <tr class="separator:a1e82027ca446cb255e4a508372f5ac12 inherit pro_methods_class_consensus_common"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abb07fcd889d4765be3c8e5ce882c9633 inherit pro_methods_class_consensus_common"><td class="memItemLeft" align="right" valign="top"><a id="abb07fcd889d4765be3c8e5ce882c9633"></a>
-<a class="el" href="struct_commit_point.html">CommitPoint</a>&#160;</td><td class="memItemRight" valign="bottom"><b>AggregateCommits</b> (const std::vector&lt; <a class="el" href="struct_commit_point.html">CommitPoint</a> &gt; &amp;commits)</td></tr>
+<a class="el" href="struct_commit_point.html">CommitPoint</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_consensus_common.html#abb07fcd889d4765be3c8e5ce882c9633">AggregateCommits</a> (const std::vector&lt; <a class="el" href="struct_commit_point.html">CommitPoint</a> &gt; &amp;commits)</td></tr>
+<tr class="memdesc:abb07fcd889d4765be3c8e5ce882c9633 inherit pro_methods_class_consensus_common"><td class="mdescLeft">&#160;</td><td class="mdescRight">Aggregates the list of received commits. <br /></td></tr>
 <tr class="separator:abb07fcd889d4765be3c8e5ce882c9633 inherit pro_methods_class_consensus_common"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aedc3eed8a36f11a4943d186f26c3c36b inherit pro_methods_class_consensus_common"><td class="memItemLeft" align="right" valign="top"><a id="aedc3eed8a36f11a4943d186f26c3c36b"></a>
-<a class="el" href="struct_response.html">Response</a>&#160;</td><td class="memItemRight" valign="bottom"><b>AggregateResponses</b> (const std::vector&lt; <a class="el" href="struct_response.html">Response</a> &gt; &amp;responses)</td></tr>
+<a class="el" href="struct_response.html">Response</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_consensus_common.html#aedc3eed8a36f11a4943d186f26c3c36b">AggregateResponses</a> (const std::vector&lt; <a class="el" href="struct_response.html">Response</a> &gt; &amp;responses)</td></tr>
+<tr class="memdesc:aedc3eed8a36f11a4943d186f26c3c36b inherit pro_methods_class_consensus_common"><td class="mdescLeft">&#160;</td><td class="mdescRight">Aggregates the list of received responses. <br /></td></tr>
 <tr class="separator:aedc3eed8a36f11a4943d186f26c3c36b inherit pro_methods_class_consensus_common"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad4ca153cfa7e2dbc6104bfef90cbcf2e inherit pro_methods_class_consensus_common"><td class="memItemLeft" align="right" valign="top"><a id="ad4ca153cfa7e2dbc6104bfef90cbcf2e"></a>
-<a class="el" href="struct_signature.html">Signature</a>&#160;</td><td class="memItemRight" valign="bottom"><b>AggregateSign</b> (const <a class="el" href="struct_challenge.html">Challenge</a> &amp;challenge, const <a class="el" href="struct_response.html">Response</a> &amp;aggregated_response)</td></tr>
+<a class="el" href="struct_signature.html">Signature</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_consensus_common.html#ad4ca153cfa7e2dbc6104bfef90cbcf2e">AggregateSign</a> (const <a class="el" href="struct_challenge.html">Challenge</a> &amp;challenge, const <a class="el" href="struct_response.html">Response</a> &amp;aggregated_response)</td></tr>
+<tr class="memdesc:ad4ca153cfa7e2dbc6104bfef90cbcf2e inherit pro_methods_class_consensus_common"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generates the collective signature. <br /></td></tr>
 <tr class="separator:ad4ca153cfa7e2dbc6104bfef90cbcf2e inherit pro_methods_class_consensus_common"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab13c9e937179b53c7e26326d9a0df92b inherit pro_methods_class_consensus_common"><td class="memItemLeft" align="right" valign="top"><a id="ab13c9e937179b53c7e26326d9a0df92b"></a>
-<a class="el" href="struct_challenge.html">Challenge</a>&#160;</td><td class="memItemRight" valign="bottom"><b>GetChallenge</b> (const std::vector&lt; unsigned char &gt; &amp;msg, unsigned int offset, unsigned int size, const <a class="el" href="struct_commit_point.html">CommitPoint</a> &amp;aggregated_commit, const <a class="el" href="struct_pub_key.html">PubKey</a> &amp;aggregated_key)</td></tr>
+<a class="el" href="struct_challenge.html">Challenge</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_consensus_common.html#ab13c9e937179b53c7e26326d9a0df92b">GetChallenge</a> (const std::vector&lt; unsigned char &gt; &amp;msg, unsigned int offset, unsigned int size, const <a class="el" href="struct_commit_point.html">CommitPoint</a> &amp;aggregated_commit, const <a class="el" href="struct_pub_key.html">PubKey</a> &amp;aggregated_key)</td></tr>
+<tr class="memdesc:ab13c9e937179b53c7e26326d9a0df92b inherit pro_methods_class_consensus_common"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generates the challenge according to the aggregated commit and key. <br /></td></tr>
 <tr class="separator:ab13c9e937179b53c7e26326d9a0df92b inherit pro_methods_class_consensus_common"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pro_attribs_class_consensus_common"><td colspan="2" onclick="javascript:toggleInherit('pro_attribs_class_consensus_common')"><img src="closed.png" alt="-"/>&#160;Protected Attributes inherited from <a class="el" href="class_consensus_common.html">ConsensusCommon</a></td></tr>
 <tr class="memitem:ab4a710f19ec40f1e5f9a387ff5e18c0e inherit pro_attribs_class_consensus_common"><td class="memItemLeft" align="right" valign="top"><a id="ab4a710f19ec40f1e5f9a387ff5e18c0e"></a>
-State&#160;</td><td class="memItemRight" valign="bottom"><b>m_state</b></td></tr>
+State&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_consensus_common.html#ab4a710f19ec40f1e5f9a387ff5e18c0e">m_state</a></td></tr>
+<tr class="memdesc:ab4a710f19ec40f1e5f9a387ff5e18c0e inherit pro_attribs_class_consensus_common"><td class="mdescLeft">&#160;</td><td class="mdescRight">State of the active consensus session. <br /></td></tr>
 <tr class="separator:ab4a710f19ec40f1e5f9a387ff5e18c0e inherit pro_attribs_class_consensus_common"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afa04c21286fccfba29df7ba757d469b2 inherit pro_attribs_class_consensus_common"><td class="memItemLeft" align="right" valign="top"><a id="afa04c21286fccfba29df7ba757d469b2"></a>
-const double&#160;</td><td class="memItemRight" valign="bottom"><b>TOLERANCE_FRACTION</b></td></tr>
+const double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_consensus_common.html#afa04c21286fccfba29df7ba757d469b2">TOLERANCE_FRACTION</a></td></tr>
+<tr class="memdesc:afa04c21286fccfba29df7ba757d469b2 inherit pro_attribs_class_consensus_common"><td class="mdescLeft">&#160;</td><td class="mdescRight">The minimum fraction of peers necessary to achieve consensus. <br /></td></tr>
 <tr class="separator:afa04c21286fccfba29df7ba757d469b2 inherit pro_attribs_class_consensus_common"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1eb43b6cb77cf353ad2a77d4f018433b inherit pro_attribs_class_consensus_common"><td class="memItemLeft" align="right" valign="top"><a id="a1eb43b6cb77cf353ad2a77d4f018433b"></a>
-uint32_t&#160;</td><td class="memItemRight" valign="bottom"><b>m_consensusID</b></td></tr>
+uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_consensus_common.html#a1eb43b6cb77cf353ad2a77d4f018433b">m_consensusID</a></td></tr>
+<tr class="memdesc:a1eb43b6cb77cf353ad2a77d4f018433b inherit pro_attribs_class_consensus_common"><td class="mdescLeft">&#160;</td><td class="mdescRight">The unique ID assigned to the active consensus session. <br /></td></tr>
 <tr class="separator:a1eb43b6cb77cf353ad2a77d4f018433b inherit pro_attribs_class_consensus_common"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abf1c0e211bf9bf78ae3ac6f54540b803 inherit pro_attribs_class_consensus_common"><td class="memItemLeft" align="right" valign="top"><a id="abf1c0e211bf9bf78ae3ac6f54540b803"></a>
-std::vector&lt; unsigned char &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>m_blockHash</b></td></tr>
+std::vector&lt; unsigned char &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_consensus_common.html#abf1c0e211bf9bf78ae3ac6f54540b803">m_blockHash</a></td></tr>
+<tr class="memdesc:abf1c0e211bf9bf78ae3ac6f54540b803 inherit pro_attribs_class_consensus_common"><td class="mdescLeft">&#160;</td><td class="mdescRight">[TODO] The unique block hash assigned to the active consensus session. <br /></td></tr>
 <tr class="separator:abf1c0e211bf9bf78ae3ac6f54540b803 inherit pro_attribs_class_consensus_common"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0d78add6e3add7d479993b2ebe2ff3bd inherit pro_attribs_class_consensus_common"><td class="memItemLeft" align="right" valign="top"><a id="a0d78add6e3add7d479993b2ebe2ff3bd"></a>
-uint16_t&#160;</td><td class="memItemRight" valign="bottom"><b>m_myID</b></td></tr>
+uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_consensus_common.html#a0d78add6e3add7d479993b2ebe2ff3bd">m_myID</a></td></tr>
+<tr class="memdesc:a0d78add6e3add7d479993b2ebe2ff3bd inherit pro_attribs_class_consensus_common"><td class="mdescLeft">&#160;</td><td class="mdescRight">The ID assigned to this peer (equal to its index in the peer table). <br /></td></tr>
 <tr class="separator:a0d78add6e3add7d479993b2ebe2ff3bd inherit pro_attribs_class_consensus_common"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad5615b18f41b6165f01a024ee2960bb2 inherit pro_attribs_class_consensus_common"><td class="memItemLeft" align="right" valign="top"><a id="ad5615b18f41b6165f01a024ee2960bb2"></a>
-<a class="el" href="struct_priv_key.html">PrivKey</a>&#160;</td><td class="memItemRight" valign="bottom"><b>m_myPrivKey</b></td></tr>
+<a class="el" href="struct_priv_key.html">PrivKey</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_consensus_common.html#ad5615b18f41b6165f01a024ee2960bb2">m_myPrivKey</a></td></tr>
+<tr class="memdesc:ad5615b18f41b6165f01a024ee2960bb2 inherit pro_attribs_class_consensus_common"><td class="mdescLeft">&#160;</td><td class="mdescRight">Private key of this peer. <br /></td></tr>
 <tr class="separator:ad5615b18f41b6165f01a024ee2960bb2 inherit pro_attribs_class_consensus_common"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abbe9ad8a68674a5769754d4ef284fd2f inherit pro_attribs_class_consensus_common"><td class="memItemLeft" align="right" valign="top"><a id="abbe9ad8a68674a5769754d4ef284fd2f"></a>
-std::deque&lt; <a class="el" href="struct_pub_key.html">PubKey</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>m_pubKeys</b></td></tr>
+std::deque&lt; <a class="el" href="struct_pub_key.html">PubKey</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_consensus_common.html#abbe9ad8a68674a5769754d4ef284fd2f">m_pubKeys</a></td></tr>
+<tr class="memdesc:abbe9ad8a68674a5769754d4ef284fd2f inherit pro_attribs_class_consensus_common"><td class="mdescLeft">&#160;</td><td class="mdescRight">List of public keys for the committee. <br /></td></tr>
 <tr class="separator:abbe9ad8a68674a5769754d4ef284fd2f inherit pro_attribs_class_consensus_common"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5f624c6aa34ab29f291122dbe49f5193 inherit pro_attribs_class_consensus_common"><td class="memItemLeft" align="right" valign="top"><a id="a5f624c6aa34ab29f291122dbe49f5193"></a>
-std::deque&lt; <a class="el" href="struct_peer.html">Peer</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>m_peerInfo</b></td></tr>
+std::deque&lt; <a class="el" href="struct_peer.html">Peer</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_consensus_common.html#a5f624c6aa34ab29f291122dbe49f5193">m_peerInfo</a></td></tr>
+<tr class="memdesc:a5f624c6aa34ab29f291122dbe49f5193 inherit pro_attribs_class_consensus_common"><td class="mdescLeft">&#160;</td><td class="mdescRight">List of peers for the committee. <br /></td></tr>
 <tr class="separator:a5f624c6aa34ab29f291122dbe49f5193 inherit pro_attribs_class_consensus_common"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aef0094c53457275b2d56cf8cd3e73bca inherit pro_attribs_class_consensus_common"><td class="memItemLeft" align="right" valign="top"><a id="aef0094c53457275b2d56cf8cd3e73bca"></a>
-std::vector&lt; unsigned char &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>m_message</b></td></tr>
+std::vector&lt; unsigned char &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_consensus_common.html#aef0094c53457275b2d56cf8cd3e73bca">m_message</a></td></tr>
+<tr class="memdesc:aef0094c53457275b2d56cf8cd3e73bca inherit pro_attribs_class_consensus_common"><td class="mdescLeft">&#160;</td><td class="mdescRight">The payload to be evaluated for the active consensus session. <br /></td></tr>
 <tr class="separator:aef0094c53457275b2d56cf8cd3e73bca inherit pro_attribs_class_consensus_common"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8ed00f6e8ab8f0e2ef5ac9f7c66788f6 inherit pro_attribs_class_consensus_common"><td class="memItemLeft" align="right" valign="top"><a id="a8ed00f6e8ab8f0e2ef5ac9f7c66788f6"></a>
-unsigned char&#160;</td><td class="memItemRight" valign="bottom"><b>m_classByte</b></td></tr>
+unsigned char&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_consensus_common.html#a8ed00f6e8ab8f0e2ef5ac9f7c66788f6">m_classByte</a></td></tr>
+<tr class="memdesc:a8ed00f6e8ab8f0e2ef5ac9f7c66788f6 inherit pro_attribs_class_consensus_common"><td class="mdescLeft">&#160;</td><td class="mdescRight">The class byte value for the next consensus message to be composed. <br /></td></tr>
 <tr class="separator:a8ed00f6e8ab8f0e2ef5ac9f7c66788f6 inherit pro_attribs_class_consensus_common"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a948dadc089543e2a7f977c004c627a4b inherit pro_attribs_class_consensus_common"><td class="memItemLeft" align="right" valign="top"><a id="a948dadc089543e2a7f977c004c627a4b"></a>
-unsigned char&#160;</td><td class="memItemRight" valign="bottom"><b>m_insByte</b></td></tr>
+unsigned char&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_consensus_common.html#a948dadc089543e2a7f977c004c627a4b">m_insByte</a></td></tr>
+<tr class="memdesc:a948dadc089543e2a7f977c004c627a4b inherit pro_attribs_class_consensus_common"><td class="mdescLeft">&#160;</td><td class="mdescRight">The instruction byte value for the next consensus message to be composed. <br /></td></tr>
 <tr class="separator:a948dadc089543e2a7f977c004c627a4b inherit pro_attribs_class_consensus_common"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abac1febc4c1921416e0b3bae2281385d inherit pro_attribs_class_consensus_common"><td class="memItemLeft" align="right" valign="top"><a id="abac1febc4c1921416e0b3bae2281385d"></a>
-<a class="el" href="struct_signature.html">Signature</a>&#160;</td><td class="memItemRight" valign="bottom"><b>m_collectiveSig</b></td></tr>
+<a class="el" href="struct_signature.html">Signature</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_consensus_common.html#abac1febc4c1921416e0b3bae2281385d">m_collectiveSig</a></td></tr>
+<tr class="memdesc:abac1febc4c1921416e0b3bae2281385d inherit pro_attribs_class_consensus_common"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generated collective signature. <br /></td></tr>
 <tr class="separator:abac1febc4c1921416e0b3bae2281385d inherit pro_attribs_class_consensus_common"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3b6f2760270c837015b0c19ce545bb93 inherit pro_attribs_class_consensus_common"><td class="memItemLeft" align="right" valign="top"><a id="a3b6f2760270c837015b0c19ce545bb93"></a>
-std::vector&lt; bool &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>m_responseMap</b></td></tr>
+std::vector&lt; bool &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_consensus_common.html#a3b6f2760270c837015b0c19ce545bb93">m_responseMap</a></td></tr>
+<tr class="memdesc:a3b6f2760270c837015b0c19ce545bb93 inherit pro_attribs_class_consensus_common"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a class="el" href="struct_response.html" title="Stores information on the response generated by each signer in the EC-Schnorr multisignature scheme...">Response</a> map for the generated collective signature. <br /></td></tr>
 <tr class="separator:a3b6f2760270c837015b0c19ce545bb93 inherit pro_attribs_class_consensus_common"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Implements the functionality for the consensus committee leader. </p>
-<p>Copyright (c) 2018 <a class="el" href="class_zilliqa.html" title="Main Zilliqa class. ">Zilliqa</a> This is an alpha (internal) release and is not suitable for production. This source code is being disclosed to you solely for the purpose of your participation in testing <a class="el" href="class_zilliqa.html" title="Main Zilliqa class. ">Zilliqa</a>. You may view, compile and run the code for that purpose and pursuant to the protocols and algorithms that are programmed into, and intended by, the code. You may not do anything else with the code without express permission from <a class="el" href="class_zilliqa.html" title="Main Zilliqa class. ">Zilliqa</a> Research Pte. Ltd., including modifying or publishing the code (or any part of it), and developing or forming another public or private blockchain network. This source code is provided ‘as is’ and no warranties are given as to title or non-infringement, merchantability or fitness for purpose and, to the extent permitted by law, all liability for your use of the code is disclaimed. Some programs in this code are governed by the GNU General Public License v3.0 (available at <a href="https://www.gnu.org/licenses/gpl-3.0.en.html">https://www.gnu.org/licenses/gpl-3.0.en.html</a>) (‘GPLv3’). The programs that are governed by GPLv3.0 are those programs that are located in the folders src/depends and tests/depends and which include a reference to GPLv3 in their program files. </p>
 </div><hr/>The documentation for this class was generated from the following files:<ul>
 <li>src/libConsensus/<a class="el" href="_consensus_leader_8h_source.html">ConsensusLeader.h</a></li>
-<li>src/libConsensus/Consensus.cpp</li>
 <li>src/libConsensus/ConsensusLeader.cpp</li>
 </ul>
 </div><!-- contents -->
