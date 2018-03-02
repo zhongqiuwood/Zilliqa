@@ -14,7 +14,6 @@
 * and which include a reference to GPLv3 in their program files.
 **/
 
-
 #include "libCrypto/MultiSig.h"
 #include "libUtils/Logger.h"
 
@@ -23,13 +22,13 @@
 
 using namespace std;
 
-BOOST_AUTO_TEST_SUITE (multisigtest)
+BOOST_AUTO_TEST_SUITE(multisigtest)
 
-BOOST_AUTO_TEST_CASE (test_multisig)
+BOOST_AUTO_TEST_CASE(test_multisig)
 {
     INIT_STDOUT_LOGGER();
 
-    Schnorr & schnorr = Schnorr::GetInstance();
+    Schnorr& schnorr = Schnorr::GetInstance();
 
     // Generate key pairs
     const unsigned int nbsigners = 2000;
@@ -99,12 +98,11 @@ BOOST_AUTO_TEST_CASE (test_multisig)
     Response response_copy;
     response_copy = *aggregatedResponse;
     BOOST_CHECK_MESSAGE(response_copy == *aggregatedResponse, "Response operator= failed");
-
 }
 
-BOOST_AUTO_TEST_CASE (test_serialization)
+BOOST_AUTO_TEST_CASE(test_serialization)
 {
-    Schnorr & schnorr = Schnorr::GetInstance();
+    Schnorr& schnorr = Schnorr::GetInstance();
 
     // Generate key pairs
     const unsigned int nbsigners = 80;
@@ -186,4 +184,4 @@ BOOST_AUTO_TEST_CASE (test_serialization)
     BOOST_CHECK_MESSAGE(schnorr.Verify(message_1, *signature, *aggregatedPubkey) == false, "Signature verification (wrong message) failed");
 }
 
-BOOST_AUTO_TEST_SUITE_END ()
+BOOST_AUTO_TEST_SUITE_END()

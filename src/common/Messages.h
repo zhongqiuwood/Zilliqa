@@ -14,7 +14,6 @@
 * and which include a reference to GPLv3 in their program files.
 **/
 
-
 #ifndef __MESSAGES_H__
 #define __MESSAGES_H__
 
@@ -56,7 +55,7 @@ enum NodeInstructionType : unsigned char
     SUBMITTRANSACTION = 0x04,
     MICROBLOCKCONSENSUS = 0x05,
     FINALBLOCK = 0x06,
-    FORWARDTRANSACTION  = 0x07
+    FORWARDTRANSACTION = 0x07
 };
 
 enum LookupInstructionType : unsigned char
@@ -80,11 +79,11 @@ enum LookupInstructionType : unsigned char
 
 enum TxSharingMode : unsigned char
 {
-    IDLE              = 0x00,
-    SEND_ONLY         = 0x01,
-    DS_FORWARD_ONLY   = 0x02,
+    IDLE = 0x00,
+    SEND_ONLY = 0x01,
+    DS_FORWARD_ONLY = 0x02,
     NODE_FORWARD_ONLY = 0x03,
-    SEND_AND_FORWARD  = 0x04
+    SEND_AND_FORWARD = 0x04
 };
 
 #endif // __MESSAGES_H__

@@ -17,8 +17,8 @@
 #include <cstring>
 #include <iostream>
 #include <mutex>
-#include "libUtils/TimeLockedFunction.h"
 #include "libUtils/Logger.h"
+#include "libUtils/TimeLockedFunction.h"
 
 #define BOOST_TEST_MODULE utils
 #include <boost/test/included/unit_test.hpp>
@@ -33,7 +33,7 @@ void main_function(int count_up_to)
     LOG_MARKER();
 
     counter = 0;
-    for (int i=0; i<count_up_to; i++)
+    for (int i = 0; i < count_up_to; i++)
     {
         {
             lock_guard<mutex> guard(m);

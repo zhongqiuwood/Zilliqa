@@ -14,7 +14,6 @@
 * and which include a reference to GPLv3 in their program files.
 **/
 
-
 #ifndef __ZILLIQA_H__
 #define __ZILLIQA_H__
 
@@ -25,8 +24,8 @@
 #include "libLookup/Lookup.h"
 #include "libMediator/Mediator.h"
 #include "libNetwork/Peer.h"
-#include "libNetwork/PeerStore.h"
 #include "libNetwork/PeerManager.h"
+#include "libNetwork/PeerStore.h"
 #include "libNode/Node.h"
 
 /// Main Zilliqa class.
@@ -40,20 +39,19 @@ class Zilliqa
     ConsensusUser m_cu; // Note: This is just a test class to demo Consensus usage
 
 public:
-
     /// Constructor.
-    Zilliqa(const std::pair<PrivKey, PubKey> & key, const Peer & peer, bool loadConfig);
+    Zilliqa(const std::pair<PrivKey, PubKey>& key, const Peer& peer, bool loadConfig);
 
     /// Destructor.
     ~Zilliqa();
 
-    void LogSelfNodeInfo(const std::pair<PrivKey, PubKey> & key, const Peer & peer);
+    void LogSelfNodeInfo(const std::pair<PrivKey, PubKey>& key, const Peer& peer);
 
     /// Forwards an incoming message for processing by the appropriate subclass.
-    void Dispatch(const std::vector<unsigned char> & message, const Peer & from);
+    void Dispatch(const std::vector<unsigned char>& message, const Peer& from);
 
     /// Returns a list of broadcast peers based on the specified message and instruction types.
-    std::vector<Peer> RetrieveBroadcastList(unsigned char msg_type, unsigned char ins_type, const Peer & from);
+    std::vector<Peer> RetrieveBroadcastList(unsigned char msg_type, unsigned char ins_type, const Peer& from);
 };
 
 #endif // __ZILLIQA_H__

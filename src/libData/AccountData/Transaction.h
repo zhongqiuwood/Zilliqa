@@ -24,8 +24,8 @@
 #include <boost/multiprecision/cpp_int.hpp>
 
 #include "Address.h"
-#include "common/Serializable.h"
 #include "common/Constants.h"
+#include "common/Serializable.h"
 #include "depends/common/FixedHash.h"
 
 using TxnHash = dev::h256;
@@ -42,68 +42,65 @@ class Transaction : public Serializable
     std::array<unsigned char, TRAN_SIG_SIZE> m_signature;
 
 public:
-
     /// Default constructor.
     Transaction();
 
     /// Constructor with specified transaction fields.
-    Transaction
-    (
+    Transaction(
         uint32_t version,
-        const boost::multiprecision::uint256_t & nonce,
-        const Address & toAddr,
-        const Address & fromAddr,
-        const boost::multiprecision::uint256_t & amount,
-        const std::array<unsigned char, TRAN_SIG_SIZE> & signature
-    );
+        const boost::multiprecision::uint256_t& nonce,
+        const Address& toAddr,
+        const Address& fromAddr,
+        const boost::multiprecision::uint256_t& amount,
+        const std::array<unsigned char, TRAN_SIG_SIZE>& signature);
 
     /// Constructor for loading transaction information from a byte stream.
-    Transaction(const std::vector<unsigned char> & src, unsigned int offset);
+    Transaction(const std::vector<unsigned char>& src, unsigned int offset);
 
     /// Implements the Serialize function inherited from Serializable.
-    unsigned int Serialize(std::vector<unsigned char> & dst, unsigned int offset) const;
+    unsigned int Serialize(std::vector<unsigned char>& dst, unsigned int offset) const;
 
     /// Implements the Deserialize function inherited from Serializable.
-    void Deserialize(const std::vector<unsigned char> & src, unsigned int offset);
+    void Deserialize(const std::vector<unsigned char>& src, unsigned int offset);
 
     /// Returns the size in bytes when serializing the transaction.
     static unsigned int GetSerializedSize();
 
     /// Returns the transaction ID.
-    const TxnHash & GetTranID() const;
+    const TxnHash& GetTranID() const;
 
     /// Returns the current version.
-    const uint32_t & GetVersion() const;
+    const uint32_t& GetVersion() const;
 
     /// Returns the transaction nonce.
-    const boost::multiprecision::uint256_t & GetNonce() const;
+    const boost::multiprecision::uint256_t& GetNonce() const;
 
     /// Returns the transaction destination account address.
-    const Address & GetToAddr() const;
+    const Address& GetToAddr() const;
 
     /// Returns the transaction source account address.
-    const Address & GetFromAddr() const;
+    const Address& GetFromAddr() const;
 
     /// Returns the transaction amount.
-    const boost::multiprecision::uint256_t & GetAmount() const;
+    const boost::multiprecision::uint256_t& GetAmount() const;
 
     /// Returns the EC-Schnorr signature over the transaction data.
-    const std::array<unsigned char, TRAN_SIG_SIZE> & GetSignature() const;
+    const std::array<unsigned char, TRAN_SIG_SIZE>& GetSignature() const;
 
     /// Identifies the shard number that should process the transaction.
-    static unsigned int GetShardIndex(const Address & fromAddr, unsigned int numShards);
+    static unsigned int GetShardIndex(const Address& fromAddr, unsigned int numShards);
 
     /// Equality comparison operator.
-    bool operator==(const Transaction & tran) const;
+    bool operator==(const Transaction& tran) const;
 
     /// Less-than comparison operator.
-    bool operator<(const Transaction & tran) const;
+    bool operator<(const Transaction& tran) const;
 
     /// Greater-than comparison operator.
-    bool operator>(const Transaction & tran) const;
+    bool operator>(const Transaction& tran) const;
 
     /// Assignment operator.
-    Transaction & operator=(const Transaction & src);
+    Transaction& operator=(const Transaction& src);
 };
 
 #endif // __TRANSACTION_H__

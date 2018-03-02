@@ -25,9 +25,9 @@
 #include "depends/libDatabase/LevelDB.h"
 #include "libData/BlockData/Block.h"
 
-typedef std::shared_ptr<DSBlock> DSBlockSharedPtr; 
+typedef std::shared_ptr<DSBlock> DSBlockSharedPtr;
 typedef std::shared_ptr<TxBlock> TxBlockSharedPtr;
-typedef std::shared_ptr<Transaction> TxBodySharedPtr; 
+typedef std::shared_ptr<Transaction> TxBodySharedPtr;
 
 /// Manages persistent storage of DS and Tx blocks.
 class BlockStorage
@@ -38,36 +38,38 @@ class BlockStorage
     LevelDB m_txBlockchainDB;
     std::shared_timed_mutex m_putBlockMutex;
 
-    BlockStorage() : m_metadataDB("metadata"), m_txBodyDB("txBodies"), 
-                     m_dsBlockchainDB("dsBlocks"), m_txBlockchainDB("txBlocks") {};
+    BlockStorage()
+        : m_metadataDB("metadata")
+        , m_txBodyDB("txBodies")
+        , m_dsBlockchainDB("dsBlocks")
+        , m_txBlockchainDB("txBlocks"){};
     ~BlockStorage() = default;
-    bool PutBlock(const boost::multiprecision::uint256_t & blockNum, 
-                  const std::vector<unsigned char> & block, const BlockType & blockType);
+    bool PutBlock(const boost::multiprecision::uint256_t& blockNum,
+                  const std::vector<unsigned char>& block, const BlockType& blockType);
 
 public:
-
     /// Returns the singleton BlockStorage instance.
-    static BlockStorage & GetBlockStorage();
+    static BlockStorage& GetBlockStorage();
 
     /// Adds a DS block to storage.
-    bool PutDSBlock(const boost::multiprecision::uint256_t & blockNum, 
-                    const std::vector<unsigned char> & block); 
+    bool PutDSBlock(const boost::multiprecision::uint256_t& blockNum,
+                    const std::vector<unsigned char>& block);
 
     /// Adds a Tx block to storage.
-    bool PutTxBlock(const boost::multiprecision::uint256_t & blockNum, 
-                    const std::vector<unsigned char> & block); 
+    bool PutTxBlock(const boost::multiprecision::uint256_t& blockNum,
+                    const std::vector<unsigned char>& block);
 
     /// Retrieves the requested DS block.
-    bool GetDSBlock(const boost::multiprecision::uint256_t & blocknum, DSBlockSharedPtr & block);
+    bool GetDSBlock(const boost::multiprecision::uint256_t& blocknum, DSBlockSharedPtr& block);
 
     /// Retrieves the requested Tx block.
-    bool GetTxBlock(const boost::multiprecision::uint256_t & blocknum, TxBlockSharedPtr & block);
+    bool GetTxBlock(const boost::multiprecision::uint256_t& blocknum, TxBlockSharedPtr& block);
 
     /// Adds a transaction body to storage.
-    bool PutTxBody(const dev::h256 & key, const std::vector<unsigned char> & body);
+    bool PutTxBody(const dev::h256& key, const std::vector<unsigned char>& body);
 
     /// Retrieves the requested transaction body.
-    bool GetTxBody(const dev::h256 & key, TxBodySharedPtr & body);
+    bool GetTxBody(const dev::h256& key, TxBodySharedPtr& body);
 
     // /// Adds a transaction body to storage.
     // bool PutTxBody(const std::string & key, const std::vector<unsigned char> & body);

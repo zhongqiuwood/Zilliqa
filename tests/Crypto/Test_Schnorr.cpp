@@ -14,7 +14,6 @@
 * and which include a reference to GPLv3 in their program files.
 **/
 
-
 #include <cstring>
 #include "libCrypto/Schnorr.h"
 #include "libUtils/Logger.h"
@@ -25,32 +24,32 @@
 
 using namespace std;
 
-BOOST_AUTO_TEST_SUITE (schnorrtest)
+BOOST_AUTO_TEST_SUITE(schnorrtest)
 
-BOOST_AUTO_TEST_CASE (test_curve_setup)
+BOOST_AUTO_TEST_CASE(test_curve_setup)
 {
     INIT_STDOUT_LOGGER();
 
-    Schnorr & schnorr = Schnorr::GetInstance();
+    Schnorr& schnorr = Schnorr::GetInstance();
 
     unique_ptr<BIGNUM, void (*)(BIGNUM*)> a(BN_new(), BN_clear_free);
     unique_ptr<BIGNUM, void (*)(BIGNUM*)> b(BN_new(), BN_clear_free);
     unique_ptr<BIGNUM, void (*)(BIGNUM*)> p(BN_new(), BN_clear_free);
     unique_ptr<BIGNUM, void (*)(BIGNUM*)> h(BN_new(), BN_clear_free);
 
-    const char * order_expected = "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141";
-    const char * basept_expected = "0279BE667EF9DCBBAC55A06295CE870B07029BFCDB2DCE28D959F2815B16F81798";
-    const char * p_expected = "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFC2F";
-    const char * a_expected = "0";
-    const char * b_expected = "07";
-    const char * h_expected = "01";
+    const char* order_expected = "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141";
+    const char* basept_expected = "0279BE667EF9DCBBAC55A06295CE870B07029BFCDB2DCE28D959F2815B16F81798";
+    const char* p_expected = "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFC2F";
+    const char* a_expected = "0";
+    const char* b_expected = "07";
+    const char* h_expected = "01";
 
     unique_ptr<char, void (*)(void*)> order_actual(BN_bn2hex(schnorr.GetCurve().m_order.get()), free);
     BOOST_CHECK_MESSAGE(strcmp(order_expected, order_actual.get()) == 0, "Wrong order generated");
 
     unique_ptr<char, void (*)(void*)> basept_actual(EC_POINT_point2hex(schnorr.GetCurve().m_group.get(), EC_GROUP_get0_generator(schnorr.GetCurve().m_group.get()), POINT_CONVERSION_COMPRESSED, NULL), free);
     BOOST_CHECK_MESSAGE(strcmp(basept_expected, basept_actual.get()) == 0, "Wrong basept generated");
-   
+
     if ((a != nullptr) && (b != nullptr) && (p != nullptr) && (h != nullptr))
     {
         BOOST_CHECK_MESSAGE(EC_GROUP_get_curve_GFp(schnorr.GetCurve().m_group.get(), p.get(), a.get(), b.get(), NULL) != 0, "EC_GROUP_get_curve_GFp failed");
@@ -68,9 +67,9 @@ BOOST_AUTO_TEST_CASE (test_curve_setup)
     }
 }
 
-BOOST_AUTO_TEST_CASE (test_keys)
+BOOST_AUTO_TEST_CASE(test_keys)
 {
-    Schnorr & schnorr = Schnorr::GetInstance();
+    Schnorr& schnorr = Schnorr::GetInstance();
 
     unique_ptr<EC_POINT, void (*)(EC_POINT*)> P(EC_POINT_new(schnorr.GetCurve().m_group.get()), EC_POINT_clear_free);
 
@@ -83,9 +82,9 @@ BOOST_AUTO_TEST_CASE (test_keys)
     BOOST_CHECK_MESSAGE(EC_POINT_cmp(schnorr.GetCurve().m_group.get(), keypair.second.m_P.get(), P.get(), NULL) == 0, "Key generation check #4 failed");
 }
 
-BOOST_AUTO_TEST_CASE (test_sign_verif)
+BOOST_AUTO_TEST_CASE(test_sign_verif)
 {
-    Schnorr & schnorr = Schnorr::GetInstance();
+    Schnorr& schnorr = Schnorr::GetInstance();
 
     pair<PrivKey, PubKey> keypair = schnorr.GenKeyPair();
 
@@ -94,12 +93,12 @@ BOOST_AUTO_TEST_CASE (test_sign_verif)
     vector<unsigned char> message_rand(message_size);
     vector<unsigned char> message_1(message_size, 0x01);
     generate(message_rand.begin(), message_rand.end(), std::rand);
-    
+
     Signature signature;
 
     // Generate the signature
     BOOST_CHECK_MESSAGE(schnorr.Sign(message_rand, keypair.first, keypair.second, signature) == true, "Signing failed");
-    
+
     // Check the generated signature
     BOOST_CHECK_MESSAGE(BN_cmp(signature.m_r.get(), schnorr.GetCurve().m_order.get()) == -1, "Signature generation check #1 failed");
     BOOST_CHECK_MESSAGE(BN_is_zero(signature.m_r.get()) != 1, "Signature generation check #2 failed");
@@ -111,21 +110,21 @@ BOOST_AUTO_TEST_CASE (test_sign_verif)
     BOOST_CHECK_MESSAGE(schnorr.Verify(message_1, signature, keypair.second) == false, "Signature verification (wrong message) failed");
 }
 
-BOOST_AUTO_TEST_CASE (test_performance)
+BOOST_AUTO_TEST_CASE(test_performance)
 {
-    Schnorr & schnorr = Schnorr::GetInstance();
+    Schnorr& schnorr = Schnorr::GetInstance();
 
     pair<PrivKey, PubKey> keypair = schnorr.GenKeyPair();
 
-    const unsigned int message_sizes[] = { 128*1024, 256*1024, 512*1024, 1*1024*1024, 2*1024*1024, 4*1024*1024, 8*1024*1024, 16*1024*1024, 32*1024*1024 };
-    const char * printable_sizes[]     = { "128kB",  "256kB",  "512kB",  "1MB",       "2MB",       "4MB",       "8MB",       "16MB",       "32MB"       };
+    const unsigned int message_sizes[] = {128 * 1024, 256 * 1024, 512 * 1024, 1 * 1024 * 1024, 2 * 1024 * 1024, 4 * 1024 * 1024, 8 * 1024 * 1024, 16 * 1024 * 1024, 32 * 1024 * 1024};
+    const char* printable_sizes[] = {"128kB", "256kB", "512kB", "1MB", "2MB", "4MB", "8MB", "16MB", "32MB"};
     const unsigned int num_messages = sizeof(message_sizes) / sizeof(message_sizes[0]);
 
     for (unsigned int i = 0; i < num_messages; i++)
     {
         vector<unsigned char> message_rand(message_sizes[i]);
         generate(message_rand.begin(), message_rand.end(), std::rand);
-        
+
         Signature signature;
 
         // Generate the signature
@@ -133,7 +132,7 @@ BOOST_AUTO_TEST_CASE (test_performance)
         BOOST_CHECK_MESSAGE(schnorr.Sign(message_rand, keypair.first, keypair.second, signature) == true, "Signing failed");
         LOG_MESSAGE("Message size  = " << printable_sizes[i]);
         LOG_MESSAGE("Sign (usec)   = " << r_timer_end(t));
-        
+
         // Check the generated signature
         BOOST_CHECK_MESSAGE(BN_cmp(signature.m_r.get(), schnorr.GetCurve().m_order.get()) == -1, "Signature generation check #1 failed");
         BOOST_CHECK_MESSAGE(BN_is_zero(signature.m_r.get()) != 1, "Signature generation check #2 failed");
@@ -148,9 +147,9 @@ BOOST_AUTO_TEST_CASE (test_performance)
     }
 }
 
-BOOST_AUTO_TEST_CASE (test_serialization)
+BOOST_AUTO_TEST_CASE(test_serialization)
 {
-    Schnorr & schnorr = Schnorr::GetInstance();
+    Schnorr& schnorr = Schnorr::GetInstance();
 
     pair<PrivKey, PubKey> keypair = schnorr.GenKeyPair();
 
@@ -193,4 +192,4 @@ BOOST_AUTO_TEST_CASE (test_serialization)
     BOOST_CHECK_MESSAGE(signature == signature2, "Signature serialization check #2 failed");
 }
 
-BOOST_AUTO_TEST_SUITE_END ()
+BOOST_AUTO_TEST_SUITE_END()

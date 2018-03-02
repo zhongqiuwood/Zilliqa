@@ -25,12 +25,11 @@
 template<class T>
 class CircularArray
 {
-    T * m_array;
+    T* m_array;
     int m_capacity;
     boost::multiprecision::uint256_t m_size;
 
 public:
-
     /// Default constructor.
     CircularArray()
     {
@@ -46,23 +45,23 @@ public:
         m_array = new T[capacity];
     }
 
-    CircularArray(const CircularArray<T> & circularArray) = delete;
+    CircularArray(const CircularArray<T>& circularArray) = delete;
 
-    CircularArray & operator=(const CircularArray<T> & circularArray) = delete;
+    CircularArray& operator=(const CircularArray<T>& circularArray) = delete;
 
     /// Destructor.
     ~CircularArray()
     {
-        if(m_array != nullptr)
+        if (m_array != nullptr)
         {
             delete[] m_array;
         }
     }
 
     /// Index operator.
-    T & operator[](boost::multiprecision::uint256_t index)
+    T& operator[](boost::multiprecision::uint256_t index)
     {
-        if(m_array == nullptr)
+        if (m_array == nullptr)
         {
             LOG_MESSAGE("Error: m_array is nullptr")
             throw;
@@ -71,9 +70,9 @@ public:
     }
 
     /// Adds an element to the array at the specified index.
-    void insert_new(boost::multiprecision::uint256_t index, const T & element)
+    void insert_new(boost::multiprecision::uint256_t index, const T& element)
     {
-        if(m_array == nullptr)
+        if (m_array == nullptr)
         {
             LOG_MESSAGE("Error: m_array is nullptr")
             throw;
@@ -83,20 +82,20 @@ public:
     }
 
     /// Returns the element at the back of the array.
-    T & back()
+    T& back()
     {
-        if(m_array == nullptr)
+        if (m_array == nullptr)
         {
             LOG_MESSAGE("Error: m_array is nullptr")
             throw;
         }
-        return m_array[(int)((m_size-1) % m_capacity)];
+        return m_array[(int)((m_size - 1) % m_capacity)];
     }
 
     /// Adds an element to the end of the array.
     void push_back(T element)
     {
-        if(m_array == nullptr)
+        if (m_array == nullptr)
         {
             LOG_MESSAGE("Error: m_array is nullptr")
             throw;

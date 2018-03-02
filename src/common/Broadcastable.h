@@ -25,9 +25,8 @@
 class Broadcastable
 {
 public:
-
     /// Returns the list of destination peers for a message with the specified instruction type.
-    virtual std::vector<Peer> GetBroadcastList(unsigned char ins_type, const Peer & broadcast_originator)
+    virtual std::vector<Peer> GetBroadcastList(unsigned char ins_type, const Peer& broadcast_originator)
     {
         LOG_MARKER();
         std::vector<Peer> peers = PeerStore::GetStore().GetAllPeers();

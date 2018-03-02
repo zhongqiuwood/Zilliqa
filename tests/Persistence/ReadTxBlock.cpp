@@ -26,9 +26,9 @@
 #define BOOST_TEST_MODULE persistencetest
 #include <boost/test/included/unit_test.hpp>
 
-BOOST_AUTO_TEST_SUITE (persistencetest)
+BOOST_AUTO_TEST_SUITE(persistencetest)
 
-BOOST_AUTO_TEST_CASE (testBlockStorage)
+BOOST_AUTO_TEST_CASE(testBlockStorage)
 {
     INIT_STDOUT_LOGGER();
 
@@ -36,8 +36,8 @@ BOOST_AUTO_TEST_CASE (testBlockStorage)
 
     int blocknumber;
 
-    std::cout<<"Enter block number: ";
-    std::cin>>blocknumber;
+    std::cout << "Enter block number: ";
+    std::cin >> blocknumber;
 
     TxBlockSharedPtr block2;
     BlockStorage::GetBlockStorage().GetTxBlock(blocknumber, block2);
@@ -48,4 +48,4 @@ BOOST_AUTO_TEST_CASE (testBlockStorage)
     LOG_MESSAGE("Block num txs value retrieved: " << (*block2).GetHeader().GetNumTxs());
 }
 
-BOOST_AUTO_TEST_SUITE_END ()
+BOOST_AUTO_TEST_SUITE_END()

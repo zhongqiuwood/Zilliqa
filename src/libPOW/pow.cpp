@@ -14,29 +14,28 @@
 * and which include a reference to GPLv3 in their program files.
 **/
 
-
-#include <iostream>
-#include <iomanip>
 #include <ctime>
+#include <iomanip>
+#include <iostream>
 
 #include "pow.h"
 //#include "libCrypto/Sha3.h"
+#include "common/Serializable.h"
 #include "libCrypto/Sha2.h"
 #include "libUtils/DataConversion.h"
-#include "common/Serializable.h"
 
 POW::POW()
 {
     currentBlockNum = 0;
-    ethash_light_client = EthashLightNew(0); // TODO: Do we still need this? Can we call it at mediator? 
+    ethash_light_client = EthashLightNew(0); // TODO: Do we still need this? Can we call it at mediator?
 }
 
 POW::~POW()
 {
-    EthashLightDelete(ethash_light_client); 
+    EthashLightDelete(ethash_light_client);
 }
 
-POW & POW::GetInstance()
+POW& POW::GetInstance()
 {
     static POW pow;
     return pow;
@@ -47,12 +46,12 @@ void POW::StopMining()
     shouldMine = false;
 }
 
-std::string POW::BytesToHexString(const uint8_t * str, const uint64_t s)
+std::string POW::BytesToHexString(const uint8_t* str, const uint64_t s)
 {
     std::ostringstream ret;
 
     for (size_t i = 0; i < s; ++i)
-        ret << std::hex << std::setfill('0') << std::setw(2) << std::nouppercase << (int) str[i];
+        ret << std::hex << std::setfill('0') << std::setw(2) << std::nouppercase << (int)str[i];
 
     return ret.str();
 }
@@ -77,13 +76,14 @@ std::vector<uint8_t> POW::HexStringToBytes(std::string const& _s)
         {
             ret.push_back((uint8_t)(FromHex(_s[i]) * 16 + FromHex(_s[i + 1])));
         }
-        catch (...){
+        catch (...)
+        {
             ret.push_back(0);
         }
     return ret;
 }
 
-std::string POW::BlockhashToHexString(ethash_h256_t * _hash)
+std::string POW::BlockhashToHexString(ethash_h256_t* _hash)
 {
     return BytesToHexString((uint8_t*)_hash, 32);
 }
@@ -99,10 +99,10 @@ int POW::FromHex(char _i)
     return -1;
 }
 
-ethash_h256_t POW::StringToBlockhash(std::string const & _s)
+ethash_h256_t POW::StringToBlockhash(std::string const& _s)
 {
     ethash_h256_t ret;
-    std::vector<uint8_t>  b = HexStringToBytes(_s);
+    std::vector<uint8_t> b = HexStringToBytes(_s);
     memcpy(&ret, b.data(), b.size());
     return ret;
 }
@@ -110,17 +110,17 @@ ethash_h256_t POW::StringToBlockhash(std::string const & _s)
 ethash_h256_t POW::DifficultyLevelInInt(uint8_t difficulty)
 {
     uint8_t b[UINT256_SIZE];
-    std::fill(b, b+32, 0xff);
+    std::fill(b, b + 32, 0xff);
     uint8_t firstNbytesToSet = difficulty / 8;
     uint8_t nBytesBitsToSet = difficulty % 8;
 
-    for (int i=0; i<firstNbytesToSet; i++)
+    for (int i = 0; i < firstNbytesToSet; i++)
     {
         b[i] = 0;
     }
-    const unsigned char masks[9] = { 0xFF, 0x7F, 0x3F, 0x1F, 0x0F, 0x07, 0x01, 0x00 } ;
+    const unsigned char masks[9] = {0xFF, 0x7F, 0x3F, 0x1F, 0x0F, 0x07, 0x01, 0x00};
     b[firstNbytesToSet] = masks[nBytesBitsToSet];
-    return StringToBlockhash(BytesToHexString(b , UINT256_SIZE));
+    return StringToBlockhash(BytesToHexString(b, UINT256_SIZE));
 }
 
 ethash_light_t POW::EthashLightNew(uint64_t block_number)
@@ -138,7 +138,7 @@ bool POW::EthashConfigureLightClient(uint64_t block_number)
     std::lock_guard<std::mutex> g(m_mutexLightClientConfigure);
     if (block_number != currentBlockNum)
     {
-        EthashLightDelete(ethash_light_client); 
+        EthashLightDelete(ethash_light_client);
         ethash_light_client = EthashLightNew(block_number);
         currentBlockNum = block_number;
     }
@@ -151,33 +151,33 @@ bool POW::EthashConfigureLightClient(uint64_t block_number)
     return true;
 }
 
-ethash_return_value_t POW::EthashLightCompute(ethash_light_t & light, ethash_h256_t const & header_hash, uint64_t nonce)
+ethash_return_value_t POW::EthashLightCompute(ethash_light_t& light, ethash_h256_t const& header_hash, uint64_t nonce)
 {
     return ethash_light_compute(light, header_hash, nonce);
 }
 
-ethash_full_t POW::EthashFullNew(ethash_light_t & light, ethash_callback_t & CallBack)
+ethash_full_t POW::EthashFullNew(ethash_light_t& light, ethash_callback_t& CallBack)
 {
     return ethash_full_new(light, CallBack);
 }
 
-void POW::EthashFullDelete(ethash_full_t & full)
+void POW::EthashFullDelete(ethash_full_t& full)
 {
     ethash_full_delete(full);
 }
 
-ethash_return_value_t POW::EthashFullCompute(ethash_full_t & full, ethash_h256_t const & header_hash, uint64_t nonce)
+ethash_return_value_t POW::EthashFullCompute(ethash_full_t& full, ethash_h256_t const& header_hash, uint64_t nonce)
 {
     return ethash_full_compute(full, header_hash, nonce);
 }
 
-ethash_mining_result_t POW::MineLight(ethash_light_t & light, ethash_h256_t const & header_hash, ethash_h256_t & difficulty)
+ethash_mining_result_t POW::MineLight(ethash_light_t& light, ethash_h256_t const& header_hash, ethash_h256_t& difficulty)
 {
     uint64_t nonce = std::time(0);
     while (shouldMine)
     {
         ethash_return_value_t mineResult = EthashLightCompute(light, header_hash, nonce);
-        if(ethash_check_difficulty(&mineResult.result, &difficulty))
+        if (ethash_check_difficulty(&mineResult.result, &difficulty))
         {
             ethash_mining_result_t winning_result = {BlockhashToHexString(&mineResult.result), BlockhashToHexString(&mineResult.mix_hash), nonce, true};
             return winning_result;
@@ -185,17 +185,17 @@ ethash_mining_result_t POW::MineLight(ethash_light_t & light, ethash_h256_t cons
         nonce++;
     }
 
-    ethash_mining_result_t failure_result = { "", "", 0, false };
+    ethash_mining_result_t failure_result = {"", "", 0, false};
     return failure_result;
 }
 
-ethash_mining_result_t POW::MineFull(ethash_full_t & full, ethash_h256_t const & header_hash, ethash_h256_t & difficulty)
+ethash_mining_result_t POW::MineFull(ethash_full_t& full, ethash_h256_t const& header_hash, ethash_h256_t& difficulty)
 {
     uint64_t nonce = std::time(0);
     while (shouldMine)
     {
         ethash_return_value_t mineResult = EthashFullCompute(full, header_hash, nonce);
-        if(ethash_check_difficulty(&mineResult.result, &difficulty))
+        if (ethash_check_difficulty(&mineResult.result, &difficulty))
         {
             ethash_mining_result_t winning_result = {BlockhashToHexString(&mineResult.result), BlockhashToHexString(&mineResult.mix_hash), nonce, true};
             return winning_result;
@@ -203,14 +203,14 @@ ethash_mining_result_t POW::MineFull(ethash_full_t & full, ethash_h256_t const &
         nonce++;
     }
 
-    ethash_mining_result_t failure_result = { "", "", 0, false };
+    ethash_mining_result_t failure_result = {"", "", 0, false};
     return failure_result;
 }
 
-bool POW::VerifyLight(ethash_light_t & light, ethash_h256_t const &header_hash, uint64_t winning_nonce , ethash_h256_t & difficulty, ethash_h256_t & result, ethash_h256_t & mixhash)
+bool POW::VerifyLight(ethash_light_t& light, ethash_h256_t const& header_hash, uint64_t winning_nonce, ethash_h256_t& difficulty, ethash_h256_t& result, ethash_h256_t& mixhash)
 {
     ethash_return_value_t mineResult = EthashLightCompute(light, header_hash, winning_nonce);
-    if(ethash_check_difficulty(&mineResult.result, &difficulty))
+    if (ethash_check_difficulty(&mineResult.result, &difficulty))
     {
         return true;
     }
@@ -220,10 +220,10 @@ bool POW::VerifyLight(ethash_light_t & light, ethash_h256_t const &header_hash, 
     }
 }
 
-bool POW::VerifyFull(ethash_full_t & full, ethash_h256_t const & header_hash, uint64_t winning_nonce, ethash_h256_t & difficulty, ethash_h256_t & result, ethash_h256_t & mixhash)
+bool POW::VerifyFull(ethash_full_t& full, ethash_h256_t const& header_hash, uint64_t winning_nonce, ethash_h256_t& difficulty, ethash_h256_t& result, ethash_h256_t& mixhash)
 {
     ethash_return_value_t mineResult = EthashFullCompute(full, header_hash, winning_nonce);
-    if(ethash_check_difficulty(&mineResult.result, &difficulty))
+    if (ethash_check_difficulty(&mineResult.result, &difficulty))
     {
         return true;
     }
@@ -233,18 +233,18 @@ bool POW::VerifyFull(ethash_full_t & full, ethash_h256_t const & header_hash, ui
     }
 }
 
-std::vector<unsigned char> POW::ConcatAndhash(const std::array<unsigned char, UINT256_SIZE> & rand1,
-                                              const std::array<unsigned char, UINT256_SIZE> & rand2,
-                                              const boost::multiprecision::uint128_t & ipAddr,
-                                              const PubKey & pubKey)
+std::vector<unsigned char> POW::ConcatAndhash(const std::array<unsigned char, UINT256_SIZE>& rand1,
+                                              const std::array<unsigned char, UINT256_SIZE>& rand2,
+                                              const boost::multiprecision::uint128_t& ipAddr,
+                                              const PubKey& pubKey)
 {
     std::vector<unsigned char> vec;
-    for(const auto& s1: rand1)
+    for (const auto& s1 : rand1)
     {
         vec.push_back(s1);
     }
 
-    for(const auto& s1: rand2)
+    for (const auto& s1 : rand2)
     {
         vec.push_back(s1);
     }
@@ -261,12 +261,12 @@ std::vector<unsigned char> POW::ConcatAndhash(const std::array<unsigned char, UI
     return sha2_result;
 }
 
-ethash_mining_result_t POW::PoWMine(const boost::multiprecision::uint256_t & blockNum,
+ethash_mining_result_t POW::PoWMine(const boost::multiprecision::uint256_t& blockNum,
                                     uint8_t difficulty,
-                                    const std::array<unsigned char, UINT256_SIZE> & rand1,
-                                    const std::array<unsigned char, UINT256_SIZE> & rand2,
-                                    const boost::multiprecision::uint128_t & ipAddr,
-                                    const PubKey & pubKey,
+                                    const std::array<unsigned char, UINT256_SIZE>& rand1,
+                                    const std::array<unsigned char, UINT256_SIZE>& rand2,
+                                    const boost::multiprecision::uint128_t& ipAddr,
+                                    const PubKey& pubKey,
                                     bool fullDataset)
 {
     LOG_MARKER();
@@ -286,7 +286,7 @@ ethash_mining_result_t POW::PoWMine(const boost::multiprecision::uint256_t & blo
     if (fullDataset)
     {
         ethash_callback_t CallBack = NULL;
-        ethash_full_t fullClient = POW::EthashFullNew(ethash_light_client,  CallBack);
+        ethash_full_t fullClient = POW::EthashFullNew(ethash_light_client, CallBack);
         result = MineFull(fullClient, headerHash, diffForPoW);
         EthashFullDelete(fullClient);
     }
@@ -297,16 +297,16 @@ ethash_mining_result_t POW::PoWMine(const boost::multiprecision::uint256_t & blo
     return result;
 }
 
-bool POW::PoWVerify(const boost::multiprecision::uint256_t & blockNum,
+bool POW::PoWVerify(const boost::multiprecision::uint256_t& blockNum,
                     uint8_t difficulty,
-                    const std::array<unsigned char, UINT256_SIZE> & rand1,
-                    const std::array<unsigned char, UINT256_SIZE> & rand2,
-                    const boost::multiprecision::uint128_t & ipAddr,
-                    const PubKey & pubKey,
+                    const std::array<unsigned char, UINT256_SIZE>& rand1,
+                    const std::array<unsigned char, UINT256_SIZE>& rand2,
+                    const boost::multiprecision::uint128_t& ipAddr,
+                    const PubKey& pubKey,
                     bool fullDataset,
                     uint64_t winning_nonce,
-                    std::string &winning_result,
-                    std::string &winning_mixhash)
+                    std::string& winning_result,
+                    std::string& winning_mixhash)
 {
     LOG_MARKER();
     EthashConfigureLightClient((uint64_t)blockNum);
@@ -323,22 +323,22 @@ bool POW::PoWVerify(const boost::multiprecision::uint256_t & blockNum,
     //TODO: check mix hash to prevent DDOS attack
     if (check_hash_string != winning_result)
     {
-        //std::cout << check_hash_string << std::endl; 
-        //std::cout << winning_result << std::endl; 
-        //return false; 
+        //std::cout << check_hash_string << std::endl;
+        //std::cout << winning_result << std::endl;
+        //return false;
     }
 
     bool result;
     if (fullDataset)
     {
         ethash_callback_t CallBack = NULL;
-        ethash_full_t fullClient = POW::EthashFullNew(ethash_light_client,  CallBack);
-        result =  VerifyFull(fullClient, headerHash, winning_nonce, diffForPoW, winnning_result, winnning_mixhash);
+        ethash_full_t fullClient = POW::EthashFullNew(ethash_light_client, CallBack);
+        result = VerifyFull(fullClient, headerHash, winning_nonce, diffForPoW, winnning_result, winnning_mixhash);
         EthashFullDelete(fullClient);
     }
     else
     {
-        result =  VerifyLight(ethash_light_client, headerHash, winning_nonce, diffForPoW, winnning_result, winnning_mixhash);
+        result = VerifyLight(ethash_light_client, headerHash, winning_nonce, diffForPoW, winnning_result, winnning_mixhash);
     }
     return result;
 }

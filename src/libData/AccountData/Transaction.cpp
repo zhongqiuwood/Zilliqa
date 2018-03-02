@@ -17,8 +17,8 @@
 #include <algorithm>
 
 #include "Transaction.h"
-#include "libUtils/Logger.h"
 #include "libCrypto/Sha2.h"
+#include "libUtils/Logger.h"
 
 using namespace std;
 using namespace boost::multiprecision;
@@ -30,23 +30,26 @@ unsigned char TX_COND = 0x2;
 
 Transaction::Transaction()
 {
-
 }
 
-Transaction::Transaction(const vector<unsigned char> & src, unsigned int offset)
+Transaction::Transaction(const vector<unsigned char>& src, unsigned int offset)
 {
     Deserialize(src, offset);
 }
 
-Transaction::Transaction
-(
+Transaction::Transaction(
     uint32_t version,
-    const uint256_t & nonce,
-    const Address & toAddr,
-    const Address & fromAddr,
-    const uint256_t & amount,
-    const array<unsigned char, TRAN_SIG_SIZE> & signature
-) : m_version(version), m_nonce(nonce), m_toAddr(toAddr), m_fromAddr(fromAddr), m_amount(amount), m_signature(signature)//, m_pred(pred)
+    const uint256_t& nonce,
+    const Address& toAddr,
+    const Address& fromAddr,
+    const uint256_t& amount,
+    const array<unsigned char, TRAN_SIG_SIZE>& signature)
+    : m_version(version)
+    , m_nonce(nonce)
+    , m_toAddr(toAddr)
+    , m_fromAddr(fromAddr)
+    , m_amount(amount)
+    , m_signature(signature) //, m_pred(pred)
 {
     // [TODO] m_signature should be generated from the rest
 
@@ -67,18 +70,18 @@ Transaction::Transaction
 
     SHA2<HASH_TYPE::HASH_VARIANT_256> sha2;
     sha2.Update(vec);
-    const vector<unsigned char> & output = sha2.Finalize();
+    const vector<unsigned char>& output = sha2.Finalize();
 
     assert(output.size() == 32);
 
     copy(output.begin(), output.end(), m_tranID.asArray().begin());
 }
 
-unsigned int Transaction::Serialize(vector<unsigned char> & dst, unsigned int offset) const
+unsigned int Transaction::Serialize(vector<unsigned char>& dst, unsigned int offset) const
 {
     // LOG_MARKER();
 
-    unsigned int size_needed = TRAN_HASH_SIZE + sizeof(uint32_t) + UINT256_SIZE + ACC_ADDR_SIZE + ACC_ADDR_SIZE + UINT256_SIZE + TRAN_SIG_SIZE;// + predicate_size_needed;
+    unsigned int size_needed = TRAN_HASH_SIZE + sizeof(uint32_t) + UINT256_SIZE + ACC_ADDR_SIZE + ACC_ADDR_SIZE + UINT256_SIZE + TRAN_SIG_SIZE; // + predicate_size_needed;
     unsigned int size_remaining = dst.size() - offset;
 
     if (size_remaining < size_needed)
@@ -105,7 +108,7 @@ unsigned int Transaction::Serialize(vector<unsigned char> & dst, unsigned int of
     return size_needed;
 }
 
-void Transaction::Deserialize(const vector<unsigned char> & src, unsigned int offset)
+void Transaction::Deserialize(const vector<unsigned char>& src, unsigned int offset)
 {
     // LOG_MARKER();
 
@@ -126,42 +129,42 @@ void Transaction::Deserialize(const vector<unsigned char> & src, unsigned int of
     copy(src.begin() + curOffset, src.begin() + curOffset + TRAN_SIG_SIZE, m_signature.begin());
 }
 
-const TxnHash & Transaction::GetTranID() const
+const TxnHash& Transaction::GetTranID() const
 {
     return m_tranID;
 }
 
-const uint32_t & Transaction::GetVersion() const
+const uint32_t& Transaction::GetVersion() const
 {
     return m_version;
 }
 
-const uint256_t & Transaction::GetNonce() const
+const uint256_t& Transaction::GetNonce() const
 {
     return m_nonce;
 }
 
-const Address & Transaction::GetToAddr() const
+const Address& Transaction::GetToAddr() const
 {
     return m_toAddr;
 }
 
-const Address & Transaction::GetFromAddr() const
+const Address& Transaction::GetFromAddr() const
 {
     return m_fromAddr;
 }
 
-const uint256_t & Transaction::GetAmount() const
+const uint256_t& Transaction::GetAmount() const
 {
     return m_amount;
 }
 
-const array<unsigned char, TRAN_SIG_SIZE> & Transaction::GetSignature() const
+const array<unsigned char, TRAN_SIG_SIZE>& Transaction::GetSignature() const
 {
     return m_signature;
 }
 
-unsigned int Transaction::GetShardIndex(const Address & fromAddr, unsigned int numShards)
+unsigned int Transaction::GetShardIndex(const Address& fromAddr, unsigned int numShards)
 {
     unsigned int target_shard = 0;
     unsigned int numbits = log2(numShards);
@@ -193,21 +196,13 @@ unsigned int Transaction::GetSerializedSize()
     return size_needed_wo_predicate;
 }
 
-bool Transaction::operator==(const Transaction & tran) const
+bool Transaction::operator==(const Transaction& tran) const
 {
-    return
-    (
-        (m_tranID == tran.m_tranID) &&
-        (m_version == tran.m_version) &&
-        (m_nonce == tran.m_nonce) &&
-        (m_toAddr == tran.m_toAddr) &&
-        (m_fromAddr == tran.m_fromAddr) &&
-        (m_amount == tran.m_amount) &&
-        (m_signature == tran.m_signature)
-    );
+    return (
+        (m_tranID == tran.m_tranID) && (m_version == tran.m_version) && (m_nonce == tran.m_nonce) && (m_toAddr == tran.m_toAddr) && (m_fromAddr == tran.m_fromAddr) && (m_amount == tran.m_amount) && (m_signature == tran.m_signature));
 }
 
-bool Transaction::operator<(const Transaction & tran) const
+bool Transaction::operator<(const Transaction& tran) const
 {
     if (m_tranID < tran.m_tranID)
     {
@@ -277,12 +272,12 @@ bool Transaction::operator<(const Transaction & tran) const
     }
 }
 
-bool Transaction::operator>(const Transaction & tran) const
+bool Transaction::operator>(const Transaction& tran) const
 {
     return !((*this == tran) || (*this < tran));
 }
 
-Transaction & Transaction::operator=(const Transaction & src)
+Transaction& Transaction::operator=(const Transaction& src)
 {
     copy(src.m_tranID.asArray().begin(), src.m_tranID.asArray().end(), m_tranID.asArray().begin());
     m_version = src.m_version;

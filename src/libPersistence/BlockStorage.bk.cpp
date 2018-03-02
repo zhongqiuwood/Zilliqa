@@ -14,10 +14,10 @@
 * and which include a reference to GPLv3 in their program files.
 **/
 
-#include <sys/stat.h>
-#include <string>
 #include <fstream>
 #include <iostream>
+#include <string>
+#include <sys/stat.h>
 #include <sys/syscall.h>
 #include <unistd.h>
 
@@ -27,7 +27,7 @@ using namespace std;
 
 unsigned int BlockStorage::m_blockFileSize = 128 * ONE_MEGABYTE;
 
-static unsigned int GetInt(const char * src, int & pos)
+static unsigned int GetInt(const char* src, int& pos)
 {
     unsigned int result = 0;
     while ((src[pos] != '\0') && (src[pos] != '.'))
@@ -41,16 +41,16 @@ static unsigned int GetInt(const char * src, int & pos)
     return result;
 }
 
-static string ConvertUInt256ToString(boost::multiprecision::uint256_t number) 
+static string ConvertUInt256ToString(boost::multiprecision::uint256_t number)
 {
-    if (number == 0) 
+    if (number == 0)
     {
         return "0";
     }
     string result = "";
-    while (number != 0) 
+    while (number != 0)
     {
-        result += to_string( (unsigned int) number % 10 );
+        result += to_string((unsigned int)number % 10);
         number /= 10;
     }
     reverse(result.begin(), result.end());
@@ -73,7 +73,7 @@ class BlockStorage::LastBlockFileInfo
 public:
     unsigned int filenum;
 
-    LastBlockFileInfo(const string & src)
+    LastBlockFileInfo(const string& src)
     {
         int pos = 0;
         filenum = GetInt(src.c_str(), pos);
@@ -106,7 +106,7 @@ public:
     unsigned int numblocks;
     unsigned int filesize;
 
-    BlockFileInfo(const string & src)
+    BlockFileInfo(const string& src)
     {
         int pos = 0;
         numblocks = GetInt(src.c_str(), pos);
@@ -162,7 +162,7 @@ public:
     unsigned int blocksize;
     unsigned int decompressed_blocksize;
 
-    BlockInfo(const string & src)
+    BlockInfo(const string& src)
     {
         int pos = 0;
         filenum = GetInt(src.c_str(), pos);
@@ -171,8 +171,8 @@ public:
         decompressed_blocksize = GetInt(src.c_str(), pos);
     }
 
-    BlockInfo(unsigned int filenum, unsigned int fileoffset, 
-        unsigned int blocksize, unsigned int decompressed_blocksize)
+    BlockInfo(unsigned int filenum, unsigned int fileoffset,
+              unsigned int blocksize, unsigned int decompressed_blocksize)
     {
         this->filenum = filenum;
         this->fileoffset = fileoffset;
@@ -202,21 +202,23 @@ public:
     }
 };
 
-BlockStorage & BlockStorage::GetBlockStorage()
+BlockStorage& BlockStorage::GetBlockStorage()
 {
     static BlockStorage bs;
     return bs;
 }
 
-BlockStorage::BlockStorage() : m_metadataDB("blocks.db"), m_txBodyDB("txbodies.db"), 
-    m_dsBlockchainDB("dsblocks.db"), m_txBlockchainDB("txblocks.db")
+BlockStorage::BlockStorage()
+    : m_metadataDB("blocks.db")
+    , m_txBodyDB("txbodies.db")
+    , m_dsBlockchainDB("dsblocks.db")
+    , m_txBlockchainDB("txblocks.db")
 {
     struct stat s;
     string tmp = m_metadataDB.ReadFromDB(LastBlockFileInfo::GenerateKey(BlockType::DS));
 
     // Couldn't find key "dl" (or it doesn't exist) and couldn't stat Blocks/ds/Blk00001.bin --> new system
-    if ( (strcmp(tmp.c_str(), "DB_ERROR") == 0) && 
-        (stat(BlockFileInfo::GenerateFilename(1, BlockType::DS).c_str(), &s) != 0) )
+    if ((strcmp(tmp.c_str(), "DB_ERROR") == 0) && (stat(BlockFileInfo::GenerateFilename(1, BlockType::DS).c_str(), &s) != 0))
     {
         LastBlockFileInfo lbfi(1);
         if (m_metadataDB.WriteToDB(LastBlockFileInfo::GenerateKey(BlockType::DS), lbfi.ToString()) != 0)
@@ -245,8 +247,7 @@ BlockStorage::BlockStorage() : m_metadataDB("blocks.db"), m_txBodyDB("txbodies.d
 
     tmp = m_metadataDB.ReadFromDB(LastBlockFileInfo::GenerateKey(BlockType::Tx));
     // Couldn't find key "tl" (or it doesn't exist) and couldn't stat Blocks/tx/Blk00001.bin --> new system
-    if ( (strcmp(tmp.c_str(), "DB_ERROR") == 0) && 
-        (stat(BlockFileInfo::GenerateFilename(1, BlockType::Tx).c_str(), &s) != 0) )
+    if ((strcmp(tmp.c_str(), "DB_ERROR") == 0) && (stat(BlockFileInfo::GenerateFilename(1, BlockType::Tx).c_str(), &s) != 0))
     {
         LastBlockFileInfo lbfi(1);
         if (m_metadataDB.WriteToDB(LastBlockFileInfo::GenerateKey(BlockType::Tx), lbfi.ToString()) != 0)
@@ -281,8 +282,8 @@ BlockStorage::BlockStorage() : m_metadataDB("blocks.db"), m_txBodyDB("txbodies.d
     m_blockStorageType = BlockStorageType::None;
 }
 
-void BlockStorage::AddBlockToDSCache(const boost::multiprecision::uint256_t & blockNum, 
-    const vector<unsigned char> & block) 
+void BlockStorage::AddBlockToDSCache(const boost::multiprecision::uint256_t& blockNum,
+                                     const vector<unsigned char>& block)
 {
     std::unique_lock<std::shared_timed_mutex> lock(m_dsBlockCacheMutex);
     // Select first NULL entry, else select last entry
@@ -314,8 +315,8 @@ void BlockStorage::AddBlockToDSCache(const boost::multiprecision::uint256_t & bl
     }
 }
 
-void BlockStorage::AddBlockToTxCache(const boost::multiprecision::uint256_t & blockNum, 
-    const vector<unsigned char> & block) 
+void BlockStorage::AddBlockToTxCache(const boost::multiprecision::uint256_t& blockNum,
+                                     const vector<unsigned char>& block)
 {
     std::unique_lock<std::shared_timed_mutex> lock(m_txBlockCacheMutex);
     // Select first NULL entry, else select last entry
@@ -344,11 +345,11 @@ void BlockStorage::AddBlockToTxCache(const boost::multiprecision::uint256_t & bl
         list<pair<boost::multiprecision::uint256_t, TxBlockSharedPtr>>::iterator iter_next = iter;
         iter_next++;
         m_txblock_cache.splice(m_txblock_cache.begin(), m_txblock_cache, iter, iter_next);
-    }    
+    }
 }
 
-bool BlockStorage::PutBlockToDisk(const boost::multiprecision::uint256_t & blockNum, 
-    const vector<unsigned char> & block, const BlockType & blockType)
+bool BlockStorage::PutBlockToDisk(const boost::multiprecision::uint256_t& blockNum,
+                                  const vector<unsigned char>& block, const BlockType& blockType)
 {
     // pid_t tid = syscall(SYS_gettid);
 
@@ -358,7 +359,7 @@ bool BlockStorage::PutBlockToDisk(const boost::multiprecision::uint256_t & block
 
     string tmp = "";
 
-    // Get db entry on last block file    
+    // Get db entry on last block file
     if (blockType == BlockType::DS)
     {
         tmp = m_metadataDB.ReadFromDB(LastBlockFileInfo::GenerateKey(BlockType::DS));
@@ -367,15 +368,15 @@ bool BlockStorage::PutBlockToDisk(const boost::multiprecision::uint256_t & block
     {
         tmp = m_metadataDB.ReadFromDB(LastBlockFileInfo::GenerateKey(BlockType::Tx));
     }
-    
+
     if (strcmp(tmp.c_str(), "DB_ERROR") == 0)
-    {    
+    {
         // THREAD// LOG_ERROR(tid);
         return false;
     }
-    
+
     LastBlockFileInfo lbfi(tmp);
-    
+
     // Get db entry on last block file info
     if (blockType == BlockType::DS)
     {
@@ -386,7 +387,7 @@ bool BlockStorage::PutBlockToDisk(const boost::multiprecision::uint256_t & block
         tmp = m_metadataDB.ReadFromDB(BlockFileInfo::GenerateKey(lbfi.filenum, BlockType::Tx));
     }
     if (strcmp(tmp.c_str(), "DB_ERROR") == 0)
-    {    
+    {
         // THREAD// LOG_ERROR(tid);
         return false;
     }
@@ -411,7 +412,7 @@ bool BlockStorage::PutBlockToDisk(const boost::multiprecision::uint256_t & block
         if (blockType == BlockType::DS)
             blockFileInfoFileName = BlockFileInfo::GenerateFilename(lbfi.filenum, BlockType::DS);
         else if (blockType == BlockType::Tx)
-            blockFileInfoFileName = BlockFileInfo::GenerateFilename(lbfi.filenum, BlockType::Tx);            
+            blockFileInfoFileName = BlockFileInfo::GenerateFilename(lbfi.filenum, BlockType::Tx);
 
         // Put block into new file
         lbfi.filenum++;
@@ -419,10 +420,10 @@ bool BlockStorage::PutBlockToDisk(const boost::multiprecision::uint256_t & block
         {
             ofstream ofs(blockFileInfoFileName.c_str(), ios::out | ios::binary);
             LOG_MESSAGE("DEBUG: Writing compressed block to disk");
-            ofs.write((const char*) compressed_block.get(), compressed_block_len);
+            ofs.write((const char*)compressed_block.get(), compressed_block_len);
             ofs.close();
         }
-        catch(...)
+        catch (...)
         {
             // THREAD// LOG_ERROR(tid);
             return false;
@@ -439,7 +440,7 @@ bool BlockStorage::PutBlockToDisk(const boost::multiprecision::uint256_t & block
         }
         else if (blockType == BlockType::Tx)
         {
-            blockInfoKey = BlockInfo::GenerateKey(blockNum, BlockType::Tx); 
+            blockInfoKey = BlockInfo::GenerateKey(blockNum, BlockType::Tx);
         }
 
         if (m_metadataDB.WriteToDB(blockInfoKey, bi.ToString()) != 0)
@@ -463,7 +464,7 @@ bool BlockStorage::PutBlockToDisk(const boost::multiprecision::uint256_t & block
         else if (blockType == BlockType::Tx)
         {
             blockFileInfoKey = BlockFileInfo::GenerateKey(lbfi.filenum, BlockType::Tx);
-            lastBlockFileInfoKey = LastBlockFileInfo::GenerateKey(BlockType::Tx);     
+            lastBlockFileInfoKey = LastBlockFileInfo::GenerateKey(BlockType::Tx);
         }
 
         if (m_metadataDB.WriteToDB(blockFileInfoKey, bfi.ToString()) != 0)
@@ -497,10 +498,10 @@ bool BlockStorage::PutBlockToDisk(const boost::multiprecision::uint256_t & block
         {
             ofstream ofs(blockFileInfoFilename.c_str(), ios::out | ios::binary | ios::app);
             ofs.seekp(bfi.filesize, ios_base::beg);
-            ofs.write((const char*) compressed_block.get(), compressed_block_len);
+            ofs.write((const char*)compressed_block.get(), compressed_block_len);
             ofs.close();
         }
-        catch(...)
+        catch (...)
         {
             // THREAD// LOG_ERROR(tid);
             return false;
@@ -564,7 +565,7 @@ bool BlockStorage::PutBlockToDisk(const boost::multiprecision::uint256_t & block
     return true;
 }
 
-bool BlockStorage::GetDSBlockFromDisk(const boost::multiprecision::uint256_t & blocknum, DSBlockSharedPtr &  block)
+bool BlockStorage::GetDSBlockFromDisk(const boost::multiprecision::uint256_t& blocknum, DSBlockSharedPtr& block)
 {
     // pid_t tid = syscall(SYS_gettid);
 
@@ -607,24 +608,24 @@ bool BlockStorage::GetDSBlockFromDisk(const boost::multiprecision::uint256_t & b
             // THREAD// LOG_ERROR(tid);
             return false;
         }
-        
+
         BlockInfo bi(tmp);
 
         // Read the block from the file
         LOG_MESSAGE("DEBUG: Reading compressed block from disk");
-        unique_ptr<unsigned char> buf{ new unsigned char[bi.blocksize] };
+        unique_ptr<unsigned char> buf{new unsigned char[bi.blocksize]};
 
         vector<unsigned char> blockVector;
         try
         {
             //cout << "Opening " << BlockFileInfo::GenerateFilename(bi.filenum, BlockType::DS) << endl;
-            ifstream ifs(BlockFileInfo::GenerateFilename(bi.filenum, BlockType::DS).c_str(), 
-                ios::in | ios::binary);
+            ifstream ifs(BlockFileInfo::GenerateFilename(bi.filenum, BlockType::DS).c_str(),
+                         ios::in | ios::binary);
             ifs.seekg(bi.fileoffset, ios_base::beg);
-            ifs.read((char*) buf.get(), bi.blocksize);
+            ifs.read((char*)buf.get(), bi.blocksize);
             ifs.close();
         }
-        catch(...)
+        catch (...)
         {
             // THREAD// LOG_ERROR(tid);
             return false;
@@ -676,7 +677,7 @@ bool BlockStorage::GetDSBlockFromDisk(const boost::multiprecision::uint256_t & b
     return true;
 }
 
-bool BlockStorage::GetTxBlockFromDisk(const boost::multiprecision::uint256_t & blocknum, TxBlockSharedPtr &  block)
+bool BlockStorage::GetTxBlockFromDisk(const boost::multiprecision::uint256_t& blocknum, TxBlockSharedPtr& block)
 {
     // pid_t tid = syscall(SYS_gettid);
 
@@ -719,23 +720,23 @@ bool BlockStorage::GetTxBlockFromDisk(const boost::multiprecision::uint256_t & b
             // THREAD// LOG_ERROR(tid);
             return false;
         }
-        
+
         BlockInfo bi(tmp);
 
         // Read the block from the file
         LOG_MESSAGE("DEBUG: Reading compressed block from disk");
-        
-        std::unique_ptr<unsigned char[]> buf{ new unsigned char[bi.blocksize] };
-        
+
+        std::unique_ptr<unsigned char[]> buf{new unsigned char[bi.blocksize]};
+
         try
         {
-            ifstream ifs(BlockFileInfo::GenerateFilename(bi.filenum, BlockType::Tx).c_str(), 
-                ios::in | ios::binary);
+            ifstream ifs(BlockFileInfo::GenerateFilename(bi.filenum, BlockType::Tx).c_str(),
+                         ios::in | ios::binary);
             ifs.seekg(bi.fileoffset, ios_base::beg);
-            ifs.read((char*) buf.get(), bi.blocksize);
+            ifs.read((char*)buf.get(), bi.blocksize);
             ifs.close();
         }
-        catch(...)
+        catch (...)
         {
             // THREAD// LOG_ERROR(tid);
             return false;
@@ -789,8 +790,8 @@ bool BlockStorage::GetTxBlockFromDisk(const boost::multiprecision::uint256_t & b
     return true;
 }
 
-bool BlockStorage::PutBlockToLevelDB(const boost::multiprecision::uint256_t & blockNum, 
-    const vector<unsigned char> & body, const BlockType & blockType)
+bool BlockStorage::PutBlockToLevelDB(const boost::multiprecision::uint256_t& blockNum,
+                                     const vector<unsigned char>& body, const BlockType& blockType)
 {
     string key = ConvertUInt256ToString(blockNum);
     int ret;
@@ -805,100 +806,103 @@ bool BlockStorage::PutBlockToLevelDB(const boost::multiprecision::uint256_t & bl
     return (ret == 0);
 }
 
-bool BlockStorage::GetDSBlockFromLevelDB(const boost::multiprecision::uint256_t & blockNum, 
-    DSBlockSharedPtr & block)
+bool BlockStorage::GetDSBlockFromLevelDB(const boost::multiprecision::uint256_t& blockNum,
+                                         DSBlockSharedPtr& block)
 {
     string key = ConvertUInt256ToString(blockNum);
     string blockString = m_dsBlockchainDB.ReadFromDB(key);
     const unsigned char* raw_memory = reinterpret_cast<const unsigned char*>(blockString.c_str());
-    block = DSBlockSharedPtr( new DSBlock(std::vector<unsigned char>(raw_memory, 
-        raw_memory + blockString.size()), 0) );
+    block = DSBlockSharedPtr(new DSBlock(std::vector<unsigned char>(raw_memory,
+                                                                    raw_memory + blockString.size()),
+                                         0));
     return true;
 }
 
-bool BlockStorage::GetTxBlockFromLevelDB(const boost::multiprecision::uint256_t & blockNum, 
-    TxBlockSharedPtr & block)
+bool BlockStorage::GetTxBlockFromLevelDB(const boost::multiprecision::uint256_t& blockNum,
+                                         TxBlockSharedPtr& block)
 {
     string key = ConvertUInt256ToString(blockNum);
     string blockString = m_txBlockchainDB.ReadFromDB(key);
     const unsigned char* raw_memory = reinterpret_cast<const unsigned char*>(blockString.c_str());
-    block = TxBlockSharedPtr( new TxBlock(std::vector<unsigned char>(raw_memory, 
-        raw_memory + blockString.size()), 0) );
+    block = TxBlockSharedPtr(new TxBlock(std::vector<unsigned char>(raw_memory,
+                                                                    raw_memory + blockString.size()),
+                                         0));
     return true;
 }
 
-bool BlockStorage::PutDSBlock(const boost::multiprecision::uint256_t & blockNum, 
-    const vector<unsigned char> & body)
+bool BlockStorage::PutDSBlock(const boost::multiprecision::uint256_t& blockNum,
+                              const vector<unsigned char>& body)
 {
-    switch(m_blockStorageType)
+    switch (m_blockStorageType)
     {
-        case BlockStorageType::FileSystem:
-            return PutBlockToDisk(blockNum, body, BlockType::DS);
-        case BlockStorageType::LevelDB:
-            return PutBlockToLevelDB(blockNum, body, BlockType::DS);
-        case BlockStorageType::None:
-            return false;
+    case BlockStorageType::FileSystem:
+        return PutBlockToDisk(blockNum, body, BlockType::DS);
+    case BlockStorageType::LevelDB:
+        return PutBlockToLevelDB(blockNum, body, BlockType::DS);
+    case BlockStorageType::None:
+        return false;
     }
     return false;
 }
 
-bool BlockStorage::PutTxBlock(const boost::multiprecision::uint256_t & blockNum, 
-    const vector<unsigned char> & body)
+bool BlockStorage::PutTxBlock(const boost::multiprecision::uint256_t& blockNum,
+                              const vector<unsigned char>& body)
 {
-    switch(m_blockStorageType)
+    switch (m_blockStorageType)
     {
-        case BlockStorageType::FileSystem:
-            return PutBlockToDisk(blockNum, body, BlockType::Tx);
-        case BlockStorageType::LevelDB:
-            return PutBlockToLevelDB(blockNum, body, BlockType::Tx);
-        case BlockStorageType::None:
-            return false;
+    case BlockStorageType::FileSystem:
+        return PutBlockToDisk(blockNum, body, BlockType::Tx);
+    case BlockStorageType::LevelDB:
+        return PutBlockToLevelDB(blockNum, body, BlockType::Tx);
+    case BlockStorageType::None:
+        return false;
     }
     return false;
 }
 
-bool BlockStorage::GetDSBlock(const boost::multiprecision::uint256_t & blockNum, 
-    DSBlockSharedPtr & block)
+bool BlockStorage::GetDSBlock(const boost::multiprecision::uint256_t& blockNum,
+                              DSBlockSharedPtr& block)
 {
-    switch(m_blockStorageType)
+    switch (m_blockStorageType)
     {
-        case BlockStorageType::FileSystem:
-            return GetDSBlockFromDisk(blockNum, block);
-        case BlockStorageType::LevelDB:
-            return GetDSBlockFromLevelDB(blockNum, block);
-        case BlockStorageType::None:
-            return false;
+    case BlockStorageType::FileSystem:
+        return GetDSBlockFromDisk(blockNum, block);
+    case BlockStorageType::LevelDB:
+        return GetDSBlockFromLevelDB(blockNum, block);
+    case BlockStorageType::None:
+        return false;
     }
     return false;
 }
 
-bool BlockStorage::GetTxBlock(const boost::multiprecision::uint256_t & blockNum, 
-    TxBlockSharedPtr & block)
+bool BlockStorage::GetTxBlock(const boost::multiprecision::uint256_t& blockNum,
+                              TxBlockSharedPtr& block)
 {
-    switch(m_blockStorageType)
+    switch (m_blockStorageType)
     {
-        case BlockStorageType::FileSystem:
-            return GetTxBlockFromDisk(blockNum, block);
-        case BlockStorageType::LevelDB:
-            return GetTxBlockFromLevelDB(blockNum, block);
-        case BlockStorageType::None:
-            return false;
+    case BlockStorageType::FileSystem:
+        return GetTxBlockFromDisk(blockNum, block);
+    case BlockStorageType::LevelDB:
+        return GetTxBlockFromLevelDB(blockNum, block);
+    case BlockStorageType::None:
+        return false;
     }
     return false;
 }
 
-bool BlockStorage::PutTxBody(const string & key, const vector<unsigned char> & body)
+bool BlockStorage::PutTxBody(const string& key, const vector<unsigned char>& body)
 {
     int ret = m_txBodyDB.WriteToDB(key, std::string(reinterpret_cast<const char*>(&body[0]), body.size()));
     return (ret == 0);
 }
 
-void BlockStorage::GetTxBody(const string & key, TxBodySharedPtr & body)
+void BlockStorage::GetTxBody(const string& key, TxBodySharedPtr& body)
 {
     string bodyString = m_txBodyDB.ReadFromDB(key);
     const unsigned char* raw_memory = reinterpret_cast<const unsigned char*>(bodyString.c_str());
-    body = TxBodySharedPtr( new Transaction(std::vector<unsigned char>(raw_memory, 
-        raw_memory + bodyString.size()), 0) );
+    body = TxBodySharedPtr(new Transaction(std::vector<unsigned char>(raw_memory,
+                                                                      raw_memory + bodyString.size()),
+                                           0));
 }
 
 void BlockStorage::SetBlockStorageType(BlockStorageType _blockStorageType)
@@ -906,8 +910,8 @@ void BlockStorage::SetBlockStorageType(BlockStorageType _blockStorageType)
     m_blockStorageType = _blockStorageType;
 }
 
-bool BlockStorage::Compress(const unsigned char * src, int src_len, 
-    shared_ptr<unsigned char> & dst, lzo_uint & dst_len)
+bool BlockStorage::Compress(const unsigned char* src, int src_len,
+                            shared_ptr<unsigned char>& dst, lzo_uint& dst_len)
 {
     // pid_t tid = syscall(SYS_gettid);
 
@@ -915,9 +919,8 @@ bool BlockStorage::Compress(const unsigned char * src, int src_len,
 
     const lzo_uint src_len_lzo = src_len + 1;
 
-    shared_ptr<unsigned char> compressed_object{ 
-        new unsigned char __LZO_MMODEL[ src_len_lzo + src_len_lzo / 16 + 64 + 3 ] 
-    };
+    shared_ptr<unsigned char> compressed_object{
+        new unsigned char __LZO_MMODEL[src_len_lzo + src_len_lzo / 16 + 64 + 3]};
 
     if (compressed_object.get() == NULL)
     {
@@ -931,11 +934,10 @@ bool BlockStorage::Compress(const unsigned char * src, int src_len,
         return false;
     }
 
-    lzo_align_t __LZO_MMODEL wrkmem[ ( (LZO1X_1_MEM_COMPRESS) + 
-        (sizeof(lzo_align_t) - 1) ) / sizeof(lzo_align_t) ];
+    lzo_align_t __LZO_MMODEL wrkmem[((LZO1X_1_MEM_COMPRESS) + (sizeof(lzo_align_t) - 1)) / sizeof(lzo_align_t)];
 
-    int r = lzo1x_1_compress( (const unsigned char*) src, src_len_lzo, 
-        compressed_object.get(), &dst_len, wrkmem );
+    int r = lzo1x_1_compress((const unsigned char*)src, src_len_lzo,
+                             compressed_object.get(), &dst_len, wrkmem);
 
     // THREADLOG_MESSAGE(tid, "Compression: " << src_len << " -> " << dst_len);
 
@@ -946,12 +948,12 @@ bool BlockStorage::Compress(const unsigned char * src, int src_len,
     }
 
     dst = compressed_object;
-    
+
     return true;
 }
 
-bool BlockStorage::Decompress(const unsigned char * src, 
-    const lzo_uint src_len, unsigned char * dst)
+bool BlockStorage::Decompress(const unsigned char* src,
+                              const lzo_uint src_len, unsigned char* dst)
 {
     // pid_t tid = syscall(SYS_gettid);
 
@@ -965,7 +967,7 @@ bool BlockStorage::Decompress(const unsigned char * src,
 
     lzo_uint dst_len = src_len;
 
-    int r = lzo1x_decompress(src, src_len, (unsigned char*) dst, &dst_len, NULL);
+    int r = lzo1x_decompress(src, src_len, (unsigned char*)dst, &dst_len, NULL);
     if (r != LZO_E_OK)
     {
         // THREAD// LOG_ERROR(tid);

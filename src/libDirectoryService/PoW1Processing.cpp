@@ -15,17 +15,17 @@
 **/
 
 #include <algorithm>
-#include <thread>
 #include <chrono>
+#include <thread>
 
 #include "DirectoryService.h"
 #include "common/Constants.h"
 #include "common/Messages.h"
 #include "common/Serializable.h"
 #include "depends/common/RLP.h"
+#include "depends/libDatabase/MemoryDB.h"
 #include "depends/libTrie/TrieDB.h"
 #include "depends/libTrie/TrieHash.h"
-#include "depends/libDatabase/MemoryDB.h"
 #include "libCrypto/Sha2.h"
 #include "libMediator/Mediator.h"
 #include "libNetwork/P2PComm.h"
@@ -54,9 +54,9 @@ bool DirectoryService::CheckWhetherMaxSubmissionsReceived(Peer peer, PubKey key)
     return false;
 }
 
-bool DirectoryService::VerifyPoW1Submission(const vector<unsigned char> & message, const Peer & from, PubKey & key, unsigned int curr_offset,
-                                            uint32_t & portNo, uint64_t & nonce, array<unsigned char, 32> & rand1,
-                                            array<unsigned char, 32> & rand2, unsigned int & difficulty, uint256_t & block_num)
+bool DirectoryService::VerifyPoW1Submission(const vector<unsigned char>& message, const Peer& from, PubKey& key, unsigned int curr_offset,
+                                            uint32_t& portNo, uint64_t& nonce, array<unsigned char, 32>& rand1,
+                                            array<unsigned char, 32>& rand2, unsigned int& difficulty, uint256_t& block_num)
 {
     // 8-byte nonce
     nonce = Serializable::GetNumber<uint64_t>(message, curr_offset, sizeof(uint64_t));
@@ -95,8 +95,8 @@ bool DirectoryService::VerifyPoW1Submission(const vector<unsigned char> & messag
     return result;
 }
 
-bool DirectoryService::ParseMessageAndVerifyPOW1(const vector<unsigned char> &message, unsigned int offset,
-                                                 const Peer &from)
+bool DirectoryService::ParseMessageAndVerifyPOW1(const vector<unsigned char>& message, unsigned int offset,
+                                                 const Peer& from)
 {
     unsigned int curr_offset = offset;
 
@@ -131,8 +131,7 @@ bool DirectoryService::ParseMessageAndVerifyPOW1(const vector<unsigned char> &me
     // if ((m_state != POW1_SUBMISSION) && (m_state != DSBLOCK_CONSENSUS_PREP))
     if (!CheckState(VERIFYPOW1))
     {
-        LOG_MESSAGE2(to_string(m_mediator.m_currentEpochNum).c_str(), "Too late - current state is " << m_state
-                                                   << ". Don't verify cause I have other work to do. Assume true as it has no impact.");
+        LOG_MESSAGE2(to_string(m_mediator.m_currentEpochNum).c_str(), "Too late - current state is " << m_state << ". Don't verify cause I have other work to do. Assume true as it has no impact.");
         return true;
     }
 
@@ -142,7 +141,7 @@ bool DirectoryService::ParseMessageAndVerifyPOW1(const vector<unsigned char> &me
     unsigned int difficulty;
     uint256_t block_num;
     bool result = VerifyPoW1Submission(message, from, key, curr_offset, portNo, nonce, rand1,
-                         rand2, difficulty, block_num);
+                                       rand2, difficulty, block_num);
 
     if (result == true)
     {
@@ -174,22 +173,20 @@ bool DirectoryService::ParseMessageAndVerifyPOW1(const vector<unsigned char> &me
     else
     {
         LOG_MESSAGE2(to_string(m_mediator.m_currentEpochNum).c_str(), "Invalid PoW1 submission");
-        LOG_MESSAGE2(to_string(m_mediator.m_currentEpochNum).c_str(), "blockNum: " << block_num << " Difficulty: " << difficulty << " nonce: " << nonce << " ip: " <<
-                                 peer.GetPrintableIPAddress() << ":" << portNo);
-        LOG_MESSAGE2(to_string(m_mediator.m_currentEpochNum).c_str(), "rand1: " << DataConversion::charArrToHexStr(rand1) << " rand2: " <<
-                              DataConversion::charArrToHexStr(rand2));
+        LOG_MESSAGE2(to_string(m_mediator.m_currentEpochNum).c_str(), "blockNum: " << block_num << " Difficulty: " << difficulty << " nonce: " << nonce << " ip: " << peer.GetPrintableIPAddress() << ":" << portNo);
+        LOG_MESSAGE2(to_string(m_mediator.m_currentEpochNum).c_str(), "rand1: " << DataConversion::charArrToHexStr(rand1) << " rand2: " << DataConversion::charArrToHexStr(rand2));
     }
     return result;
 }
 #endif // IS_LOOKUP_NODE
 
-bool DirectoryService::ProcessPoW1Submission(const vector<unsigned char> & message, unsigned int offset, const Peer & from)
+bool DirectoryService::ProcessPoW1Submission(const vector<unsigned char>& message, unsigned int offset, const Peer& from)
 {
 #ifndef IS_LOOKUP_NODE
     // Message = [32-byte block number] [4-byte listening port] [33-byte public key] [8-byte nonce] [32-byte resulting hash] [32-byte mixhash]
     LOG_MARKER();
     shared_lock<shared_timed_mutex> lock(m_mutexProducerConsumer);
-    unsigned int sleep_time_while_waiting = 100; 
+    unsigned int sleep_time_while_waiting = 100;
     if (m_state == FINALBLOCK_CONSENSUS)
     {
         for (unsigned int i = 0; i < POW_SUB_BUFFER_TIME; i++)
@@ -202,7 +199,6 @@ bool DirectoryService::ProcessPoW1Submission(const vector<unsigned char> & messa
             if (i % 10 == 0)
             {
                 LOG_MESSAGE2(to_string(m_mediator.m_currentEpochNum).c_str(), "Waiting for POW1_SUBMISSION before processing. Current state is " << m_state);
-
             }
             this_thread::sleep_for(chrono::milliseconds(sleep_time_while_waiting));
         }
@@ -216,8 +212,7 @@ bool DirectoryService::ProcessPoW1Submission(const vector<unsigned char> & messa
     }
 
     if (IsMessageSizeInappropriate(message.size(), offset,
-                                   sizeof(uint256_t) + sizeof(uint32_t) + PUB_KEY_SIZE +
-                                   sizeof(uint64_t) + BLOCK_HASH_SIZE + BLOCK_HASH_SIZE))
+                                   sizeof(uint256_t) + sizeof(uint32_t) + PUB_KEY_SIZE + sizeof(uint64_t) + BLOCK_HASH_SIZE + BLOCK_HASH_SIZE))
     {
         return false;
     }

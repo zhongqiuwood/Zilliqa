@@ -14,14 +14,15 @@
 * and which include a reference to GPLv3 in their program files.
 **/
 
-
 #include "MultiSig.h"
 #include "Sha2.h"
 #include "libUtils/Logger.h"
 
 using namespace std;
 
-CommitSecret::CommitSecret() : m_s(BN_new(), BN_clear_free), m_initialized(false)
+CommitSecret::CommitSecret()
+    : m_s(BN_new(), BN_clear_free)
+    , m_initialized(false)
 {
     // commit->secret should be in [2,...,order-1]
     // -1 means no constraint on the MSB of kpriv->d
@@ -37,7 +38,7 @@ CommitSecret::CommitSecret() : m_s(BN_new(), BN_clear_free), m_initialized(false
 
     do
     {
-        const Curve & curve = Schnorr::GetInstance().GetCurve();
+        const Curve& curve = Schnorr::GetInstance().GetCurve();
 
         err = (BN_rand(m_s.get(), BN_num_bits(curve.m_order.get()), -1, 0) == 0);
         if (err)
@@ -52,18 +53,19 @@ CommitSecret::CommitSecret() : m_s(BN_new(), BN_clear_free), m_initialized(false
             LOG_MESSAGE("Error: Value to commit gen failed");
             break;
         }
-    }
-    while (BN_is_zero(m_s.get()) || BN_is_one(m_s.get()));
+    } while (BN_is_zero(m_s.get()) || BN_is_one(m_s.get()));
 
     m_initialized = (err == false);
 }
 
-CommitSecret::CommitSecret(const vector<unsigned char> & src, unsigned int offset)
+CommitSecret::CommitSecret(const vector<unsigned char>& src, unsigned int offset)
 {
     Deserialize(src, offset);
 }
 
-CommitSecret::CommitSecret(const CommitSecret & src) : m_s(BN_new(), BN_clear_free), m_initialized(false)
+CommitSecret::CommitSecret(const CommitSecret& src)
+    : m_s(BN_new(), BN_clear_free)
+    , m_initialized(false)
 {
     if (m_s != nullptr)
     {
@@ -85,7 +87,6 @@ CommitSecret::CommitSecret(const CommitSecret & src) : m_s(BN_new(), BN_clear_fr
 
 CommitSecret::~CommitSecret()
 {
-
 }
 
 bool CommitSecret::Initialized() const
@@ -93,7 +94,7 @@ bool CommitSecret::Initialized() const
     return m_initialized;
 }
 
-unsigned int CommitSecret::Serialize(vector<unsigned char> & dst, unsigned int offset) const
+unsigned int CommitSecret::Serialize(vector<unsigned char>& dst, unsigned int offset) const
 {
     LOG_MARKER();
 
@@ -105,7 +106,7 @@ unsigned int CommitSecret::Serialize(vector<unsigned char> & dst, unsigned int o
     return COMMIT_SECRET_SIZE;
 }
 
-void CommitSecret::Deserialize(const vector<unsigned char> & src, unsigned int offset)
+void CommitSecret::Deserialize(const vector<unsigned char>& src, unsigned int offset)
 {
     LOG_MARKER();
 
@@ -121,18 +122,20 @@ void CommitSecret::Deserialize(const vector<unsigned char> & src, unsigned int o
     }
 }
 
-CommitSecret & CommitSecret::operator=(const CommitSecret & src)
+CommitSecret& CommitSecret::operator=(const CommitSecret& src)
 {
     m_initialized = (BN_copy(m_s.get(), src.m_s.get()) == m_s.get());
     return *this;
 }
 
-bool CommitSecret::operator==(const CommitSecret & r) const
+bool CommitSecret::operator==(const CommitSecret& r) const
 {
     return (m_initialized && r.m_initialized && (BN_cmp(m_s.get(), r.m_s.get()) == 0));
 }
 
-CommitPoint::CommitPoint() : m_p(EC_POINT_new(Schnorr::GetInstance().GetCurve().m_group.get()), EC_POINT_clear_free), m_initialized(false)
+CommitPoint::CommitPoint()
+    : m_p(EC_POINT_new(Schnorr::GetInstance().GetCurve().m_group.get()), EC_POINT_clear_free)
+    , m_initialized(false)
 {
     if (m_p == nullptr)
     {
@@ -141,7 +144,9 @@ CommitPoint::CommitPoint() : m_p(EC_POINT_new(Schnorr::GetInstance().GetCurve().
     }
 }
 
-CommitPoint::CommitPoint(const CommitSecret & secret) : m_p(EC_POINT_new(Schnorr::GetInstance().GetCurve().m_group.get()), EC_POINT_clear_free), m_initialized(false)
+CommitPoint::CommitPoint(const CommitSecret& secret)
+    : m_p(EC_POINT_new(Schnorr::GetInstance().GetCurve().m_group.get()), EC_POINT_clear_free)
+    , m_initialized(false)
 {
     if (m_p == nullptr)
     {
@@ -152,12 +157,14 @@ CommitPoint::CommitPoint(const CommitSecret & secret) : m_p(EC_POINT_new(Schnorr
     Set(secret);
 }
 
-CommitPoint::CommitPoint(const vector<unsigned char> & src, unsigned int offset)
+CommitPoint::CommitPoint(const vector<unsigned char>& src, unsigned int offset)
 {
     Deserialize(src, offset);
 }
 
-CommitPoint::CommitPoint(const CommitPoint & src) : m_p(EC_POINT_new(Schnorr::GetInstance().GetCurve().m_group.get()), EC_POINT_clear_free), m_initialized(false)
+CommitPoint::CommitPoint(const CommitPoint& src)
+    : m_p(EC_POINT_new(Schnorr::GetInstance().GetCurve().m_group.get()), EC_POINT_clear_free)
+    , m_initialized(false)
 {
     if (m_p == nullptr)
     {
@@ -179,7 +186,6 @@ CommitPoint::CommitPoint(const CommitPoint & src) : m_p(EC_POINT_new(Schnorr::Ge
 
 CommitPoint::~CommitPoint()
 {
-
 }
 
 bool CommitPoint::Initialized() const
@@ -187,7 +193,7 @@ bool CommitPoint::Initialized() const
     return m_initialized;
 }
 
-unsigned int CommitPoint::Serialize(vector<unsigned char> & dst, unsigned int offset) const
+unsigned int CommitPoint::Serialize(vector<unsigned char>& dst, unsigned int offset) const
 {
     LOG_MARKER();
 
@@ -199,7 +205,7 @@ unsigned int CommitPoint::Serialize(vector<unsigned char> & dst, unsigned int of
     return COMMIT_POINT_SIZE;
 }
 
-void CommitPoint::Deserialize(const vector<unsigned char> & src, unsigned int offset)
+void CommitPoint::Deserialize(const vector<unsigned char>& src, unsigned int offset)
 {
     LOG_MARKER();
 
@@ -215,7 +221,7 @@ void CommitPoint::Deserialize(const vector<unsigned char> & src, unsigned int of
     }
 }
 
-void CommitPoint::Set(const CommitSecret & secret)
+void CommitPoint::Set(const CommitSecret& secret)
 {
     if (!secret.Initialized())
     {
@@ -234,13 +240,13 @@ void CommitPoint::Set(const CommitSecret & secret)
     }
 }
 
-CommitPoint & CommitPoint::operator=(const CommitPoint & src)
+CommitPoint& CommitPoint::operator=(const CommitPoint& src)
 {
     m_initialized = (EC_POINT_copy(m_p.get(), src.m_p.get()) == 1);
     return *this;
 }
 
-bool CommitPoint::operator==(const CommitPoint & r) const
+bool CommitPoint::operator==(const CommitPoint& r) const
 {
     unique_ptr<BN_CTX, void (*)(BN_CTX*)> ctx(BN_CTX_new(), BN_CTX_free);
     if (ctx == nullptr)
@@ -252,7 +258,9 @@ bool CommitPoint::operator==(const CommitPoint & r) const
     return (m_initialized && r.m_initialized && (EC_POINT_cmp(Schnorr::GetInstance().GetCurve().m_group.get(), m_p.get(), r.m_p.get(), ctx.get()) == 0));
 }
 
-Challenge::Challenge() : m_c(BN_new(), BN_clear_free), m_initialized(false)
+Challenge::Challenge()
+    : m_c(BN_new(), BN_clear_free)
+    , m_initialized(false)
 {
     if (m_c == nullptr)
     {
@@ -261,7 +269,9 @@ Challenge::Challenge() : m_c(BN_new(), BN_clear_free), m_initialized(false)
     }
 }
 
-Challenge::Challenge(const CommitPoint & aggregatedCommit, const PubKey & aggregatedPubkey, const vector<unsigned char> & message) : m_c(BN_new(), BN_clear_free), m_initialized(false)
+Challenge::Challenge(const CommitPoint& aggregatedCommit, const PubKey& aggregatedPubkey, const vector<unsigned char>& message)
+    : m_c(BN_new(), BN_clear_free)
+    , m_initialized(false)
 {
     if (m_c == nullptr)
     {
@@ -272,12 +282,14 @@ Challenge::Challenge(const CommitPoint & aggregatedCommit, const PubKey & aggreg
     Set(aggregatedCommit, aggregatedPubkey, message);
 }
 
-Challenge::Challenge(const vector<unsigned char> & src, unsigned int offset)
+Challenge::Challenge(const vector<unsigned char>& src, unsigned int offset)
 {
     Deserialize(src, offset);
 }
 
-Challenge::Challenge(const Challenge & src) : m_c(BN_new(), BN_clear_free), m_initialized(false)
+Challenge::Challenge(const Challenge& src)
+    : m_c(BN_new(), BN_clear_free)
+    , m_initialized(false)
 {
     if (m_c != nullptr)
     {
@@ -299,7 +311,6 @@ Challenge::Challenge(const Challenge & src) : m_c(BN_new(), BN_clear_free), m_in
 
 Challenge::~Challenge()
 {
-
 }
 
 bool Challenge::Initialized() const
@@ -307,7 +318,7 @@ bool Challenge::Initialized() const
     return m_initialized;
 }
 
-unsigned int Challenge::Serialize(vector<unsigned char> & dst, unsigned int offset) const
+unsigned int Challenge::Serialize(vector<unsigned char>& dst, unsigned int offset) const
 {
     LOG_MARKER();
 
@@ -319,7 +330,7 @@ unsigned int Challenge::Serialize(vector<unsigned char> & dst, unsigned int offs
     return CHALLENGE_SIZE;
 }
 
-void Challenge::Deserialize(const vector<unsigned char> & src, unsigned int offset)
+void Challenge::Deserialize(const vector<unsigned char>& src, unsigned int offset)
 {
     LOG_MARKER();
 
@@ -335,7 +346,7 @@ void Challenge::Deserialize(const vector<unsigned char> & src, unsigned int offs
     }
 }
 
-void Challenge::Set(const CommitPoint & aggregatedCommit, const PubKey & aggregatedPubkey, const vector<unsigned char> & message)
+void Challenge::Set(const CommitPoint& aggregatedCommit, const PubKey& aggregatedPubkey, const vector<unsigned char>& message)
 {
     // Initial checks
 
@@ -364,7 +375,7 @@ void Challenge::Set(const CommitPoint & aggregatedCommit, const PubKey & aggrega
     vector<unsigned char> buf(Schnorr::PUBKEY_COMPRESSED_SIZE_BYTES);
     SHA2<HASH_TYPE::HASH_VARIANT_256> sha2;
 
-    const Curve & curve = Schnorr::GetInstance().GetCurve();
+    const Curve& curve = Schnorr::GetInstance().GetCurve();
 
     // Convert the committment to octets first
     if (EC_POINT_point2oct(curve.m_group.get(), aggregatedCommit.m_p.get(), POINT_CONVERSION_COMPRESSED, buf.data(), Schnorr::PUBKEY_COMPRESSED_SIZE_BYTES, NULL) != Schnorr::PUBKEY_COMPRESSED_SIZE_BYTES)
@@ -375,7 +386,7 @@ void Challenge::Set(const CommitPoint & aggregatedCommit, const PubKey & aggrega
 
     // Hash commitment
     sha2.Update(buf);
-    
+
     // Clear buffer
     fill(buf.begin(), buf.end(), 0x00);
 
@@ -388,7 +399,7 @@ void Challenge::Set(const CommitPoint & aggregatedCommit, const PubKey & aggrega
 
     // Hash public key
     sha2.Update(buf);
-    
+
     // Hash message
     sha2.Update(message);
     vector<unsigned char> digest = sha2.Finalize();
@@ -409,18 +420,20 @@ void Challenge::Set(const CommitPoint & aggregatedCommit, const PubKey & aggrega
     m_initialized = true;
 }
 
-Challenge & Challenge::operator=(const Challenge & src)
+Challenge& Challenge::operator=(const Challenge& src)
 {
     m_initialized = (BN_copy(m_c.get(), src.m_c.get()) == m_c.get());
     return *this;
 }
 
-bool Challenge::operator==(const Challenge & r) const
+bool Challenge::operator==(const Challenge& r) const
 {
     return (m_initialized && r.m_initialized && (BN_cmp(m_c.get(), r.m_c.get()) == 0));
 }
 
-Response::Response() : m_r(BN_new(), BN_clear_free), m_initialized(false)
+Response::Response()
+    : m_r(BN_new(), BN_clear_free)
+    , m_initialized(false)
 {
     if (m_r == nullptr)
     {
@@ -429,7 +442,9 @@ Response::Response() : m_r(BN_new(), BN_clear_free), m_initialized(false)
     }
 }
 
-Response::Response(const CommitSecret & secret, const Challenge & challenge, const PrivKey & privkey) : m_r(BN_new(), BN_clear_free), m_initialized(false)
+Response::Response(const CommitSecret& secret, const Challenge& challenge, const PrivKey& privkey)
+    : m_r(BN_new(), BN_clear_free)
+    , m_initialized(false)
 {
     // Initial checks
 
@@ -442,12 +457,14 @@ Response::Response(const CommitSecret & secret, const Challenge & challenge, con
     Set(secret, challenge, privkey);
 }
 
-Response::Response(const vector<unsigned char> & src, unsigned int offset)
+Response::Response(const vector<unsigned char>& src, unsigned int offset)
 {
     Deserialize(src, offset);
 }
 
-Response::Response(const Response & src) : m_r(BN_new(), BN_clear_free), m_initialized(false)
+Response::Response(const Response& src)
+    : m_r(BN_new(), BN_clear_free)
+    , m_initialized(false)
 {
     if (m_r != nullptr)
     {
@@ -469,7 +486,6 @@ Response::Response(const Response & src) : m_r(BN_new(), BN_clear_free), m_initi
 
 Response::~Response()
 {
-
 }
 
 bool Response::Initialized() const
@@ -477,7 +493,7 @@ bool Response::Initialized() const
     return m_initialized;
 }
 
-unsigned int Response::Serialize(vector<unsigned char> & dst, unsigned int offset) const
+unsigned int Response::Serialize(vector<unsigned char>& dst, unsigned int offset) const
 {
     LOG_MARKER();
 
@@ -489,7 +505,7 @@ unsigned int Response::Serialize(vector<unsigned char> & dst, unsigned int offse
     return RESPONSE_SIZE;
 }
 
-void Response::Deserialize(const vector<unsigned char> & src, unsigned int offset)
+void Response::Deserialize(const vector<unsigned char>& src, unsigned int offset)
 {
     LOG_MARKER();
 
@@ -505,7 +521,7 @@ void Response::Deserialize(const vector<unsigned char> & src, unsigned int offse
     }
 }
 
-void Response::Set(const CommitSecret & secret, const Challenge & challenge, const PrivKey & privkey)
+void Response::Set(const CommitSecret& secret, const Challenge& challenge, const PrivKey& privkey)
 {
     // Initial checks
 
@@ -543,9 +559,9 @@ void Response::Set(const CommitSecret & secret, const Challenge & challenge, con
         throw exception();
     }
 
-    const Curve & curve = Schnorr::GetInstance().GetCurve();
+    const Curve& curve = Schnorr::GetInstance().GetCurve();
 
-    // kpriv*c  
+    // kpriv*c
     if (BN_mod_mul(m_r.get(), challenge.m_c.get(), privkey.m_d.get(), curve.m_order.get(), ctx.get()) == 0)
     {
         LOG_MESSAGE("Error: BIGNUM mod mul failed");
@@ -562,20 +578,20 @@ void Response::Set(const CommitSecret & secret, const Challenge & challenge, con
     m_initialized = true;
 }
 
-Response & Response::operator=(const Response & src)
+Response& Response::operator=(const Response& src)
 {
     m_initialized = (BN_copy(m_r.get(), src.m_r.get()) == m_r.get());
     return *this;
 }
 
-bool Response::operator==(const Response & r) const
+bool Response::operator==(const Response& r) const
 {
     return (m_initialized && r.m_initialized && (BN_cmp(m_r.get(), r.m_r.get()) == 0));
 }
 
-shared_ptr<PubKey> MultiSig::AggregatePubKeys(const vector<PubKey> & pubkeys)
+shared_ptr<PubKey> MultiSig::AggregatePubKeys(const vector<PubKey>& pubkeys)
 {
-    const Curve & curve = Schnorr::GetInstance().GetCurve();
+    const Curve& curve = Schnorr::GetInstance().GetCurve();
 
     if (pubkeys.size() == 0)
     {
@@ -602,9 +618,9 @@ shared_ptr<PubKey> MultiSig::AggregatePubKeys(const vector<PubKey> & pubkeys)
     return aggregatedPubkey;
 }
 
-shared_ptr<CommitPoint> MultiSig::AggregateCommits(const vector<CommitPoint> & commitPoints)
+shared_ptr<CommitPoint> MultiSig::AggregateCommits(const vector<CommitPoint>& commitPoints)
 {
-    const Curve & curve = Schnorr::GetInstance().GetCurve();
+    const Curve& curve = Schnorr::GetInstance().GetCurve();
 
     if (commitPoints.size() == 0)
     {
@@ -631,9 +647,9 @@ shared_ptr<CommitPoint> MultiSig::AggregateCommits(const vector<CommitPoint> & c
     return aggregatedCommit;
 }
 
-shared_ptr<Response> MultiSig::AggregateResponses(const vector<Response> & responses)
+shared_ptr<Response> MultiSig::AggregateResponses(const vector<Response>& responses)
 {
-    const Curve & curve = Schnorr::GetInstance().GetCurve();
+    const Curve& curve = Schnorr::GetInstance().GetCurve();
 
     if (responses.size() == 0)
     {
@@ -661,13 +677,13 @@ shared_ptr<Response> MultiSig::AggregateResponses(const vector<Response> & respo
         {
             LOG_MESSAGE("Error: Response aggregation failed");
             return nullptr;
-        }   
+        }
     }
 
     return aggregatedResponse;
 }
 
-shared_ptr<Signature> MultiSig::AggregateSign(const Challenge & challenge, const Response & aggregatedResponse)
+shared_ptr<Signature> MultiSig::AggregateSign(const Challenge& challenge, const Response& aggregatedResponse)
 {
     if (!challenge.Initialized())
     {
@@ -702,7 +718,6 @@ shared_ptr<Signature> MultiSig::AggregateSign(const Challenge & challenge, const
 
     return result;
 }
-
 
 // bool MultiSig::SignResponse(const CommitSecret & commitSecret, const Challenge & challenge, const PrivKey & privkey, Signature & result)
 // {
@@ -754,14 +769,14 @@ shared_ptr<Signature> MultiSig::AggregateSign(const Challenge & challenge, const
 //             return false;
 //         }
 
-//         // Compute s = k - r*krpiv  
-//         // r*kpriv  
+//         // Compute s = k - r*krpiv
+//         // r*kpriv
 //         err = (BN_mod_mul(result.m_s.get(), challenge.m_c.get(), privkey.m_d.get(), m_curve.m_order.get(), ctx.get()) == 0);
 //         if (err)
 //         {
 //             LOG_MESSAGE("Error: Response mod mul failed");
 //             return false;
-//         } 
+//         }
 
 //         // k-r*kpriv
 //         err = (BN_mod_sub(result.m_s.get(), commitSecret.m_s.get(), result.m_s.get(), m_curve.m_order.get(), ctx.get()) == 0);
@@ -781,8 +796,7 @@ shared_ptr<Signature> MultiSig::AggregateSign(const Challenge & challenge, const
 //     return true;
 // }
 
-
-bool MultiSig::VerifyResponse(const Response & response, const Challenge & challenge, const PubKey & pubkey, const CommitPoint & commitPoint)
+bool MultiSig::VerifyResponse(const Response& response, const Challenge& challenge, const PubKey& pubkey, const CommitPoint& commitPoint)
 {
     LOG_MARKER();
 
@@ -812,10 +826,10 @@ bool MultiSig::VerifyResponse(const Response & response, const Challenge & chall
         return false;
     }
 
-    const Curve & curve = Schnorr::GetInstance().GetCurve();
+    const Curve& curve = Schnorr::GetInstance().GetCurve();
 
     // The algorithm to check whether the commit point generated from its resopnse is the same one received in the commit phase
-    // Check if s is in [1, ..., order-1] 
+    // Check if s is in [1, ..., order-1]
     // Compute Q = sG + r*kpub
     // return Q == commitPoint
 
@@ -827,8 +841,8 @@ bool MultiSig::VerifyResponse(const Response & response, const Challenge & chall
 
     if ((ctx != nullptr) && (Q != nullptr))
     {
-        // 1. Check if s is in [1, ..., order-1] 
-        err = (BN_is_zero(response.m_r.get()) || (BN_cmp(response.m_r.get(), curve.m_order.get()) !=-1));
+        // 1. Check if s is in [1, ..., order-1]
+        err = (BN_is_zero(response.m_r.get()) || (BN_cmp(response.m_r.get(), curve.m_order.get()) != -1));
         if (err)
         {
             LOG_MESSAGE("Error: Response not in range");
@@ -850,7 +864,6 @@ bool MultiSig::VerifyResponse(const Response & response, const Challenge & chall
             LOG_MESSAGE("Error: Generated commit point doesn't match the given one");
             return false;
         }
-
     }
     else
     {

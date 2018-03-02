@@ -28,14 +28,14 @@
 
 using namespace std;
 
-BlockStorage & BlockStorage::GetBlockStorage()
+BlockStorage& BlockStorage::GetBlockStorage()
 {
     static BlockStorage bs;
     return bs;
 }
 
-bool BlockStorage::PutBlock(const boost::multiprecision::uint256_t & blockNum, 
-    const vector<unsigned char> & body, const BlockType & blockType)
+bool BlockStorage::PutBlock(const boost::multiprecision::uint256_t& blockNum,
+                            const vector<unsigned char>& body, const BlockType& blockType)
 {
     int ret;
     if (blockType == BlockType::DS)
@@ -49,70 +49,73 @@ bool BlockStorage::PutBlock(const boost::multiprecision::uint256_t & blockNum,
     return (ret == 0);
 }
 
-bool BlockStorage::PutDSBlock(const boost::multiprecision::uint256_t & blockNum, 
-    const vector<unsigned char> & body)
+bool BlockStorage::PutDSBlock(const boost::multiprecision::uint256_t& blockNum,
+                              const vector<unsigned char>& body)
 {
     return PutBlock(blockNum, body, BlockType::DS);
 }
 
-bool BlockStorage::PutTxBlock(const boost::multiprecision::uint256_t & blockNum, 
-    const vector<unsigned char> & body)
+bool BlockStorage::PutTxBlock(const boost::multiprecision::uint256_t& blockNum,
+                              const vector<unsigned char>& body)
 {
     return PutBlock(blockNum, body, BlockType::Tx);
 }
 
-bool BlockStorage::GetDSBlock(const boost::multiprecision::uint256_t & blockNum, 
-    DSBlockSharedPtr & block)
+bool BlockStorage::GetDSBlock(const boost::multiprecision::uint256_t& blockNum,
+                              DSBlockSharedPtr& block)
 {
     string blockString = m_dsBlockchainDB.Lookup(blockNum);
 
-    if(blockString.empty())
+    if (blockString.empty())
     {
         return false;
     }
-    
+
     LOG_MESSAGE(blockString);
     LOG_MESSAGE(blockString.length());
     const unsigned char* raw_memory = reinterpret_cast<const unsigned char*>(blockString.c_str());
-    block = DSBlockSharedPtr( new DSBlock(std::vector<unsigned char>(raw_memory, 
-                                          raw_memory + blockString.size()), 0) );
+    block = DSBlockSharedPtr(new DSBlock(std::vector<unsigned char>(raw_memory,
+                                                                    raw_memory + blockString.size()),
+                                         0));
     return true;
 }
 
-bool BlockStorage::GetTxBlock(const boost::multiprecision::uint256_t & blockNum, 
-    TxBlockSharedPtr & block)
+bool BlockStorage::GetTxBlock(const boost::multiprecision::uint256_t& blockNum,
+                              TxBlockSharedPtr& block)
 {
     string blockString = m_txBlockchainDB.Lookup(blockNum);
- 
-    if(blockString.empty())
+
+    if (blockString.empty())
     {
         return false;
     }
- 
+
     const unsigned char* raw_memory = reinterpret_cast<const unsigned char*>(blockString.c_str());
-    block = TxBlockSharedPtr( new TxBlock(std::vector<unsigned char>(raw_memory, 
-                                          raw_memory + blockString.size()), 0) );
+    block = TxBlockSharedPtr(new TxBlock(std::vector<unsigned char>(raw_memory,
+                                                                    raw_memory + blockString.size()),
+                                         0));
     return true;
 }
 
-bool BlockStorage::PutTxBody(const dev::h256 & key, const vector<unsigned char> & body)
+bool BlockStorage::PutTxBody(const dev::h256& key, const vector<unsigned char>& body)
 {
     int ret = m_txBodyDB.Insert(key, body);
     return (ret == 0);
 }
 
-bool BlockStorage::GetTxBody(const dev::h256 & key, TxBodySharedPtr & body)
+bool BlockStorage::GetTxBody(const dev::h256& key, TxBodySharedPtr& body)
 {
     string bodyString = m_txBodyDB.Lookup(key);
-    
-    if(bodyString.empty())
+
+    if (bodyString.empty())
     {
         return false;
     }
-    
+
     const unsigned char* raw_memory = reinterpret_cast<const unsigned char*>(bodyString.c_str());
-    body = TxBodySharedPtr( new Transaction(std::vector<unsigned char>(raw_memory, 
-                                            raw_memory + bodyString.size()), 0) );
+    body = TxBodySharedPtr(new Transaction(std::vector<unsigned char>(raw_memory,
+                                                                      raw_memory + bodyString.size()),
+                                           0));
     return true;
 }
 
@@ -126,6 +129,6 @@ bool BlockStorage::GetTxBody(const dev::h256 & key, TxBodySharedPtr & body)
 // {
 //     string bodyString = m_txBodyDB.Lookup(key);
 //     const unsigned char* raw_memory = reinterpret_cast<const unsigned char*>(bodyString.c_str());
-//     body = TxBodySharedPtr( new Transaction(std::vector<unsigned char>(raw_memory, 
+//     body = TxBodySharedPtr( new Transaction(std::vector<unsigned char>(raw_memory,
 //                                             raw_memory + bodyString.size()), 0) );
 // }

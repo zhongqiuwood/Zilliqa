@@ -26,9 +26,9 @@
 #define BOOST_TEST_MODULE persistencetest
 #include <boost/test/included/unit_test.hpp>
 
-BOOST_AUTO_TEST_SUITE (persistencetest)
+BOOST_AUTO_TEST_SUITE(persistencetest)
 
-BOOST_AUTO_TEST_CASE (testBlockStorage)
+BOOST_AUTO_TEST_CASE(testBlockStorage)
 {
     INIT_STDOUT_LOGGER();
 
@@ -45,4 +45,4 @@ BOOST_AUTO_TEST_CASE (testBlockStorage)
     LOG_MESSAGE("Block2 timestamp value retrieved: " << (*block).GetHeader().GetTimestamp());
 }
 
-BOOST_AUTO_TEST_SUITE_END ()
+BOOST_AUTO_TEST_SUITE_END()

@@ -14,12 +14,12 @@
 * and which include a reference to GPLv3 in their program files.
 **/
 
-#include <iostream>
 #include <arpa/inet.h>
 #include <cstring>
+#include <iostream>
 
-#include "common/Messages.h"
 #include "common/Constants.h"
+#include "common/Messages.h"
 #include "libNetwork/P2PComm.h"
 #include "libNetwork/PeerManager.h"
 #include "libUtils/DataConversion.h"
@@ -27,14 +27,14 @@
 using namespace std;
 using namespace boost::multiprecision;
 
-typedef void (*handler_func)(int, const char *, const char *, uint32_t, const char * []);
+typedef void (*handler_func)(int, const char*, const char*, uint32_t, const char* []);
 struct message_handler
 {
-    const char * ins;
+    const char* ins;
     handler_func func;
 };
 
-void process_addpeers(int numargs, const char * progname, const char * cmdname, uint32_t listen_port, const char * args[])
+void process_addpeers(int numargs, const char* progname, const char* cmdname, uint32_t listen_port, const char* args[])
 {
     const int min_args_required = 3;
 
@@ -48,7 +48,7 @@ void process_addpeers(int numargs, const char * progname, const char * cmdname, 
         inet_aton("127.0.0.1", &ip_addr);
         Peer my_port(uint128_t(ip_addr.s_addr), listen_port);
 
-        for (int i = 0; i < numargs; )
+        for (int i = 0; i < numargs;)
         {
             if (i + 2 >= numargs)
             {
@@ -58,7 +58,7 @@ void process_addpeers(int numargs, const char * progname, const char * cmdname, 
             // Assemble an ADDNODE message
 
             // Class and Inst bytes
-            vector<unsigned char> addnode_message = { MessageType::PEER, PeerManager::InstructionType::ADDPEER };
+            vector<unsigned char> addnode_message = {MessageType::PEER, PeerManager::InstructionType::ADDPEER};
 
             // Public key
             // Temporarily just accept the public key as an input (for use with the peer store)
@@ -80,7 +80,7 @@ void process_addpeers(int numargs, const char * progname, const char * cmdname, 
     }
 }
 
-void process_broadcast(int numargs, const char * progname, const char * cmdname, uint32_t listen_port, const char * args[])
+void process_broadcast(int numargs, const char* progname, const char* cmdname, uint32_t listen_port, const char* args[])
 {
     const int num_args_required = 1;
 
@@ -105,7 +105,7 @@ void process_broadcast(int numargs, const char * progname, const char * cmdname,
     }
 }
 
-void process_cmd(int numargs, const char * progname, const char * cmdname, uint32_t listen_port, const char * args[])
+void process_cmd(int numargs, const char* progname, const char* cmdname, uint32_t listen_port, const char* args[])
 {
     const int num_args_required = 1;
 
@@ -125,7 +125,7 @@ void process_cmd(int numargs, const char * progname, const char * cmdname, uint3
     }
 }
 
-int main(int argc, const char * argv[])
+int main(int argc, const char* argv[])
 {
     if (argc < 3)
     {
@@ -134,10 +134,9 @@ int main(int argc, const char * argv[])
         return -1;
     }
 
-    const char * instruction = argv[2];
+    const char* instruction = argv[2];
 
-    const message_handler message_handlers[] =
-    {
+    const message_handler message_handlers[] = {
         {"addpeers", &process_addpeers},
         {"broadcast", &process_broadcast},
         {"cmd", &process_cmd},
@@ -160,6 +159,6 @@ int main(int argc, const char * argv[])
     {
         cout << "Unknown command parameter supplied: " << instruction << endl;
     }
-    
+
     return 0;
 }

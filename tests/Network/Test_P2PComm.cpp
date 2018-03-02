@@ -14,20 +14,19 @@
 * and which include a reference to GPLv3 in their program files.
 **/
 
-
-#include <iostream>
 #include <arpa/inet.h>
 #include <chrono>
+#include <iostream>
 #include <vector>
 #include "libNetwork/P2PComm.h"
 #include "libUtils/JoinableFunction.h"
 
 using namespace std;
 
-void process_message(const vector<unsigned char> & message, const Peer & from)
+void process_message(const vector<unsigned char>& message, const Peer& from)
 {
     LOG_MARKER();
-    LOG_MESSAGE("Received message '" << (char*) &message.at(0) << "' at port " << from.m_listenPortHost << " from address " << from.m_ipAddress);
+    LOG_MESSAGE("Received message '" << (char*)&message.at(0) << "' at port " << from.m_listenPortHost << " from address " << from.m_ipAddress);
 }
 
 int main()
@@ -41,15 +40,15 @@ int main()
 
     struct in_addr ip_addr;
     inet_aton("127.0.0.1", &ip_addr);
-    Peer peer = { ip_addr.s_addr, 30303 };
-    vector<unsigned char> message1 = { 'H', 'e', 'l', 'l', 'o', '\0' }; // Send Hello once
+    Peer peer = {ip_addr.s_addr, 30303};
+    vector<unsigned char> message1 = {'H', 'e', 'l', 'l', 'o', '\0'}; // Send Hello once
 
     P2PComm::GetInstance().SendMessage(peer, message1);
 
-    vector<Peer> peers = { peer, peer, peer };
-	vector<unsigned char> message2 = { 'W', 'o', 'r', 'l', 'd', '\0' }; // Send World 3x
+    vector<Peer> peers = {peer, peer, peer};
+    vector<unsigned char> message2 = {'W', 'o', 'r', 'l', 'd', '\0'}; // Send World 3x
 
-	P2PComm::GetInstance().SendMessage(peers, message2);	    
+    P2PComm::GetInstance().SendMessage(peers, message2);
 
     return 0;
 }

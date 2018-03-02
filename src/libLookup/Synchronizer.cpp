@@ -19,8 +19,8 @@
 #include "Synchronizer.h"
 #include "common/Messages.h"
 #include "libCrypto/Schnorr.h"
-#include "libData/BlockData/Block.h"
 #include "libData/AccountData/Transaction.h"
+#include "libData/BlockData/Block.h"
 #include "libPersistence/BlockStorage.h"
 #include "libUtils/TimeUtils.h"
 
@@ -36,17 +36,15 @@ DSBlock Synchronizer::ConstructGenesisDSBlock()
         prevHash.asArray().at(i) = i + 1;
     }
 
-    vector<unsigned char> tmpprivkey = 
-    	DataConversion::HexStrToUint8Vec(
-    		"BCCDF94ACEC5B6F1A2D96BDDC6CBE22F3C6DFD89FD791F18B722080A908253CD");
-    vector<unsigned char> tmppubkey = 
-    	DataConversion::HexStrToUint8Vec(
-    		"02AAE728127EB5A30B07D798D5236251808AD2C8BA3F18B230449D0C938969B552");
+    vector<unsigned char> tmpprivkey = DataConversion::HexStrToUint8Vec(
+        "BCCDF94ACEC5B6F1A2D96BDDC6CBE22F3C6DFD89FD791F18B722080A908253CD");
+    vector<unsigned char> tmppubkey = DataConversion::HexStrToUint8Vec(
+        "02AAE728127EB5A30B07D798D5236251808AD2C8BA3F18B230449D0C938969B552");
     PrivKey privKey(tmpprivkey, 0);
     PubKey pubKey(tmppubkey, 0);
 
     std::pair<PrivKey, PubKey> keypair = make_pair(privKey, pubKey);
- 
+
     DSBlockHeader header(20, prevHash, 12344, keypair.first, keypair.second, 0, 789);
 
     std::array<unsigned char, BLOCK_SIG_SIZE> signature;
@@ -58,21 +56,21 @@ DSBlock Synchronizer::ConstructGenesisDSBlock()
     return DSBlock(header, signature);
 }
 
-bool Synchronizer::AddGenesisDSBlockToBlockChain(DSBlockChain & dsBlockChain,
-                                                 const DSBlock & dsBlock)
+bool Synchronizer::AddGenesisDSBlockToBlockChain(DSBlockChain& dsBlockChain,
+                                                 const DSBlock& dsBlock)
 {
     dsBlockChain.AddBlock(dsBlock);
 
     // Store DS Block to disk
     vector<unsigned char> serializedDSBlock;
     dsBlock.Serialize(serializedDSBlock, 0);
-    BlockStorage::GetBlockStorage().PutDSBlock(dsBlock.GetHeader().GetBlockNum(), 
+    BlockStorage::GetBlockStorage().PutDSBlock(dsBlock.GetHeader().GetBlockNum(),
                                                serializedDSBlock);
 
     return true;
 }
 
-bool Synchronizer::InitializeGenesisDSBlock(DSBlockChain & dsBlockChain)
+bool Synchronizer::InitializeGenesisDSBlock(DSBlockChain& dsBlockChain)
 {
     DSBlock dsBlock = ConstructGenesisDSBlock();
     AddGenesisDSBlockToBlockChain(dsBlockChain, dsBlock);
@@ -82,24 +80,22 @@ bool Synchronizer::InitializeGenesisDSBlock(DSBlockChain & dsBlockChain)
 
 TxBlock Synchronizer::ConstructGenesisTxBlock()
 {
-    vector<unsigned char> tmpprivkey = 
-    	DataConversion::HexStrToUint8Vec(
-    		"BCCDF94ACEC5B6F1A2D96BDDC6CBE22F3C6DFD89FD791F18B722080A908253CD");
-    vector<unsigned char> tmppubkey = 
-    	DataConversion::HexStrToUint8Vec(
-    		"02AAE728127EB5A30B07D798D5236251808AD2C8BA3F18B230449D0C938969B552");
+    vector<unsigned char> tmpprivkey = DataConversion::HexStrToUint8Vec(
+        "BCCDF94ACEC5B6F1A2D96BDDC6CBE22F3C6DFD89FD791F18B722080A908253CD");
+    vector<unsigned char> tmppubkey = DataConversion::HexStrToUint8Vec(
+        "02AAE728127EB5A30B07D798D5236251808AD2C8BA3F18B230449D0C938969B552");
     PrivKey privKey(tmpprivkey, 0);
     PubKey pubKey(tmppubkey, 0);
 
     std::pair<PrivKey, PubKey> keypair = make_pair(privKey, pubKey);
 
-    TxBlockHeader header(TXBLOCKTYPE::FINAL, BLOCKVERSION::VERSION1, 1, 1, BlockHash(), 0, 
+    TxBlockHeader header(TXBLOCKTYPE::FINAL, BLOCKVERSION::VERSION1, 1, 1, BlockHash(), 0,
                          151384616955606, TxnHash(), StateHash(), 0, 5, keypair.second, 0, BlockHash());
-    
-    array<unsigned char, BLOCK_SIG_SIZE> emptySig = { 0 };
+
+    array<unsigned char, BLOCK_SIG_SIZE> emptySig = {0};
 
     std::vector<TxnHash> tranHashes;
-    for(int i=0; i<5; i++)
+    for (int i = 0; i < 5; i++)
     {
         tranHashes.push_back(TxnHash());
     }
@@ -107,21 +103,21 @@ TxBlock Synchronizer::ConstructGenesisTxBlock()
     return TxBlock(header, emptySig, vector<bool>(), tranHashes);
 }
 
-bool Synchronizer::AddGenesisTxBlockToBlockChain(TxBlockChain & txBlockChain, 
-                                                 const TxBlock & txBlock)
+bool Synchronizer::AddGenesisTxBlockToBlockChain(TxBlockChain& txBlockChain,
+                                                 const TxBlock& txBlock)
 {
     txBlockChain.AddBlock(txBlock);
 
     // Store Tx Block to disk
     vector<unsigned char> serializedTxBlock;
     txBlock.Serialize(serializedTxBlock, 0);
-    BlockStorage::GetBlockStorage().PutTxBlock(txBlock.GetHeader().GetBlockNum(), 
-                                               serializedTxBlock);    
+    BlockStorage::GetBlockStorage().PutTxBlock(txBlock.GetHeader().GetBlockNum(),
+                                               serializedTxBlock);
 
     return true;
 }
 
-bool Synchronizer::InitializeGenesisTxBlock(TxBlockChain & txBlockChain)
+bool Synchronizer::InitializeGenesisTxBlock(TxBlockChain& txBlockChain)
 {
     TxBlock txBlock = ConstructGenesisTxBlock();
     AddGenesisTxBlockToBlockChain(txBlockChain, txBlock);
@@ -129,10 +125,10 @@ bool Synchronizer::InitializeGenesisTxBlock(TxBlockChain & txBlockChain)
     return true;
 }
 
-bool Synchronizer::InitializeGenesisBlocks(DSBlockChain & dsBlockChain, TxBlockChain & txBlockChain)
+bool Synchronizer::InitializeGenesisBlocks(DSBlockChain& dsBlockChain, TxBlockChain& txBlockChain)
 {
-	InitializeGenesisDSBlock(dsBlockChain);
-	InitializeGenesisTxBlock(txBlockChain);
+    InitializeGenesisDSBlock(dsBlockChain);
+    InitializeGenesisTxBlock(txBlockChain);
 
     return true;
 }
@@ -165,4 +161,4 @@ bool Synchronizer::FetchLatestState(Lookup* lookup)
     // lookup->GetStateFromSeedNodes(currentBlockChainSize, 0);
     return true;
 }
-#endif // IS_LOOKUP_NODE  
+#endif // IS_LOOKUP_NODE

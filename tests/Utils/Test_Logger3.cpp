@@ -34,7 +34,7 @@ BOOST_AUTO_TEST_CASE(testLogger3)
 {
     // Write to stdout
     INIT_STDOUT_LOGGER();
-    vector<unsigned char> bytestream = { 0x12, 0x34, 0x56, 0x78, 0x9A };
+    vector<unsigned char> bytestream = {0x12, 0x34, 0x56, 0x78, 0x9A};
 
     LOG_MESSAGE("Hello world");
     LOG_PAYLOAD("Hello world", bytestream, Logger::MAX_BYTES_TO_DISPLAY); // use default max payload length

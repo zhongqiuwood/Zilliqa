@@ -14,16 +14,16 @@
 * and which include a reference to GPLv3 in their program files.
 **/
 
+#include <arpa/inet.h>
 #include <boost/multiprecision/cpp_int.hpp>
 #include <iostream>
 #include <iterator>
-#include <sys/socket.h>
 #include <netinet/in.h>
-#include <arpa/inet.h>
+#include <sys/socket.h>
 
-#include "libNetwork/Peer.h"
-#include "common/Serializable.h"
 #include "common/Constants.h"
+#include "common/Serializable.h"
+#include "libNetwork/Peer.h"
 
 #define BOOST_TEST_MODULE utils
 #include <boost/test/included/unit_test.hpp>
@@ -39,11 +39,16 @@ BOOST_AUTO_TEST_CASE(testBoostBigNum)
     uint256_t num = 256;
 
     // Arithmetic ops
-    num++; cout << num << endl;
-    num--; cout << num << endl;
-    num = num + 1; cout << num << endl;
-    num = num + num; cout << num << endl;
-    num *= 2; cout << num << endl;
+    num++;
+    cout << num << endl;
+    num--;
+    cout << num << endl;
+    num = num + 1;
+    cout << num << endl;
+    num = num + num;
+    cout << num << endl;
+    num *= 2;
+    cout << num << endl;
 
     // Logical ops
     cout << (num >= num) << endl;
@@ -51,10 +56,14 @@ BOOST_AUTO_TEST_CASE(testBoostBigNum)
     cout << (num != 514) << endl;
 
     // Bit ops
-    num = num << 1; cout << num << endl;
-    num = num >> 1; cout << num << endl;
-    num = num ^ 0xFF; cout << num << endl;
-    num = num & 0xFFFF; cout << num << endl;
+    num = num << 1;
+    cout << num << endl;
+    num = num >> 1;
+    cout << num << endl;
+    num = num ^ 0xFF;
+    cout << num << endl;
+    num = num & 0xFFFF;
+    cout << num << endl;
 
     // Serialize
     vector<unsigned char> bytestream(32, 0x00);
@@ -73,7 +82,6 @@ BOOST_AUTO_TEST_CASE(testBoostBigNum)
         num2 = (num2 << 8) + bytestream.at(i);
     }
     cout << num2 << endl;
-
 
     struct in_addr ip_addr;
     inet_aton("54.169.197.255", &ip_addr);

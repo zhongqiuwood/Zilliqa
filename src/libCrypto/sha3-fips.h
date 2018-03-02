@@ -29,15 +29,14 @@
 
 void SHA3_256(struct ethash_h256 const* ret, uint8_t const* data, size_t const size)
 {
-    unsigned char output[SHA256_HASH_BYTES] = ""; 
+    unsigned char output[SHA256_HASH_BYTES] = "";
     FIPS202_SHA3_256(data, (unsigned int)size, output);
     memcpy((uint8_t*)ret, output, SHA256_HASH_BYTES);
 }
 
-
 void SHA3_512(uint8_t* ret, uint8_t const* data, size_t const size)
 {
-    unsigned char output[SHA512_HASH_BYTES] = ""; 
+    unsigned char output[SHA512_HASH_BYTES] = "";
     FIPS202_SHA3_512(data, (unsigned int)size, output);
     memcpy(ret, output, SHA512_HASH_BYTES);
 }

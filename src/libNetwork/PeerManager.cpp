@@ -14,23 +14,23 @@
 * and which include a reference to GPLv3 in their program files.
 **/
 
-#include <iostream>
 #include <arpa/inet.h>
-#include <boost/property_tree/xml_parser.hpp>
-#include <boost/property_tree/ptree.hpp>
 #include <boost/foreach.hpp>
+#include <boost/property_tree/ptree.hpp>
+#include <boost/property_tree/xml_parser.hpp>
+#include <iostream>
 
 #include "P2PComm.h"
 #include "PeerManager.h"
-#include "common/Messages.h"
 #include "common/Constants.h"
-#include "libUtils/Logger.h"
+#include "common/Messages.h"
 #include "libUtils/DataConversion.h"
+#include "libUtils/Logger.h"
 
 using namespace std;
 using namespace boost::multiprecision;
 
-bool PeerManager::ProcessHello(const vector<unsigned char> & message, unsigned int offset, const Peer & from)
+bool PeerManager::ProcessHello(const vector<unsigned char>& message, unsigned int offset, const Peer& from)
 {
     // Message = [32-byte peer key] [4-byte peer listen port]
 
@@ -47,7 +47,7 @@ bool PeerManager::ProcessHello(const vector<unsigned char> & message, unsigned i
 
         Peer peer(from.m_ipAddress, Serializable::GetNumber<uint32_t>(message, offset + PUB_KEY_SIZE, sizeof(uint32_t)));
 
-        PeerStore & ps = PeerStore::GetStore();
+        PeerStore& ps = PeerStore::GetStore();
         ps.AddPeer(key, peer);
 
         LOG_MESSAGE("Added peer with port " << peer.m_listenPortHost << " at address " << from.GetPrintableIPAddress());
@@ -58,7 +58,7 @@ bool PeerManager::ProcessHello(const vector<unsigned char> & message, unsigned i
     return false;
 }
 
-bool PeerManager::ProcessAddPeer(const vector<unsigned char> & message, unsigned int offset, const Peer & from)
+bool PeerManager::ProcessAddPeer(const vector<unsigned char>& message, unsigned int offset, const Peer& from)
 {
     // Message = [32-byte peer key] [4-byte peer ip address] [4-byte peer listen port]
 
@@ -75,14 +75,14 @@ bool PeerManager::ProcessAddPeer(const vector<unsigned char> & message, unsigned
 
         Peer peer(Serializable::GetNumber<uint128_t>(message, offset + PUB_KEY_SIZE, UINT128_SIZE), Serializable::GetNumber<uint32_t>(message, offset + PUB_KEY_SIZE + UINT128_SIZE, sizeof(uint32_t)));
 
-        PeerStore & ps = PeerStore::GetStore();
+        PeerStore& ps = PeerStore::GetStore();
         ps.AddPeer(key, peer);
 
         LOG_MESSAGE("Added peer with port " << peer.m_listenPortHost << " at address " << peer.GetPrintableIPAddress());
 
         // Say hello
 
-        vector<unsigned char> hello_message = { MessageType::PEER, PeerManager::InstructionType::HELLO };
+        vector<unsigned char> hello_message = {MessageType::PEER, PeerManager::InstructionType::HELLO};
         m_selfKey.second.Serialize(hello_message, MessageOffset::BODY);
         Serializable::SetNumber<uint32_t>(hello_message, MessageOffset::BODY + PUB_KEY_SIZE, m_selfPeer.m_listenPortHost, sizeof(uint32_t));
 
@@ -94,7 +94,7 @@ bool PeerManager::ProcessAddPeer(const vector<unsigned char> & message, unsigned
     return false;
 }
 
-bool PeerManager::ProcessPing(const vector<unsigned char> & message, unsigned int offset, const Peer & from)
+bool PeerManager::ProcessPing(const vector<unsigned char>& message, unsigned int offset, const Peer& from)
 {
     // Message = [raw byte stream]
 
@@ -108,13 +108,13 @@ bool PeerManager::ProcessPing(const vector<unsigned char> & message, unsigned in
     return true;
 }
 
-bool PeerManager::ProcessPingAll(const vector<unsigned char> & message, unsigned int offset, const Peer & from)
+bool PeerManager::ProcessPingAll(const vector<unsigned char>& message, unsigned int offset, const Peer& from)
 {
     // Message = [raw byte stream]
 
     LOG_MARKER();
 
-    vector<unsigned char> ping_message = { MessageType::PEER, PeerManager::InstructionType::PING };
+    vector<unsigned char> ping_message = {MessageType::PEER, PeerManager::InstructionType::PING};
     ping_message.resize(ping_message.size() + message.size() - offset);
     copy(message.begin() + offset, message.end(), ping_message.begin() + MessageOffset::BODY);
 
@@ -123,7 +123,7 @@ bool PeerManager::ProcessPingAll(const vector<unsigned char> & message, unsigned
     return true;
 }
 
-bool PeerManager::ProcessBroadcast(const vector<unsigned char> & message, unsigned int offset, const Peer & from)
+bool PeerManager::ProcessBroadcast(const vector<unsigned char>& message, unsigned int offset, const Peer& from)
 {
     // Message = [raw byte stream]
 
@@ -138,7 +138,9 @@ bool PeerManager::ProcessBroadcast(const vector<unsigned char> & message, unsign
     return true;
 }
 
-PeerManager::PeerManager(const std::pair<PrivKey, PubKey> & key, const Peer & peer, bool loadConfig) : m_selfKey(key), m_selfPeer(peer)
+PeerManager::PeerManager(const std::pair<PrivKey, PubKey>& key, const Peer& peer, bool loadConfig)
+    : m_selfKey(key)
+    , m_selfPeer(peer)
 {
     LOG_MARKER();
 
@@ -155,9 +157,9 @@ PeerManager::PeerManager(const std::pair<PrivKey, PubKey> & key, const Peer & pe
         read_xml(config, pt);
 
         // Add all peers in config to peer store
-        PeerStore & ps = PeerStore::GetStore();
+        PeerStore& ps = PeerStore::GetStore();
 
-        BOOST_FOREACH(ptree::value_type const & v, pt.get_child("nodes"))
+        BOOST_FOREACH (ptree::value_type const& v, pt.get_child("nodes"))
         {
             if (v.first == "peer")
             {
@@ -171,25 +173,23 @@ PeerManager::PeerManager(const std::pair<PrivKey, PubKey> & key, const Peer & pe
                     LOG_MESSAGE("Added peer with port " << peer.m_listenPortHost << " at address " << peer.GetPrintableIPAddress());
                 }
             }
-        }        
+        }
     }
 }
 
 PeerManager::~PeerManager()
 {
-
 }
 
-bool PeerManager::Execute(const vector<unsigned char> & message, unsigned int offset, const Peer & from)
+bool PeerManager::Execute(const vector<unsigned char>& message, unsigned int offset, const Peer& from)
 {
     LOG_MARKER();
 
     bool result = false;
 
-    typedef bool(PeerManager::*InstructionHandler)(const vector<unsigned char> &, unsigned int, const Peer &);
+    typedef bool (PeerManager::*InstructionHandler)(const vector<unsigned char>&, unsigned int, const Peer&);
 
-    InstructionHandler ins_handlers[] =
-    {
+    InstructionHandler ins_handlers[] = {
         &PeerManager::ProcessHello,
         &PeerManager::ProcessAddPeer,
         &PeerManager::ProcessPing,
@@ -218,7 +218,7 @@ bool PeerManager::Execute(const vector<unsigned char> & message, unsigned int of
     return result;
 }
 
-vector<Peer> PeerManager::GetBroadcastList(unsigned char ins_type, const Peer & broadcast_originator)
+vector<Peer> PeerManager::GetBroadcastList(unsigned char ins_type, const Peer& broadcast_originator)
 {
     LOG_MARKER();
     return Broadcastable::GetBroadcastList(ins_type, broadcast_originator);

@@ -31,7 +31,7 @@ using namespace std;
 
 const streampos Logger::MAX_FILE_SIZE = 1024 * 1024 * 100; // 100MB per log file
 
-Logger::Logger(const char * prefix, bool log_to_file, streampos max_file_size)
+Logger::Logger(const char* prefix, bool log_to_file, streampos max_file_size)
 {
     this->log_to_file = log_to_file;
     this->max_file_size = max_file_size;
@@ -79,42 +79,19 @@ void Logger::newLog()
     logfile.open(fname.c_str(), ios_base::app);
 }
 
-Logger & Logger::GetLogger(const char * fname_prefix, bool log_to_file, streampos max_file_size)
+Logger& Logger::GetLogger(const char* fname_prefix, bool log_to_file, streampos max_file_size)
 {
     static Logger logger(fname_prefix, log_to_file, max_file_size);
     return logger;
 }
 
-Logger & Logger::GetStateLogger(const char * fname_prefix, bool log_to_file, streampos max_file_size)
+Logger& Logger::GetStateLogger(const char* fname_prefix, bool log_to_file, streampos max_file_size)
 {
     static Logger logger(fname_prefix, log_to_file, max_file_size);
     return logger;
 }
 
-void Logger::LogMessage(const char * msg, const char * function)
-{
-    pid_t tid = syscall(SYS_gettid);
-
-    auto clockNow = std::chrono::system_clock::now();
-    std::time_t curTime = std::chrono::system_clock::to_time_t(clockNow);
-    auto gmtTime = gmtime(&curTime);
-
-    lock_guard<mutex> guard(m);
-
-    if (log_to_file)
-    {
-        checkLog();
-        logfile << "[TID " << PAD(tid, TID_LEN) << "][" << PAD(put_time(gmtTime, "%H:%M:%S"), TIME_LEN) 
-                << "][" << LIMIT(function, MAX_FUNCNAME_LEN) << "] " << msg << endl << flush;
-    }
-    else
-    {
-        cout << "[TID " << PAD(tid, TID_LEN) << "][" << PAD(put_time(gmtTime, "%H:%M:%S"), TIME_LEN) << "][" 
-             << LIMIT(function, MAX_FUNCNAME_LEN) << "] " << msg << endl << flush;
-    }
-}
-
-void Logger::LogMessage(const char * msg, const char * function, const char * epoch)
+void Logger::LogMessage(const char* msg, const char* function)
 {
     pid_t tid = syscall(SYS_gettid);
 
@@ -128,37 +105,68 @@ void Logger::LogMessage(const char * msg, const char * function, const char * ep
     {
         checkLog();
         logfile << "[TID " << PAD(tid, TID_LEN) << "][" << PAD(put_time(gmtTime, "%H:%M:%S"), TIME_LEN)
-                << "][" << LIMIT(function, MAX_FUNCNAME_LEN) << "]" << "[Epoch " << epoch << "] " 
-                << msg << endl << flush;
+                << "][" << LIMIT(function, MAX_FUNCNAME_LEN) << "] " << msg << endl
+                << flush;
+    }
+    else
+    {
+        cout << "[TID " << PAD(tid, TID_LEN) << "][" << PAD(put_time(gmtTime, "%H:%M:%S"), TIME_LEN) << "]["
+             << LIMIT(function, MAX_FUNCNAME_LEN) << "] " << msg << endl
+             << flush;
+    }
+}
+
+void Logger::LogMessage(const char* msg, const char* function, const char* epoch)
+{
+    pid_t tid = syscall(SYS_gettid);
+
+    auto clockNow = std::chrono::system_clock::now();
+    std::time_t curTime = std::chrono::system_clock::to_time_t(clockNow);
+    auto gmtTime = gmtime(&curTime);
+
+    lock_guard<mutex> guard(m);
+
+    if (log_to_file)
+    {
+        checkLog();
+        logfile << "[TID " << PAD(tid, TID_LEN) << "][" << PAD(put_time(gmtTime, "%H:%M:%S"), TIME_LEN)
+                << "][" << LIMIT(function, MAX_FUNCNAME_LEN) << "]"
+                << "[Epoch " << epoch << "] "
+                << msg << endl
+                << flush;
     }
     else
     {
         cout << "[TID " << PAD(tid, TID_LEN) << "][" << PAD(put_time(gmtTime, "%H:%M:%S"), TIME_LEN)
-             << "][" << LIMIT(function, MAX_FUNCNAME_LEN) << "]" << "[Epoch " << epoch << "] " 
-             << msg << endl << flush;
+             << "][" << LIMIT(function, MAX_FUNCNAME_LEN) << "]"
+             << "[Epoch " << epoch << "] "
+             << msg << endl
+             << flush;
     }
 }
 
-void Logger::LogState(const char * msg, const char * function)
+void Logger::LogState(const char* msg, const char* function)
 {
     lock_guard<mutex> guard(m);
 
     if (log_to_file)
     {
         checkLog();
-        logfile << msg << endl << flush;
+        logfile << msg << endl
+                << flush;
     }
     else
     {
-        cout << msg << endl << flush;
+        cout << msg << endl
+             << flush;
     }
 }
 
-void Logger::LogMessageAndPayload(const char * msg, const vector<unsigned char> & payload, size_t max_bytes_to_display, const char * function)
+void Logger::LogMessageAndPayload(const char* msg, const vector<unsigned char>& payload, size_t max_bytes_to_display, const char* function)
 {
     pid_t tid = syscall(SYS_gettid);
 
-    static const char * hex_table = "0123456789ABCDEF";
+    static const char* hex_table = "0123456789ABCDEF";
 
     size_t payload_string_len = (payload.size() * 2) + 1;
     if (payload.size() > max_bytes_to_display)
@@ -172,11 +180,11 @@ void Logger::LogMessageAndPayload(const char * msg, const vector<unsigned char> 
         payload_string.get()[payload_string_idx++] = hex_table[(payload.at(payload_idx) >> 4) & 0xF];
         payload_string.get()[payload_string_idx++] = hex_table[payload.at(payload_idx) & 0xF];
     }
-    payload_string.get()[payload_string_len-1] = '\0';
+    payload_string.get()[payload_string_len - 1] = '\0';
 
     auto clockNow = std::chrono::system_clock::now();
-    std::time_t curTime = std::chrono::system_clock::to_time_t(clockNow); 
-    auto gmtTime = gmtime(&curTime);   
+    std::time_t curTime = std::chrono::system_clock::to_time_t(clockNow);
+    auto gmtTime = gmtime(&curTime);
 
     lock_guard<mutex> guard(m);
 
@@ -187,15 +195,17 @@ void Logger::LogMessageAndPayload(const char * msg, const vector<unsigned char> 
         if (payload.size() > max_bytes_to_display)
         {
             logfile << "[TID " << PAD(tid, TID_LEN) << "][" << PAD(put_time(gmtTime, "%H:%M:%S"), TIME_LEN)
-                    << "][" << LIMIT(function, MAX_FUNCNAME_LEN) << "] " << msg 
-                    << " (Len=" << payload.size() << "): " << payload_string.get() << "..." 
-                    << endl << flush;
+                    << "][" << LIMIT(function, MAX_FUNCNAME_LEN) << "] " << msg
+                    << " (Len=" << payload.size() << "): " << payload_string.get() << "..."
+                    << endl
+                    << flush;
         }
         else
         {
             logfile << "[TID " << PAD(tid, TID_LEN) << "][" << PAD(put_time(gmtTime, "%H:%M:%S"), TIME_LEN)
-                    << "][" << LIMIT(function, MAX_FUNCNAME_LEN) << "] " << msg 
-                    << " (Len=" << payload.size() << "): " << payload_string.get() << endl << flush;
+                    << "][" << LIMIT(function, MAX_FUNCNAME_LEN) << "] " << msg
+                    << " (Len=" << payload.size() << "): " << payload_string.get() << endl
+                    << flush;
         }
     }
     else
@@ -203,27 +213,30 @@ void Logger::LogMessageAndPayload(const char * msg, const vector<unsigned char> 
         if (payload.size() > max_bytes_to_display)
         {
             cout << "[TID " << PAD(tid, TID_LEN) << "][" << PAD(put_time(gmtTime, "%H:%M:%S"), TIME_LEN)
-                 << "][" << LIMIT(function, MAX_FUNCNAME_LEN) << "] " << msg 
-                 << " (Len=" << payload.size() << "): " << payload_string.get() << "..." 
-                 << endl << flush;
+                 << "][" << LIMIT(function, MAX_FUNCNAME_LEN) << "] " << msg
+                 << " (Len=" << payload.size() << "): " << payload_string.get() << "..."
+                 << endl
+                 << flush;
         }
         else
         {
             cout << "[TID " << PAD(tid, TID_LEN) << "][" << PAD(put_time(gmtTime, "%H:%M:%S"), TIME_LEN)
-                 << "][" << LIMIT(function, MAX_FUNCNAME_LEN) << "] " << msg << " (Len=" 
-                 << payload.size() << "): " << payload_string.get() << endl << flush;
+                 << "][" << LIMIT(function, MAX_FUNCNAME_LEN) << "] " << msg << " (Len="
+                 << payload.size() << "): " << payload_string.get() << endl
+                 << flush;
         }
     }
 }
 
-ScopeMarker::ScopeMarker(const char * function) : function(function)
+ScopeMarker::ScopeMarker(const char* function)
+    : function(function)
 {
-    Logger & logger = Logger::GetLogger(NULL, true);
+    Logger& logger = Logger::GetLogger(NULL, true);
     logger.LogMessage("BEGIN", this->function.c_str());
 }
 
 ScopeMarker::~ScopeMarker()
 {
-    Logger & logger = Logger::GetLogger(NULL, true);
+    Logger& logger = Logger::GetLogger(NULL, true);
     logger.LogMessage("END", function.c_str());
 }

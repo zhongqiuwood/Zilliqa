@@ -18,13 +18,10 @@
 * Refer to Section 4.2.3, page 24.
 **/
 
-
-
-
-#include <openssl/obj_mac.h>
-#include <openssl/ec.h>
 #include <openssl/bn.h>
+#include <openssl/ec.h>
 #include <openssl/err.h>
+#include <openssl/obj_mac.h>
 #include "Sha2.h"
 
 #include <array>
@@ -34,7 +31,9 @@
 
 using namespace std;
 
-Curve::Curve() : m_group(EC_GROUP_new_by_curve_name(NID_secp256k1), EC_GROUP_clear_free), m_order(BN_new(), BN_clear_free)
+Curve::Curve()
+    : m_group(EC_GROUP_new_by_curve_name(NID_secp256k1), EC_GROUP_clear_free)
+    , m_order(BN_new(), BN_clear_free)
 {
     if (m_order == nullptr)
     {
@@ -47,7 +46,7 @@ Curve::Curve() : m_group(EC_GROUP_new_by_curve_name(NID_secp256k1), EC_GROUP_cle
         LOG_MESSAGE("Error: Curve group setup failed");
         throw exception();
     }
-    
+
     // Get group order
     if (!EC_GROUP_get_order(m_group.get(), m_order.get(), NULL))
     {
@@ -58,16 +57,15 @@ Curve::Curve() : m_group(EC_GROUP_new_by_curve_name(NID_secp256k1), EC_GROUP_cle
 
 Curve::~Curve()
 {
-
 }
 
-shared_ptr<BIGNUM> BIGNUMSerialize::GetNumber(const vector<unsigned char> & src, unsigned int offset, unsigned int size)
+shared_ptr<BIGNUM> BIGNUMSerialize::GetNumber(const vector<unsigned char>& src, unsigned int offset, unsigned int size)
 {
     assert(size > 0);
 
     if (offset + size <= src.size())
     {
-        BIGNUM * ret = BN_bin2bn(src.data() + offset, size, NULL);
+        BIGNUM* ret = BN_bin2bn(src.data() + offset, size, NULL);
         if (ret != NULL)
         {
             return shared_ptr<BIGNUM>(ret, BN_clear_free);
@@ -81,7 +79,7 @@ shared_ptr<BIGNUM> BIGNUMSerialize::GetNumber(const vector<unsigned char> & src,
     return nullptr;
 }
 
-void BIGNUMSerialize::SetNumber(vector<unsigned char> & dst, unsigned int offset, unsigned int size, shared_ptr<BIGNUM> value)
+void BIGNUMSerialize::SetNumber(vector<unsigned char>& dst, unsigned int offset, unsigned int size, shared_ptr<BIGNUM> value)
 {
     assert(size > 0);
 
@@ -118,7 +116,7 @@ void BIGNUMSerialize::SetNumber(vector<unsigned char> & dst, unsigned int offset
     }
 }
 
-shared_ptr<EC_POINT> ECPOINTSerialize::GetNumber(const vector<unsigned char> & src, unsigned int offset, unsigned int size)
+shared_ptr<EC_POINT> ECPOINTSerialize::GetNumber(const vector<unsigned char>& src, unsigned int offset, unsigned int size)
 {
     shared_ptr<BIGNUM> bnvalue = BIGNUMSerialize::GetNumber(src, offset, size);
     if (bnvalue != nullptr)
@@ -127,10 +125,10 @@ shared_ptr<EC_POINT> ECPOINTSerialize::GetNumber(const vector<unsigned char> & s
         if (ctx == nullptr)
         {
             LOG_MESSAGE("Error: Memory allocation failure");
-            throw exception();  
+            throw exception();
         }
 
-        EC_POINT * ret = EC_POINT_bn2point(Schnorr::GetInstance().GetCurve().m_group.get(), bnvalue.get(), NULL, ctx.get());
+        EC_POINT* ret = EC_POINT_bn2point(Schnorr::GetInstance().GetCurve().m_group.get(), bnvalue.get(), NULL, ctx.get());
         if (ret != NULL)
         {
             return shared_ptr<EC_POINT>(ret, EC_POINT_clear_free);
@@ -139,7 +137,7 @@ shared_ptr<EC_POINT> ECPOINTSerialize::GetNumber(const vector<unsigned char> & s
     return nullptr;
 }
 
-void ECPOINTSerialize::SetNumber(vector<unsigned char> & dst, unsigned int offset, unsigned int size, shared_ptr<EC_POINT> value)
+void ECPOINTSerialize::SetNumber(vector<unsigned char>& dst, unsigned int offset, unsigned int size, shared_ptr<EC_POINT> value)
 {
     unique_ptr<BN_CTX, void (*)(BN_CTX*)> ctx(BN_CTX_new(), BN_CTX_free);
     if (ctx == nullptr)
@@ -158,7 +156,9 @@ void ECPOINTSerialize::SetNumber(vector<unsigned char> & dst, unsigned int offse
     return BIGNUMSerialize::SetNumber(dst, offset, size, bnvalue);
 }
 
-PrivKey::PrivKey() : m_d(BN_new(), BN_clear_free), m_initialized(false)
+PrivKey::PrivKey()
+    : m_d(BN_new(), BN_clear_free)
+    , m_initialized(false)
 {
     // kpriv->d should be in [1,...,order-1]
     // -1 means no constraint on the MSB of kpriv->d
@@ -166,7 +166,7 @@ PrivKey::PrivKey() : m_d(BN_new(), BN_clear_free), m_initialized(false)
 
     if (m_d != nullptr)
     {
-        const Curve & curve = Schnorr::GetInstance().GetCurve();
+        const Curve& curve = Schnorr::GetInstance().GetCurve();
 
         m_initialized = true;
         do
@@ -177,22 +177,23 @@ PrivKey::PrivKey() : m_d(BN_new(), BN_clear_free), m_initialized(false)
                 m_initialized = false;
                 break;
             }
-        }
-        while (BN_is_zero(m_d.get()) || BN_is_one(m_d.get()) || (BN_cmp(m_d.get(), curve.m_order.get()) != -1));
+        } while (BN_is_zero(m_d.get()) || BN_is_one(m_d.get()) || (BN_cmp(m_d.get(), curve.m_order.get()) != -1));
     }
     else
     {
         LOG_MESSAGE("Error: Memory allocation failure");
-        throw exception();        
+        throw exception();
     }
 }
 
-PrivKey::PrivKey(const vector<unsigned char> & src, unsigned int offset)
+PrivKey::PrivKey(const vector<unsigned char>& src, unsigned int offset)
 {
     Deserialize(src, offset);
 }
 
-PrivKey::PrivKey(const PrivKey & src) : m_d(BN_new(), BN_clear_free), m_initialized(false)
+PrivKey::PrivKey(const PrivKey& src)
+    : m_d(BN_new(), BN_clear_free)
+    , m_initialized(false)
 {
     if (m_d != nullptr)
     {
@@ -214,7 +215,6 @@ PrivKey::PrivKey(const PrivKey & src) : m_d(BN_new(), BN_clear_free), m_initiali
 
 PrivKey::~PrivKey()
 {
-
 }
 
 bool PrivKey::Initialized() const
@@ -222,7 +222,7 @@ bool PrivKey::Initialized() const
     return m_initialized;
 }
 
-unsigned int PrivKey::Serialize(vector<unsigned char> & dst, unsigned int offset) const
+unsigned int PrivKey::Serialize(vector<unsigned char>& dst, unsigned int offset) const
 {
     LOG_MARKER();
 
@@ -234,7 +234,7 @@ unsigned int PrivKey::Serialize(vector<unsigned char> & dst, unsigned int offset
     return PRIV_KEY_SIZE;
 }
 
-void PrivKey::Deserialize(const vector<unsigned char> & src, unsigned int offset)
+void PrivKey::Deserialize(const vector<unsigned char>& src, unsigned int offset)
 {
     LOG_MARKER();
 
@@ -250,18 +250,20 @@ void PrivKey::Deserialize(const vector<unsigned char> & src, unsigned int offset
     }
 }
 
-PrivKey & PrivKey::operator=(const PrivKey & src)
+PrivKey& PrivKey::operator=(const PrivKey& src)
 {
     m_initialized = (BN_copy(m_d.get(), src.m_d.get()) == m_d.get());
     return *this;
 }
 
-bool PrivKey::operator==(const PrivKey & r) const
+bool PrivKey::operator==(const PrivKey& r) const
 {
     return (m_initialized && r.m_initialized && (BN_cmp(m_d.get(), r.m_d.get()) == 0));
 }
 
-PubKey::PubKey() : m_P(EC_POINT_new(Schnorr::GetInstance().GetCurve().m_group.get()), EC_POINT_clear_free), m_initialized(false)
+PubKey::PubKey()
+    : m_P(EC_POINT_new(Schnorr::GetInstance().GetCurve().m_group.get()), EC_POINT_clear_free)
+    , m_initialized(false)
 {
     if (m_P == nullptr)
     {
@@ -270,7 +272,9 @@ PubKey::PubKey() : m_P(EC_POINT_new(Schnorr::GetInstance().GetCurve().m_group.ge
     }
 }
 
-PubKey::PubKey(const PrivKey & privkey) : m_P(EC_POINT_new(Schnorr::GetInstance().GetCurve().m_group.get()), EC_POINT_clear_free), m_initialized(false)
+PubKey::PubKey(const PrivKey& privkey)
+    : m_P(EC_POINT_new(Schnorr::GetInstance().GetCurve().m_group.get()), EC_POINT_clear_free)
+    , m_initialized(false)
 {
     if (m_P == nullptr)
     {
@@ -283,7 +287,7 @@ PubKey::PubKey(const PrivKey & privkey) : m_P(EC_POINT_new(Schnorr::GetInstance(
     }
     else
     {
-        const Curve & curve = Schnorr::GetInstance().GetCurve();
+        const Curve& curve = Schnorr::GetInstance().GetCurve();
 
         if (BN_is_zero(privkey.m_d.get()) || BN_is_one(privkey.m_d.get()) || (BN_cmp(privkey.m_d.get(), curve.m_order.get()) != -1))
         {
@@ -301,12 +305,14 @@ PubKey::PubKey(const PrivKey & privkey) : m_P(EC_POINT_new(Schnorr::GetInstance(
     }
 }
 
-PubKey::PubKey(const vector<unsigned char> & src, unsigned int offset)
+PubKey::PubKey(const vector<unsigned char>& src, unsigned int offset)
 {
     Deserialize(src, offset);
 }
 
-PubKey::PubKey(const PubKey & src) : m_P(EC_POINT_new(Schnorr::GetInstance().GetCurve().m_group.get()), EC_POINT_clear_free), m_initialized(false)
+PubKey::PubKey(const PubKey& src)
+    : m_P(EC_POINT_new(Schnorr::GetInstance().GetCurve().m_group.get()), EC_POINT_clear_free)
+    , m_initialized(false)
 {
     if (m_P == nullptr)
     {
@@ -316,7 +322,7 @@ PubKey::PubKey(const PubKey & src) : m_P(EC_POINT_new(Schnorr::GetInstance().Get
     else if (src.m_P == nullptr)
     {
         LOG_MESSAGE("Error: src (ec point) is null in pub key construct.");
-        throw exception(); 
+        throw exception();
     }
     else
     {
@@ -333,7 +339,6 @@ PubKey::PubKey(const PubKey & src) : m_P(EC_POINT_new(Schnorr::GetInstance().Get
 
 PubKey::~PubKey()
 {
-
 }
 
 bool PubKey::Initialized() const
@@ -341,7 +346,7 @@ bool PubKey::Initialized() const
     return m_initialized;
 }
 
-unsigned int PubKey::Serialize(vector<unsigned char> & dst, unsigned int offset) const
+unsigned int PubKey::Serialize(vector<unsigned char>& dst, unsigned int offset) const
 {
     if (m_initialized)
     {
@@ -351,7 +356,7 @@ unsigned int PubKey::Serialize(vector<unsigned char> & dst, unsigned int offset)
     return PUB_KEY_SIZE;
 }
 
-void PubKey::Deserialize(const vector<unsigned char> & src, unsigned int offset)
+void PubKey::Deserialize(const vector<unsigned char>& src, unsigned int offset)
 {
     m_P = ECPOINTSerialize::GetNumber(src, offset, PUB_KEY_SIZE);
     if (m_P == nullptr)
@@ -365,13 +370,13 @@ void PubKey::Deserialize(const vector<unsigned char> & src, unsigned int offset)
     }
 }
 
-PubKey & PubKey::operator=(const PubKey & src)
+PubKey& PubKey::operator=(const PubKey& src)
 {
     m_initialized = (EC_POINT_copy(m_P.get(), src.m_P.get()) == 1);
     return *this;
 }
 
-bool PubKey::operator<(const PubKey & r) const
+bool PubKey::operator<(const PubKey& r) const
 {
     unique_ptr<BN_CTX, void (*)(BN_CTX*)> ctx(BN_CTX_new(), BN_CTX_free);
     if (ctx == nullptr)
@@ -386,7 +391,7 @@ bool PubKey::operator<(const PubKey & r) const
     return (m_initialized && r.m_initialized && (BN_cmp(lhs_bnvalue.get(), rhs_bnvalue.get()) == -1));
 }
 
-bool PubKey::operator>(const PubKey & r) const
+bool PubKey::operator>(const PubKey& r) const
 {
     unique_ptr<BN_CTX, void (*)(BN_CTX*)> ctx(BN_CTX_new(), BN_CTX_free);
     if (ctx == nullptr)
@@ -401,7 +406,7 @@ bool PubKey::operator>(const PubKey & r) const
     return (m_initialized && r.m_initialized && (BN_cmp(lhs_bnvalue.get(), rhs_bnvalue.get()) == 1));
 }
 
-bool PubKey::operator==(const PubKey & r) const
+bool PubKey::operator==(const PubKey& r) const
 {
     unique_ptr<BN_CTX, void (*)(BN_CTX*)> ctx(BN_CTX_new(), BN_CTX_free);
     if (ctx == nullptr)
@@ -413,7 +418,10 @@ bool PubKey::operator==(const PubKey & r) const
     return (m_initialized && r.m_initialized && (EC_POINT_cmp(Schnorr::GetInstance().GetCurve().m_group.get(), m_P.get(), r.m_P.get(), ctx.get()) == 0));
 }
 
-Signature::Signature() : m_r(BN_new(), BN_clear_free), m_s(BN_new(), BN_clear_free), m_initialized(false)
+Signature::Signature()
+    : m_r(BN_new(), BN_clear_free)
+    , m_s(BN_new(), BN_clear_free)
+    , m_initialized(false)
 {
     if ((m_r == nullptr) || (m_s == nullptr))
     {
@@ -423,12 +431,15 @@ Signature::Signature() : m_r(BN_new(), BN_clear_free), m_s(BN_new(), BN_clear_fr
     m_initialized = true;
 }
 
-Signature::Signature(const vector<unsigned char> & src, unsigned int offset)
+Signature::Signature(const vector<unsigned char>& src, unsigned int offset)
 {
     Deserialize(src, offset);
 }
 
-Signature::Signature(const Signature & src) : m_r(BN_new(), BN_clear_free), m_s(BN_new(), BN_clear_free), m_initialized(false)
+Signature::Signature(const Signature& src)
+    : m_r(BN_new(), BN_clear_free)
+    , m_s(BN_new(), BN_clear_free)
+    , m_initialized(false)
 {
     if ((m_r != nullptr) && (m_s != nullptr))
     {
@@ -455,7 +466,6 @@ Signature::Signature(const Signature & src) : m_r(BN_new(), BN_clear_free), m_s(
 
 Signature::~Signature()
 {
-
 }
 
 bool Signature::Initialized() const
@@ -463,7 +473,7 @@ bool Signature::Initialized() const
     return m_initialized;
 }
 
-unsigned int Signature::Serialize(vector<unsigned char> & dst, unsigned int offset) const
+unsigned int Signature::Serialize(vector<unsigned char>& dst, unsigned int offset) const
 {
     LOG_MARKER();
 
@@ -476,7 +486,7 @@ unsigned int Signature::Serialize(vector<unsigned char> & dst, unsigned int offs
     return SIGNATURE_CHALLENGE_SIZE + SIGNATURE_RESPONSE_SIZE;
 }
 
-void Signature::Deserialize(const vector<unsigned char> & src, unsigned int offset)
+void Signature::Deserialize(const vector<unsigned char>& src, unsigned int offset)
 {
     LOG_MARKER();
 
@@ -501,34 +511,32 @@ void Signature::Deserialize(const vector<unsigned char> & src, unsigned int offs
     }
 }
 
-Signature & Signature::operator=(const Signature & src)
+Signature& Signature::operator=(const Signature& src)
 {
     m_initialized = ((BN_copy(m_r.get(), src.m_r.get()) == m_r.get()) && (BN_copy(m_s.get(), src.m_s.get()) == m_s.get()));
     return *this;
 }
 
-bool Signature::operator==(const Signature & r) const
+bool Signature::operator==(const Signature& r) const
 {
     return (m_initialized && r.m_initialized && ((BN_cmp(m_r.get(), r.m_r.get()) == 0) && (BN_cmp(m_s.get(), r.m_s.get()) == 0)));
 }
 
 Schnorr::Schnorr()
 {
-
 }
 
 Schnorr::~Schnorr()
 {
-
 }
 
-Schnorr & Schnorr::GetInstance()
+Schnorr& Schnorr::GetInstance()
 {
     static Schnorr schnorr;
     return schnorr;
 }
 
-const Curve & Schnorr::GetCurve() const
+const Curve& Schnorr::GetCurve() const
 {
     return m_curve;
 }
@@ -543,12 +551,12 @@ pair<PrivKey, PubKey> Schnorr::GenKeyPair()
     return make_pair(PrivKey(privkey), PubKey(pubkey));
 }
 
-bool Schnorr::Sign(const vector<unsigned char> & message, const PrivKey & privkey, const PubKey & pubkey, Signature & result)
+bool Schnorr::Sign(const vector<unsigned char>& message, const PrivKey& privkey, const PubKey& pubkey, Signature& result)
 {
     return Sign(message, 0, message.size(), privkey, pubkey, result);
 }
 
-bool Schnorr::Sign(const vector<unsigned char> & message, unsigned int offset, unsigned int size, const PrivKey & privkey, const PubKey & pubkey, Signature & result)
+bool Schnorr::Sign(const vector<unsigned char>& message, unsigned int offset, unsigned int size, const PrivKey& privkey, const PubKey& pubkey, Signature& result)
 {
     LOG_MARKER();
 
@@ -590,7 +598,7 @@ bool Schnorr::Sign(const vector<unsigned char> & message, unsigned int offset, u
     // 1. Generate a random k from [1, ..., order-1]
     // 2. Compute the commitment Q = kG, where  G is the base point
     // 3. Compute the challenge r = H(Q, kpub, m)
-    // 4. If r = 0 mod(order), goto 1 
+    // 4. If r = 0 mod(order), goto 1
     // 4. Compute s = k - r*kpriv mod(order)
     // 5. If s = 0 goto 1.
     // 5  Signature on m is (r, s)
@@ -621,13 +629,12 @@ bool Schnorr::Sign(const vector<unsigned char> & message, unsigned int offset, u
                 {
                     LOG_MESSAGE("Error: Random generation failed");
                 }
-            }
-            while ((BN_is_zero(k.get())) || (BN_cmp(k.get(), m_curve.m_order.get()) != -1));
+            } while ((BN_is_zero(k.get())) || (BN_cmp(k.get(), m_curve.m_order.get()) != -1));
 
             // 2. Compute the commitment Q = kG, where G is the base point
             err = (EC_POINT_mul(m_curve.m_group.get(), Q.get(), k.get(), NULL, NULL, NULL) == 0);
             if (err)
-            {   
+            {
                 LOG_MESSAGE("Error: Commit generation failed");
             }
 
@@ -638,7 +645,7 @@ bool Schnorr::Sign(const vector<unsigned char> & message, unsigned int offset, u
             if (err)
             {
                 LOG_MESSAGE("Error: Commit octet conversion failed");
-            }   
+            }
 
             // Hash commitment
             sha2.Update(buf);
@@ -647,7 +654,7 @@ bool Schnorr::Sign(const vector<unsigned char> & message, unsigned int offset, u
             fill(buf.begin(), buf.end(), 0x00);
 
             // Convert the public key to octets
-            err = (EC_POINT_point2oct(m_curve.m_group.get(), pubkey.m_P.get(), POINT_CONVERSION_COMPRESSED, buf.data(), PUBKEY_COMPRESSED_SIZE_BYTES, NULL)!=PUBKEY_COMPRESSED_SIZE_BYTES);
+            err = (EC_POINT_point2oct(m_curve.m_group.get(), pubkey.m_P.get(), POINT_CONVERSION_COMPRESSED, buf.data(), PUBKEY_COMPRESSED_SIZE_BYTES, NULL) != PUBKEY_COMPRESSED_SIZE_BYTES);
             if (err)
             {
                 LOG_MESSAGE("Error: Pubkey octet conversion failed");
@@ -655,11 +662,11 @@ bool Schnorr::Sign(const vector<unsigned char> & message, unsigned int offset, u
 
             // Hash public key
             sha2.Update(buf);
-    
+
             // Hash message
             sha2.Update(message, offset, size);
             vector<unsigned char> digest = sha2.Finalize();
-        
+
             // Build the challenge
             err = ((BN_bin2bn(digest.data(), digest.size(), result.m_r.get())) == NULL);
             if (err)
@@ -671,15 +678,15 @@ bool Schnorr::Sign(const vector<unsigned char> & message, unsigned int offset, u
             if (err)
             {
                 LOG_MESSAGE("Error: BIGNUM NNmod failed");
-            }   
+            }
 
-            // 4. Compute s = k - r*krpiv  
-            // 4.1 r*kpriv  
+            // 4. Compute s = k - r*krpiv
+            // 4.1 r*kpriv
             err = (BN_mod_mul(result.m_s.get(), result.m_r.get(), privkey.m_d.get(), m_curve.m_order.get(), ctx.get()) == 0);
             if (err)
             {
                 LOG_MESSAGE("Error: Response mod mul failed");
-            } 
+            }
 
             // 4.2 k-r*kpriv
             err = (BN_mod_sub(result.m_s.get(), k.get(), result.m_s.get(), m_curve.m_order.get(), ctx.get()) == 0);
@@ -697,8 +704,7 @@ bool Schnorr::Sign(const vector<unsigned char> & message, unsigned int offset, u
             }
 
             sha2.Reset();
-        }
-        while (res);
+        } while (res);
     }
     else
     {
@@ -709,12 +715,12 @@ bool Schnorr::Sign(const vector<unsigned char> & message, unsigned int offset, u
     return (res == 0);
 }
 
-bool Schnorr::Verify(const vector<unsigned char> & message, const Signature & toverify, const PubKey & pubkey)
+bool Schnorr::Verify(const vector<unsigned char>& message, const Signature& toverify, const PubKey& pubkey)
 {
     return Verify(message, 0, message.size(), toverify, pubkey);
 }
 
-bool Schnorr::Verify(const vector<unsigned char> & message, unsigned int offset, unsigned int size, const Signature & toverify, const PubKey & pubkey)
+bool Schnorr::Verify(const vector<unsigned char>& message, unsigned int offset, unsigned int size, const Signature& toverify, const PubKey& pubkey)
 {
     LOG_MARKER();
 
@@ -747,7 +753,7 @@ bool Schnorr::Verify(const vector<unsigned char> & message, unsigned int offset,
     // Main verification procedure
 
     // The algorithm to check the signature (r, s) on a message m using a public key kpub is as follows
-    // 1. Check if r,s is in [1, ..., order-1] 
+    // 1. Check if r,s is in [1, ..., order-1]
     // 2. Compute Q = sG + r*kpub
     // 3. If Q = O (the neutral point), return 0;
     // 4. r' = H(Q, kpub, m)
@@ -766,15 +772,15 @@ bool Schnorr::Verify(const vector<unsigned char> & message, unsigned int offset,
 
     if ((challenge_built != nullptr) && (ctx != nullptr) && (Q != nullptr))
     {
-        // 1. Check if r,s is in [1, ..., order-1] 
-        err2 = (BN_is_zero(toverify.m_r.get()) || (BN_cmp(toverify.m_r.get(), m_curve.m_order.get()) !=-1));
+        // 1. Check if r,s is in [1, ..., order-1]
+        err2 = (BN_is_zero(toverify.m_r.get()) || (BN_cmp(toverify.m_r.get(), m_curve.m_order.get()) != -1));
         err = err || err2;
         if (err2)
         {
             LOG_MESSAGE("Error: Challenge not in range");
         }
 
-        err2 = (BN_is_zero(toverify.m_s.get()) || (BN_cmp(toverify.m_s.get(), m_curve.m_order.get()) !=-1));
+        err2 = (BN_is_zero(toverify.m_s.get()) || (BN_cmp(toverify.m_s.get(), m_curve.m_order.get()) != -1));
         err = err || err2;
         if (err2)
         {
@@ -811,7 +817,7 @@ bool Schnorr::Verify(const vector<unsigned char> & message, unsigned int offset,
 
         // Reset buf
         fill(buf.begin(), buf.end(), 0x00);
-    
+
         // 4.2 Convert the public key to octets
         err2 = (EC_POINT_point2oct(m_curve.m_group.get(), pubkey.m_P.get(), POINT_CONVERSION_COMPRESSED, buf.data(), PUBKEY_COMPRESSED_SIZE_BYTES, NULL) != PUBKEY_COMPRESSED_SIZE_BYTES);
         err = err || err2;
@@ -833,8 +839,8 @@ bool Schnorr::Verify(const vector<unsigned char> & message, unsigned int offset,
         if (err2)
         {
             LOG_MESSAGE("Error: Challenge bin2bn conversion failed");
-        }    
-    
+        }
+
         err2 = (BN_nnmod(challenge_built.get(), challenge_built.get(), m_curve.m_order.get(), NULL) == 0);
         err = err || err2;
         if (err2)
@@ -853,7 +859,7 @@ bool Schnorr::Verify(const vector<unsigned char> & message, unsigned int offset,
     return (!err) && (BN_cmp(challenge_built.get(), toverify.m_r.get()) == 0);
 }
 
-void Schnorr::PrintPoint(const EC_POINT * point)
+void Schnorr::PrintPoint(const EC_POINT* point)
 {
     LOG_MARKER();
 
@@ -862,8 +868,8 @@ void Schnorr::PrintPoint(const EC_POINT * point)
 
     if ((x != nullptr) && (y != nullptr))
     {
-        // Get affine coordinates for the point 
-        if (EC_POINT_get_affine_coordinates_GFp(m_curve.m_group.get(), point, x.get(), y.get(), NULL)) 
+        // Get affine coordinates for the point
+        if (EC_POINT_get_affine_coordinates_GFp(m_curve.m_group.get(), point, x.get(), y.get(), NULL))
         {
             unique_ptr<char, void (*)(void*)> x_str(BN_bn2hex(x.get()), free);
             unique_ptr<char, void (*)(void*)> y_str(BN_bn2hex(y.get()), free);

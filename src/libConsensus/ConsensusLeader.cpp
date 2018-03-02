@@ -18,10 +18,10 @@
 #include "ConsensusLeader.h"
 #include "common/Constants.h"
 #include "common/Messages.h"
-#include "libUtils/Logger.h"
+#include "libNetwork/P2PComm.h"
 #include "libUtils/DataConversion.h"
 #include "libUtils/DetachedFunction.h"
-#include "libNetwork/P2PComm.h"
+#include "libUtils/Logger.h"
 
 using namespace std;
 
@@ -29,180 +29,180 @@ bool ConsensusLeader::CheckState(Action action)
 {
     bool result = true;
 
-    switch(action)
+    switch (action)
     {
-        case SEND_ANNOUNCEMENT:
-            switch(m_state)
-            {
-                case INITIAL:
-                    break;
-                case ANNOUNCE_DONE:
-                LOG_MESSAGE("Error: Doing announce but announce already done");
-                    result = false;
-                    break;
-                case CHALLENGE_DONE:
-                LOG_MESSAGE("Error: Doing announce but challenge already done");
-                    result = false;
-                    break;
-                case COLLECTIVESIG_DONE:
-                LOG_MESSAGE("Error: Doing announce but collectivesig already done");
-                    result = false;
-                    break;
-                case FINALCHALLENGE_DONE:
-                LOG_MESSAGE("Error: Doing announce but finalchallenge already done");
-                    result = false;
-                    break;
-                case DONE:
-                LOG_MESSAGE("Error: Doing announce but consensus already done");
-                    result = false;
-                    break;
-                case ERROR:
-                default:
-                LOG_MESSAGE("Error: Unrecognized or error state");
-                    result = false;
-                    break;
-            }
+    case SEND_ANNOUNCEMENT:
+        switch (m_state)
+        {
+        case INITIAL:
             break;
-        case PROCESS_COMMIT:
-            switch(m_state)
-            {
-                case INITIAL:
-                LOG_MESSAGE("Error: Processing commit but announce not yet done");
-                    result = false;
-                    break;
-                case ANNOUNCE_DONE:
-                    break;
-                case CHALLENGE_DONE:
-                LOG_MESSAGE("Error: Processing commit but challenge already done");
-                    result = false;
-                    // LOG_MESSAGE("Processing redundant commit messages");
-                    break;
-                case COLLECTIVESIG_DONE:
-                LOG_MESSAGE("Error: Processing commit but collectivesig already done");
-                    result = false;
-                    break;
-                case FINALCHALLENGE_DONE:
-                LOG_MESSAGE("Error: Processing commit but finalchallenge already done");
-                    result = false;
-                    break;
-                case DONE:
-                LOG_MESSAGE("Error: Processing commit but consensus already done");
-                    result = false;
-                    break;
-                case ERROR:
-                default:
-                LOG_MESSAGE("Error: Unrecognized or error state");
-                    result = false;
-                    break;
-            }
-            break;
-        case PROCESS_RESPONSE:
-            switch(m_state)
-            {
-                case INITIAL:
-                LOG_MESSAGE("Error: Processing response but announce not yet done");
-                    result = false;
-                    break;
-                case ANNOUNCE_DONE:
-                LOG_MESSAGE("Error: Processing response but challenge not yet done");
-                    result = false;
-                    break;
-                case CHALLENGE_DONE:
-                    break;
-                case COLLECTIVESIG_DONE:
-                LOG_MESSAGE("Error: Processing response but collectivesig already done");
-                    result = false;
-                    break;
-                case FINALCHALLENGE_DONE:
-                LOG_MESSAGE("Error: Processing response but finalchallenge already done");
-                    result = false;
-                    break;
-                case DONE:
-                LOG_MESSAGE("Error: Processing response but consensus already done");
-                    result = false;
-                    break;
-                case ERROR:
-                default:
-                LOG_MESSAGE("Error: Unrecognized or error state");
-                    result = false;
-                    break;
-            }
-            break;
-        case PROCESS_FINALCOMMIT:
-            switch(m_state)
-            {
-                case INITIAL:
-                LOG_MESSAGE("Error: Processing finalcommit but announce not yet done");
-                    result = false;
-                    break;
-                case ANNOUNCE_DONE:
-                LOG_MESSAGE("Error: Processing finalcommit but challenge not yet done");
-                    result = false;
-                    break;
-                case CHALLENGE_DONE:
-                LOG_MESSAGE("Error: Processing finalcommit but collectivesig not yet done");
-                    result = false;
-                    break;
-                case COLLECTIVESIG_DONE:
-                    break;
-                case FINALCHALLENGE_DONE:
-                LOG_MESSAGE("Error: Processing finalcommit but finalchallenge already done");
-                    // LOG_MESSAGE("Processing redundant finalcommit messages");
-                    result = false;
-                    break;
-                case DONE:
-                LOG_MESSAGE("Error: Processing finalcommit but consensus already done");
-                    result = false;
-                    break;
-                case ERROR:
-                default:
-                LOG_MESSAGE("Error: Unrecognized or error state");
-                    result = false;
-                    break;
-            }
-            break;
-        case PROCESS_FINALRESPONSE:
-            switch(m_state)
-            {
-                case INITIAL:
-                LOG_MESSAGE("Error: Processing finalresponse but announce not yet done");
-                    result = false;
-                    break;
-                case ANNOUNCE_DONE:
-                LOG_MESSAGE("Error: Processing finalresponse but challenge not yet done");
-                    result = false;
-                    break;
-                case CHALLENGE_DONE:
-                LOG_MESSAGE("Error: Processing finalresponse but collectivesig not yet done");
-                    result = false;
-                    break;
-                case COLLECTIVESIG_DONE:
-                LOG_MESSAGE("Error: Processing finalresponse but finalchallenge not yet done");
-                    result = false;
-                    break;
-                case FINALCHALLENGE_DONE:
-                    break;
-                case DONE:
-                LOG_MESSAGE("Error: Processing finalresponse but consensus already done");
-                    result = false;
-                    break;
-                case ERROR:
-                default:
-                LOG_MESSAGE("Error: Unrecognized or error state");
-                    result = false;
-                    break;
-            }
-            break;
-        default:
-        LOG_MESSAGE("Error: Unrecognized action");
+        case ANNOUNCE_DONE:
+            LOG_MESSAGE("Error: Doing announce but announce already done");
             result = false;
             break;
+        case CHALLENGE_DONE:
+            LOG_MESSAGE("Error: Doing announce but challenge already done");
+            result = false;
+            break;
+        case COLLECTIVESIG_DONE:
+            LOG_MESSAGE("Error: Doing announce but collectivesig already done");
+            result = false;
+            break;
+        case FINALCHALLENGE_DONE:
+            LOG_MESSAGE("Error: Doing announce but finalchallenge already done");
+            result = false;
+            break;
+        case DONE:
+            LOG_MESSAGE("Error: Doing announce but consensus already done");
+            result = false;
+            break;
+        case ERROR:
+        default:
+            LOG_MESSAGE("Error: Unrecognized or error state");
+            result = false;
+            break;
+        }
+        break;
+    case PROCESS_COMMIT:
+        switch (m_state)
+        {
+        case INITIAL:
+            LOG_MESSAGE("Error: Processing commit but announce not yet done");
+            result = false;
+            break;
+        case ANNOUNCE_DONE:
+            break;
+        case CHALLENGE_DONE:
+            LOG_MESSAGE("Error: Processing commit but challenge already done");
+            result = false;
+            // LOG_MESSAGE("Processing redundant commit messages");
+            break;
+        case COLLECTIVESIG_DONE:
+            LOG_MESSAGE("Error: Processing commit but collectivesig already done");
+            result = false;
+            break;
+        case FINALCHALLENGE_DONE:
+            LOG_MESSAGE("Error: Processing commit but finalchallenge already done");
+            result = false;
+            break;
+        case DONE:
+            LOG_MESSAGE("Error: Processing commit but consensus already done");
+            result = false;
+            break;
+        case ERROR:
+        default:
+            LOG_MESSAGE("Error: Unrecognized or error state");
+            result = false;
+            break;
+        }
+        break;
+    case PROCESS_RESPONSE:
+        switch (m_state)
+        {
+        case INITIAL:
+            LOG_MESSAGE("Error: Processing response but announce not yet done");
+            result = false;
+            break;
+        case ANNOUNCE_DONE:
+            LOG_MESSAGE("Error: Processing response but challenge not yet done");
+            result = false;
+            break;
+        case CHALLENGE_DONE:
+            break;
+        case COLLECTIVESIG_DONE:
+            LOG_MESSAGE("Error: Processing response but collectivesig already done");
+            result = false;
+            break;
+        case FINALCHALLENGE_DONE:
+            LOG_MESSAGE("Error: Processing response but finalchallenge already done");
+            result = false;
+            break;
+        case DONE:
+            LOG_MESSAGE("Error: Processing response but consensus already done");
+            result = false;
+            break;
+        case ERROR:
+        default:
+            LOG_MESSAGE("Error: Unrecognized or error state");
+            result = false;
+            break;
+        }
+        break;
+    case PROCESS_FINALCOMMIT:
+        switch (m_state)
+        {
+        case INITIAL:
+            LOG_MESSAGE("Error: Processing finalcommit but announce not yet done");
+            result = false;
+            break;
+        case ANNOUNCE_DONE:
+            LOG_MESSAGE("Error: Processing finalcommit but challenge not yet done");
+            result = false;
+            break;
+        case CHALLENGE_DONE:
+            LOG_MESSAGE("Error: Processing finalcommit but collectivesig not yet done");
+            result = false;
+            break;
+        case COLLECTIVESIG_DONE:
+            break;
+        case FINALCHALLENGE_DONE:
+            LOG_MESSAGE("Error: Processing finalcommit but finalchallenge already done");
+            // LOG_MESSAGE("Processing redundant finalcommit messages");
+            result = false;
+            break;
+        case DONE:
+            LOG_MESSAGE("Error: Processing finalcommit but consensus already done");
+            result = false;
+            break;
+        case ERROR:
+        default:
+            LOG_MESSAGE("Error: Unrecognized or error state");
+            result = false;
+            break;
+        }
+        break;
+    case PROCESS_FINALRESPONSE:
+        switch (m_state)
+        {
+        case INITIAL:
+            LOG_MESSAGE("Error: Processing finalresponse but announce not yet done");
+            result = false;
+            break;
+        case ANNOUNCE_DONE:
+            LOG_MESSAGE("Error: Processing finalresponse but challenge not yet done");
+            result = false;
+            break;
+        case CHALLENGE_DONE:
+            LOG_MESSAGE("Error: Processing finalresponse but collectivesig not yet done");
+            result = false;
+            break;
+        case COLLECTIVESIG_DONE:
+            LOG_MESSAGE("Error: Processing finalresponse but finalchallenge not yet done");
+            result = false;
+            break;
+        case FINALCHALLENGE_DONE:
+            break;
+        case DONE:
+            LOG_MESSAGE("Error: Processing finalresponse but consensus already done");
+            result = false;
+            break;
+        case ERROR:
+        default:
+            LOG_MESSAGE("Error: Unrecognized or error state");
+            result = false;
+            break;
+        }
+        break;
+    default:
+        LOG_MESSAGE("Error: Unrecognized action");
+        result = false;
+        break;
     }
 
     return result;
 }
 
-bool ConsensusLeader::ProcessMessageCommitCore(const vector<unsigned char> & commit, unsigned int offset, Action action, ConsensusMessageType returnmsgtype, State nextstate)
+bool ConsensusLeader::ProcessMessageCommitCore(const vector<unsigned char>& commit, unsigned int offset, Action action, ConsensusMessageType returnmsgtype, State nextstate)
 {
     LOG_MARKER();
 
@@ -313,7 +313,7 @@ bool ConsensusLeader::ProcessMessageCommitCore(const vector<unsigned char> & com
         {
             LOG_MESSAGE("Sufficient " << m_numForConsensus << " commits obtained");
 
-            vector<unsigned char> challenge = { m_classByte, m_insByte, static_cast<unsigned char>(returnmsgtype) };
+            vector<unsigned char> challenge = {m_classByte, m_insByte, static_cast<unsigned char>(returnmsgtype)};
             result = GenerateChallengeMessage(challenge, MessageOffset::BODY + sizeof(unsigned char));
             if (result == true)
             {
@@ -469,14 +469,14 @@ bool ConsensusLeader::ProcessMessageCommitCore(const vector<unsigned char> & com
     return result;
 }
 
-bool ConsensusLeader::ProcessMessageCommit(const vector<unsigned char> & commit, unsigned int offset)
+bool ConsensusLeader::ProcessMessageCommit(const vector<unsigned char>& commit, unsigned int offset)
 {
     LOG_MARKER();
     return ProcessMessageCommitCore(commit, offset, PROCESS_COMMIT, CHALLENGE, CHALLENGE_DONE);
 }
 
-bool ConsensusLeader::ProcessMessageCommitFailure(const vector<unsigned char> & commitFailureMsg,
-                                                  unsigned int offset, const Peer & from)
+bool ConsensusLeader::ProcessMessageCommitFailure(const vector<unsigned char>& commitFailureMsg,
+                                                  unsigned int offset, const Peer& from)
 {
     LOG_MARKER();
 
@@ -497,15 +497,15 @@ bool ConsensusLeader::ProcessMessageCommitFailure(const vector<unsigned char> & 
     unsigned int curr_offset = offset;
 
     // 4-byte consensus id
-    uint32_t consensus_id = Serializable::GetNumber<uint32_t>(commitFailureMsg, curr_offset, 
+    uint32_t consensus_id = Serializable::GetNumber<uint32_t>(commitFailureMsg, curr_offset,
                                                               sizeof(uint32_t));
     curr_offset += sizeof(uint32_t);
 
     // Check the consensus id
     if (consensus_id != m_consensusID)
     {
-        LOG_MESSAGE("Error: Consensus ID in commitment (" << consensus_id << ") does not match " <<
-                    "instance consensus ID (" << m_consensusID << ")");
+        LOG_MESSAGE("Error: Consensus ID in commitment (" << consensus_id << ") does not match "
+                                                          << "instance consensus ID (" << m_consensusID << ")");
         return false;
     }
 
@@ -513,7 +513,8 @@ bool ConsensusLeader::ProcessMessageCommitFailure(const vector<unsigned char> & 
 
     // Check the block hash
     if (equal(m_blockHash.begin(), m_blockHash.end(),
-        commitFailureMsg.begin() + curr_offset) == false)
+              commitFailureMsg.begin() + curr_offset)
+        == false)
     {
         LOG_MESSAGE("Error: Block hash in commitment does not match instance block hash");
         return false;
@@ -531,7 +532,7 @@ bool ConsensusLeader::ProcessMessageCommitFailure(const vector<unsigned char> & 
         LOG_MESSAGE("Error: Backup ID beyond backup count");
         return false;
     }
-    
+
     if (m_commitFailureMap.find(backup_id) != m_commitFailureMap.end())
     {
         LOG_MESSAGE("Error: Backup has already sent commit failure message");
@@ -539,7 +540,7 @@ bool ConsensusLeader::ProcessMessageCommitFailure(const vector<unsigned char> & 
     }
 
     m_commitFailureCounter++;
-    m_commitFailureMap[backup_id] = vector<unsigned char>(commitFailureMsg.begin() + curr_offset, 
+    m_commitFailureMap[backup_id] = vector<unsigned char>(commitFailureMsg.begin() + curr_offset,
                                                           commitFailureMsg.end());
 
     m_nodeCommitFailureHandlerFunc(commitFailureMsg, curr_offset, from);
@@ -548,13 +549,13 @@ bool ConsensusLeader::ProcessMessageCommitFailure(const vector<unsigned char> & 
     {
         m_state = INITIAL;
 
-        vector<unsigned char> consensusFailureMsg = { m_classByte, m_insByte, CONSENSUSFAILURE };
+        vector<unsigned char> consensusFailureMsg = {m_classByte, m_insByte, CONSENSUSFAILURE};
         P2PComm::GetInstance().SendMessage(m_peerInfo, consensusFailureMsg);
 
-        auto main_func = [this]() mutable -> void { 
+        auto main_func = [this]() mutable -> void {
             m_shardCommitFailureHandlerFunc(m_commitFailureMap);
-        };   
-        DetachedFunction(1, main_func); 
+        };
+        DetachedFunction(1, main_func);
         // LOG_MESSAGE("Sufficient " << m_numForConsensus << " commits obtained");
 
         // vector<unsigned char> challenge = { m_classByte, m_insByte, static_cast<unsigned char>(returnmsgtype) };
@@ -585,7 +586,7 @@ bool ConsensusLeader::ProcessMessageCommitFailure(const vector<unsigned char> & 
     return true;
 }
 
-bool ConsensusLeader::GenerateChallengeMessage(vector<unsigned char> & challenge, unsigned int offset)
+bool ConsensusLeader::GenerateChallengeMessage(vector<unsigned char>& challenge, unsigned int offset)
 {
     LOG_MARKER();
 
@@ -664,7 +665,7 @@ bool ConsensusLeader::GenerateChallengeMessage(vector<unsigned char> & challenge
     return true;
 }
 
-bool ConsensusLeader::ProcessMessageResponseCore(const vector<unsigned char> & response, unsigned int offset, Action action, ConsensusMessageType returnmsgtype, State nextstate)
+bool ConsensusLeader::ProcessMessageResponseCore(const vector<unsigned char>& response, unsigned int offset, Action action, ConsensusMessageType returnmsgtype, State nextstate)
 {
     LOG_MARKER();
 
@@ -780,9 +781,9 @@ bool ConsensusLeader::ProcessMessageResponseCore(const vector<unsigned char> & r
     {
         LOG_MESSAGE("Sufficient responses obtained");
 
-        vector<unsigned char> collectivesig = { m_classByte, m_insByte,
-                                                static_cast<unsigned char>(returnmsgtype) };
-        result = GenerateCollectiveSigMessage(collectivesig, 
+        vector<unsigned char> collectivesig = {m_classByte, m_insByte,
+                                               static_cast<unsigned char>(returnmsgtype)};
+        result = GenerateCollectiveSigMessage(collectivesig,
                                               MessageOffset::BODY + sizeof(unsigned char));
 
         if (result == true)
@@ -818,21 +819,19 @@ bool ConsensusLeader::ProcessMessageResponseCore(const vector<unsigned char> & r
             // =======================================
 
             P2PComm::GetInstance().SendMessage(m_peerInfo, collectivesig);
-
-
         }
     }
 
     return result;
 }
 
-bool ConsensusLeader::ProcessMessageResponse(const vector<unsigned char> & response, unsigned int offset)
+bool ConsensusLeader::ProcessMessageResponse(const vector<unsigned char>& response, unsigned int offset)
 {
     LOG_MARKER();
     return ProcessMessageResponseCore(response, offset, PROCESS_RESPONSE, COLLECTIVESIG, COLLECTIVESIG_DONE);
 }
 
-bool ConsensusLeader::GenerateCollectiveSigMessage(vector<unsigned char> & collectivesig, unsigned int offset)
+bool ConsensusLeader::GenerateCollectiveSigMessage(vector<unsigned char>& collectivesig, unsigned int offset)
 {
     LOG_MARKER();
 
@@ -919,36 +918,36 @@ bool ConsensusLeader::GenerateCollectiveSigMessage(vector<unsigned char> & colle
     return true;
 }
 
-bool ConsensusLeader::ProcessMessageFinalCommit(const vector<unsigned char> & finalcommit, unsigned int offset)
+bool ConsensusLeader::ProcessMessageFinalCommit(const vector<unsigned char>& finalcommit, unsigned int offset)
 {
     LOG_MARKER();
     return ProcessMessageCommitCore(finalcommit, offset, PROCESS_FINALCOMMIT, FINALCHALLENGE, FINALCHALLENGE_DONE);
 }
 
-bool ConsensusLeader::ProcessMessageFinalResponse(const vector<unsigned char> & finalresponse, unsigned int offset)
+bool ConsensusLeader::ProcessMessageFinalResponse(const vector<unsigned char>& finalresponse, unsigned int offset)
 {
     LOG_MARKER();
     return ProcessMessageResponseCore(finalresponse, offset, PROCESS_FINALRESPONSE, FINALCOLLECTIVESIG, DONE);
 }
 
-ConsensusLeader::ConsensusLeader
-(
+ConsensusLeader::ConsensusLeader(
     uint32_t consensus_id,
-    const vector<unsigned char> & block_hash,
+    const vector<unsigned char>& block_hash,
     uint16_t node_id,
-    const PrivKey & privkey,
-    const deque<PubKey> & pubkeys,
-    const deque<Peer> & peer_info,
+    const PrivKey& privkey,
+    const deque<PubKey>& pubkeys,
+    const deque<Peer>& peer_info,
     unsigned char class_byte,
     unsigned char ins_byte,
     NodeCommitFailureHandlerFunc nodeCommitFailureHandlerFunc,
-    ShardCommitFailureHandlerFunc shardCommitFailureHandlerFunc
-) : ConsensusCommon(consensus_id, block_hash, node_id, privkey, pubkeys, peer_info, 
-                    class_byte, ins_byte), m_commitMap(pubkeys.size(), false),
-                    m_commitPointMap(pubkeys.size(), CommitPoint()), 
-                    m_commitRedundantMap(pubkeys.size(), false), 
-                    m_commitRedundantPointMap(pubkeys.size(), CommitPoint()),
-                    m_responseDataMap(pubkeys.size(), Response())
+    ShardCommitFailureHandlerFunc shardCommitFailureHandlerFunc)
+    : ConsensusCommon(consensus_id, block_hash, node_id, privkey, pubkeys, peer_info,
+                      class_byte, ins_byte)
+    , m_commitMap(pubkeys.size(), false)
+    , m_commitPointMap(pubkeys.size(), CommitPoint())
+    , m_commitRedundantMap(pubkeys.size(), false)
+    , m_commitRedundantPointMap(pubkeys.size(), CommitPoint())
+    , m_responseDataMap(pubkeys.size(), Response())
 {
     LOG_MARKER();
 
@@ -956,9 +955,7 @@ ConsensusLeader::ConsensusLeader
     // m_numForConsensus = (floor(TOLERANCE_FRACTION * (pubkeys.size() - 1)) + 1);
     m_numForConsensus = ceil(pubkeys.size() * TOLERANCE_FRACTION) - 1;
     m_numForConsensusFailure = pubkeys.size() - m_numForConsensus;
-    LOG_MESSAGE("TOLERANCE_FRACTION " << TOLERANCE_FRACTION << " pubkeys.size() " << 
-                pubkeys.size() << " m_numForConsensus " << m_numForConsensus <<
-                " m_numForConsensusFailure " << m_numForConsensusFailure);
+    LOG_MESSAGE("TOLERANCE_FRACTION " << TOLERANCE_FRACTION << " pubkeys.size() " << pubkeys.size() << " m_numForConsensus " << m_numForConsensus << " m_numForConsensusFailure " << m_numForConsensusFailure);
 
     m_nodeCommitFailureHandlerFunc = nodeCommitFailureHandlerFunc;
     m_shardCommitFailureHandlerFunc = shardCommitFailureHandlerFunc;
@@ -966,10 +963,9 @@ ConsensusLeader::ConsensusLeader
 
 ConsensusLeader::~ConsensusLeader()
 {
-
 }
 
-bool ConsensusLeader::StartConsensus(const vector<unsigned char> & message)
+bool ConsensusLeader::StartConsensus(const vector<unsigned char>& message)
 {
     LOG_MARKER();
 
@@ -994,9 +990,9 @@ bool ConsensusLeader::StartConsensus(const vector<unsigned char> & message)
     // Signature is over: [4-byte consensus id] [32-byte blockhash] [2-byte leader id] [message]
 
     LOG_MESSAGE("DEBUG: my ip is " << m_peerInfo.at(m_myID).GetPrintableIPAddress());
-    LOG_MESSAGE("DEBUG: my pub is " << DataConversion::SerializableToHexStr(m_pubKeys.at(m_myID)) );
+    LOG_MESSAGE("DEBUG: my pub is " << DataConversion::SerializableToHexStr(m_pubKeys.at(m_myID)));
 
-    vector<unsigned char> announcement = { m_classByte, m_insByte, static_cast<unsigned char>(ConsensusMessageType::ANNOUNCE) };
+    vector<unsigned char> announcement = {m_classByte, m_insByte, static_cast<unsigned char>(ConsensusMessageType::ANNOUNCE)};
     unsigned int curr_offset = MessageOffset::BODY + sizeof(unsigned char);
 
     // 4-byte consensus id
@@ -1044,8 +1040,8 @@ bool ConsensusLeader::StartConsensus(const vector<unsigned char> & message)
     return true;
 }
 
-bool ConsensusLeader::ProcessMessage(const vector<unsigned char> & message, unsigned int offset, 
-                                     const Peer & from)
+bool ConsensusLeader::ProcessMessage(const vector<unsigned char>& message, unsigned int offset,
+                                     const Peer& from)
 {
     LOG_MARKER();
 
@@ -1053,26 +1049,25 @@ bool ConsensusLeader::ProcessMessage(const vector<unsigned char> & message, unsi
 
     bool result = false;
 
-    switch(message.at(offset))
+    switch (message.at(offset))
     {
-        case ConsensusMessageType::COMMIT:
-            result = ProcessMessageCommit(message, offset + 1);
-            break;
-        case ConsensusMessageType::COMMITFAILURE:
-            result = ProcessMessageCommitFailure(message, offset + 1, from);
-            break;
-        case ConsensusMessageType::RESPONSE:
-            result = ProcessMessageResponse(message, offset + 1);
-            break;
-        case ConsensusMessageType::FINALCOMMIT:
-            result = ProcessMessageFinalCommit(message, offset + 1);
-            break;
-        case ConsensusMessageType::FINALRESPONSE:
-            result = ProcessMessageFinalResponse(message, offset + 1);
-            break;
-        default:
-            LOG_MESSAGE("Error: Unknown consensus message received. No: "  << 
-                        (unsigned int) message.at(offset));
+    case ConsensusMessageType::COMMIT:
+        result = ProcessMessageCommit(message, offset + 1);
+        break;
+    case ConsensusMessageType::COMMITFAILURE:
+        result = ProcessMessageCommitFailure(message, offset + 1, from);
+        break;
+    case ConsensusMessageType::RESPONSE:
+        result = ProcessMessageResponse(message, offset + 1);
+        break;
+    case ConsensusMessageType::FINALCOMMIT:
+        result = ProcessMessageFinalCommit(message, offset + 1);
+        break;
+    case ConsensusMessageType::FINALRESPONSE:
+        result = ProcessMessageFinalResponse(message, offset + 1);
+        break;
+    default:
+        LOG_MESSAGE("Error: Unknown consensus message received. No: " << (unsigned int)message.at(offset));
     }
 
     return result;

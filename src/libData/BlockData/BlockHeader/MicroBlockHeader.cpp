@@ -22,41 +22,47 @@ using namespace boost::multiprecision;
 
 MicroBlockHeader::MicroBlockHeader()
 {
-    m_blockNum = (boost::multiprecision::uint256_t) -1;
+    m_blockNum = (boost::multiprecision::uint256_t)-1;
 }
 
-MicroBlockHeader::MicroBlockHeader(const vector<unsigned char> & src, unsigned int offset)
+MicroBlockHeader::MicroBlockHeader(const vector<unsigned char>& src, unsigned int offset)
 {
     Deserialize(src, offset);
 }
 
-MicroBlockHeader::MicroBlockHeader
-(
+MicroBlockHeader::MicroBlockHeader(
     uint8_t type,
     uint32_t version,
-    const uint256_t & gasLimit,
-    const uint256_t & gasUsed,
-    const BlockHash & prevHash,
-    const uint256_t & blockNum,
-    const uint256_t & timestamp,
-    const TxnHash & txRootHash,
+    const uint256_t& gasLimit,
+    const uint256_t& gasUsed,
+    const BlockHash& prevHash,
+    const uint256_t& blockNum,
+    const uint256_t& timestamp,
+    const TxnHash& txRootHash,
     uint32_t numTxs,
-    const PubKey & minerPubKey,
-    const uint256_t & dsBlockNum,
-    const BlockHash & dsBlockHeader
-) : m_type(type), m_version(version), m_gasLimit(gasLimit), m_gasUsed(gasUsed), m_prevHash(prevHash), 
-    m_blockNum(blockNum), m_timestamp(timestamp), m_txRootHash(txRootHash), m_numTxs(numTxs), 
-    m_minerPubKey(minerPubKey), m_dsBlockNum(dsBlockNum), m_dsBlockHeader(dsBlockHeader)
+    const PubKey& minerPubKey,
+    const uint256_t& dsBlockNum,
+    const BlockHash& dsBlockHeader)
+    : m_type(type)
+    , m_version(version)
+    , m_gasLimit(gasLimit)
+    , m_gasUsed(gasUsed)
+    , m_prevHash(prevHash)
+    , m_blockNum(blockNum)
+    , m_timestamp(timestamp)
+    , m_txRootHash(txRootHash)
+    , m_numTxs(numTxs)
+    , m_minerPubKey(minerPubKey)
+    , m_dsBlockNum(dsBlockNum)
+    , m_dsBlockHeader(dsBlockHeader)
 {
 }
 
-unsigned int MicroBlockHeader::Serialize(vector<unsigned char> & dst, unsigned int offset) const
+unsigned int MicroBlockHeader::Serialize(vector<unsigned char>& dst, unsigned int offset) const
 {
     LOG_MARKER();
 
-    unsigned int size_needed = sizeof(uint8_t) + sizeof(uint32_t) + UINT256_SIZE + UINT256_SIZE + BLOCK_HASH_SIZE + 
-                               UINT256_SIZE + UINT256_SIZE + TRAN_HASH_SIZE + sizeof(uint32_t) + PUB_KEY_SIZE + 
-                               UINT256_SIZE + BLOCK_HASH_SIZE;
+    unsigned int size_needed = sizeof(uint8_t) + sizeof(uint32_t) + UINT256_SIZE + UINT256_SIZE + BLOCK_HASH_SIZE + UINT256_SIZE + UINT256_SIZE + TRAN_HASH_SIZE + sizeof(uint32_t) + PUB_KEY_SIZE + UINT256_SIZE + BLOCK_HASH_SIZE;
     unsigned int size_remaining = dst.size() - offset;
 
     if (size_remaining < size_needed)
@@ -93,7 +99,7 @@ unsigned int MicroBlockHeader::Serialize(vector<unsigned char> & dst, unsigned i
     return size_needed;
 }
 
-void MicroBlockHeader::Deserialize(const vector<unsigned char> & src, unsigned int offset)
+void MicroBlockHeader::Deserialize(const vector<unsigned char>& src, unsigned int offset)
 {
     LOG_MARKER();
     unsigned int curOffset = offset;
@@ -124,86 +130,73 @@ void MicroBlockHeader::Deserialize(const vector<unsigned char> & src, unsigned i
     copy(src.begin() + curOffset, src.begin() + curOffset + BLOCK_HASH_SIZE, m_dsBlockHeader.asArray().begin());
 }
 
-const uint8_t & MicroBlockHeader::GetType() const
+const uint8_t& MicroBlockHeader::GetType() const
 {
     return m_type;
 }
 
-const uint32_t & MicroBlockHeader::GetVersion() const
+const uint32_t& MicroBlockHeader::GetVersion() const
 {
     return m_version;
 }
 
-const uint256_t & MicroBlockHeader::GetGasLimit() const
+const uint256_t& MicroBlockHeader::GetGasLimit() const
 {
     return m_gasLimit;
 }
 
-const uint256_t & MicroBlockHeader::GetGasUsed() const
+const uint256_t& MicroBlockHeader::GetGasUsed() const
 {
     return m_gasUsed;
 }
 
-const BlockHash & MicroBlockHeader::GetPrevHash() const
+const BlockHash& MicroBlockHeader::GetPrevHash() const
 {
     return m_prevHash;
 }
 
-const uint256_t & MicroBlockHeader::GetBlockNum() const
+const uint256_t& MicroBlockHeader::GetBlockNum() const
 {
     return m_blockNum;
 }
 
-const uint256_t & MicroBlockHeader::GetTimestamp() const
+const uint256_t& MicroBlockHeader::GetTimestamp() const
 {
     return m_timestamp;
 }
 
-const TxnHash & MicroBlockHeader::GetTxRootHash() const
+const TxnHash& MicroBlockHeader::GetTxRootHash() const
 {
     return m_txRootHash;
 }
 
-const uint32_t & MicroBlockHeader::GetNumTxs()  const
+const uint32_t& MicroBlockHeader::GetNumTxs() const
 {
     return m_numTxs;
 }
 
-const PubKey & MicroBlockHeader::GetMinerPubKey() const
+const PubKey& MicroBlockHeader::GetMinerPubKey() const
 {
     return m_minerPubKey;
 }
 
-const uint256_t & MicroBlockHeader::GetDSBlockNum() const
+const uint256_t& MicroBlockHeader::GetDSBlockNum() const
 {
     return m_dsBlockNum;
 }
 
-const BlockHash & MicroBlockHeader::GetDSBlockHeader() const
+const BlockHash& MicroBlockHeader::GetDSBlockHeader() const
 {
     return m_dsBlockHeader;
 }
 
-bool MicroBlockHeader::operator==(const MicroBlockHeader & header) const
+bool MicroBlockHeader::operator==(const MicroBlockHeader& header) const
 {
-    return
-        (
-            (m_type == header.m_type) &&
-            (m_version == header.m_version) &&
-            (m_gasLimit == header.m_gasLimit) &&
-            (m_gasUsed == header.m_gasUsed) &&
-            (m_prevHash == header.m_prevHash) &&
-            (m_blockNum == header.m_blockNum) &&
-            (m_timestamp == header.m_timestamp) &&
-            (m_txRootHash == header.m_txRootHash) &&
-            (m_numTxs == header.m_numTxs) &&
-            (m_minerPubKey == header.m_minerPubKey) &&
-            (m_dsBlockHeader == header.m_dsBlockHeader) &&
-            (m_dsBlockHeader == m_dsBlockHeader)
-        );
+    return (
+        (m_type == header.m_type) && (m_version == header.m_version) && (m_gasLimit == header.m_gasLimit) && (m_gasUsed == header.m_gasUsed) && (m_prevHash == header.m_prevHash) && (m_blockNum == header.m_blockNum) && (m_timestamp == header.m_timestamp) && (m_txRootHash == header.m_txRootHash) && (m_numTxs == header.m_numTxs) && (m_minerPubKey == header.m_minerPubKey) && (m_dsBlockHeader == header.m_dsBlockHeader) && (m_dsBlockHeader == m_dsBlockHeader));
 }
 
-bool MicroBlockHeader::operator<(const MicroBlockHeader & header) const
+bool MicroBlockHeader::operator<(const MicroBlockHeader& header) const
 {
     if (m_type < header.m_type)
     {
@@ -295,7 +288,7 @@ bool MicroBlockHeader::operator<(const MicroBlockHeader & header) const
     }
 }
 
-bool MicroBlockHeader::operator>(const MicroBlockHeader & header) const
+bool MicroBlockHeader::operator>(const MicroBlockHeader& header) const
 {
     return !((*this == header) || (*this < header));
 }

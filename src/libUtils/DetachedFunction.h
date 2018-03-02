@@ -14,7 +14,6 @@
 * and which include a reference to GPLv3 in their program files.
 **/
 
-
 #ifndef __DETACHEDFUNCTION_H__
 #define __DETACHEDFUNCTION_H__
 
@@ -26,12 +25,11 @@
 class DetachedFunction
 {
 public:
-
     /// Retry limit for launching the detached threads.
     const static int MaxAttempt = 3;
 
     /// Template constructor.
-    template <class callable, class... arguments>
+    template<class callable, class... arguments>
     DetachedFunction(int num_threads, callable&& f, arguments&&... args)
     {
         std::function<typename std::result_of<callable(arguments...)>::type()> task(std::bind(
@@ -43,18 +41,17 @@ public:
         {
             for (int j = 0; j < MaxAttempt; j++)
             {
-                try 
+                try
                 {
                     if (attemp_flag == false)
                     {
                         std::thread(task).detach(); // attempt to detach a non-thread
                         attemp_flag = true;
                     }
-                } 
-                catch(const std::system_error& e) 
+                }
+                catch (const std::system_error& e)
                 {
-                    LOG_MESSAGE("Error: " << j << " times tried. Caught system_error with code " << 
-                                e.code() << " meaning " << e.what() << '\n');
+                    LOG_MESSAGE("Error: " << j << " times tried. Caught system_error with code " << e.code() << " meaning " << e.what() << '\n');
                     std::this_thread::sleep_for(std::chrono::milliseconds(100));
                 }
             }

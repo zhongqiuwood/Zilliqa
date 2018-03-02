@@ -14,7 +14,6 @@
 * and which include a reference to GPLv3 in their program files.
 **/
 
-
 #include "SanityChecks.h"
 
 using namespace std;

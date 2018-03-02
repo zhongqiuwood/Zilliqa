@@ -17,10 +17,10 @@
 #ifndef CONCURRENT_THREADPOOL_H
 #define CONCURRENT_THREADPOOL_H
 
-#include <thread>
-#include <mutex>
-#include <functional>
 #include <condition_variable>
+#include <functional>
+#include <mutex>
+#include <thread>
 
 /**
  *  Set to 1 to use vector instead of queue for jobs container to improve
@@ -37,21 +37,21 @@
 class ThreadPool // This class requires a number of c++11 features be present in your compiler.
 {
 public:
-
     /// Constructor.
 #if CONTIGUOUS_JOBS_MEMORY
-    explicit ThreadPool(const unsigned int threadCount, const unsigned int jobsReserveCount = 0) :
+    explicit ThreadPool(const unsigned int threadCount, const unsigned int jobsReserveCount = 0)
+        :
 #else
-    explicit ThreadPool(const unsigned int threadCount) :
+    explicit ThreadPool(const unsigned int threadCount)
+        :
 #endif
-        _jobsLeft(0),
-        _bailout(false)
+        _jobsLeft(0)
+        , _bailout(false)
     {
         _threads.reserve(threadCount);
         for (unsigned int index = 0; index < threadCount; ++index)
         {
-            _threads.push_back(std::thread([this]
-            {
+            _threads.push_back(std::thread([this] {
                 this->Task();
             }));
         }
@@ -109,17 +109,16 @@ public:
 
         for (std::thread& thread : _threads)
         {
-            try 
+            try
             {
                 if (thread.joinable())
                 {
                     thread.join();
                 }
             }
-            catch(const std::system_error & e)
+            catch (const std::system_error& e)
             {
-                LOG_MESSAGE("Error: Caught system_error with code " << 
-                            e.code() << " meaning " << e.what() << '\n');
+                LOG_MESSAGE("Error: Caught system_error with code " << e.code() << " meaning " << e.what() << '\n');
             }
         }
     }
@@ -130,8 +129,7 @@ public:
         std::unique_lock<std::mutex> lock(_jobsLeftMutex);
         if (_jobsLeft > 0)
         {
-            _waitVar.wait(lock, [this]
-            {
+            _waitVar.wait(lock, [this] {
                 return _jobsLeft == 0;
             });
         }
@@ -164,8 +162,7 @@ private:
                 }
 
                 // Wait for a job if we don't have any.
-                _jobAvailableVar.wait(lock, [this]
-                {
+                _jobAvailableVar.wait(lock, [this] {
                     return !_queue.empty() || _bailout;
                 });
 
@@ -174,7 +171,7 @@ private:
                     return;
                 }
 
-                // Get job from the queue
+                    // Get job from the queue
 #if CONTIGUOUS_JOBS_MEMORY
                 job = _queue.back();
                 _queue.pop_back();

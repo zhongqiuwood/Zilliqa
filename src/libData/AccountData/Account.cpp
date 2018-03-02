@@ -15,16 +15,18 @@ Account::Account()
 {
 }
 
-Account::Account(const vector<unsigned char> & src, unsigned int offset)
+Account::Account(const vector<unsigned char>& src, unsigned int offset)
 {
     Deserialize(src, offset);
 }
 
-Account::Account(const uint256_t & balance, const uint256_t & nonce) : m_balance(balance), m_nonce(nonce)
+Account::Account(const uint256_t& balance, const uint256_t& nonce)
+    : m_balance(balance)
+    , m_nonce(nonce)
 {
 }
 
-unsigned int Account::Serialize(vector<unsigned char> & dst, unsigned int offset) const
+unsigned int Account::Serialize(vector<unsigned char>& dst, unsigned int offset) const
 {
     LOG_MARKER();
 
@@ -45,7 +47,7 @@ unsigned int Account::Serialize(vector<unsigned char> & dst, unsigned int offset
     return size_needed;
 }
 
-void Account::Deserialize(const vector<unsigned char> & src, unsigned int offset)
+void Account::Deserialize(const vector<unsigned char>& src, unsigned int offset)
 {
     LOG_MARKER();
 
@@ -56,19 +58,19 @@ void Account::Deserialize(const vector<unsigned char> & src, unsigned int offset
     m_nonce = GetNumber<uint256_t>(src, curOffset, UINT256_SIZE);
 }
 
-bool Account::IncreaseBalance(const uint256_t & delta)
+bool Account::IncreaseBalance(const uint256_t& delta)
 {
     m_balance += delta;
     return true;
 }
 
-bool Account::DecreaseBalance(const uint256_t & delta)
+bool Account::DecreaseBalance(const uint256_t& delta)
 {
     if (m_balance < delta)
     {
         return false;
     }
-    
+
     m_balance -= delta;
     return true;
 }
@@ -79,17 +81,17 @@ bool Account::IncreaseNonce()
     return true;
 }
 
-const uint256_t & Account::GetBalance() const
+const uint256_t& Account::GetBalance() const
 {
     return m_balance;
 }
 
-const uint256_t & Account::GetNonce() const
+const uint256_t& Account::GetNonce() const
 {
     return m_nonce;
 }
 
-Address Account::GetAddressFromPublicKey(const PubKey & pubKey)
+Address Account::GetAddressFromPublicKey(const PubKey& pubKey)
 {
     Address address;
 
@@ -97,8 +99,8 @@ Address Account::GetAddressFromPublicKey(const PubKey & pubKey)
     pubKey.Serialize(vec, 0);
     SHA2<HASH_TYPE::HASH_VARIANT_256> sha2;
     sha2.Update(vec);
-    
-    const vector<unsigned char> & output = sha2.Finalize();
+
+    const vector<unsigned char>& output = sha2.Finalize();
     assert(output.size() == 32);
 
     copy(output.end() - ACC_ADDR_SIZE, output.end(), address.asArray().begin());

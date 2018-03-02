@@ -14,7 +14,6 @@
 * and which include a reference to GPLv3 in their program files.
 **/
 
-
 #include "libNetwork/PeerStore.h"
 #include "libUtils/Logger.h"
 
@@ -23,13 +22,13 @@
 
 using namespace std;
 
-BOOST_AUTO_TEST_SUITE (peerstoretest)
+BOOST_AUTO_TEST_SUITE(peerstoretest)
 
-BOOST_AUTO_TEST_CASE (test1)
+BOOST_AUTO_TEST_CASE(test1)
 {
     INIT_STDOUT_LOGGER();
 
-    PeerStore & ps = PeerStore::GetStore();
+    PeerStore& ps = PeerStore::GetStore();
 
     BOOST_CHECK_MESSAGE(ps.GetPeerCount() == 0, "PeerStore initial state check #1 failed");
     BOOST_CHECK_MESSAGE(ps.GetAllPeers().size() == 0, "PeerStore initial state check #2 failed");
@@ -66,4 +65,4 @@ BOOST_AUTO_TEST_CASE (test1)
     BOOST_CHECK_MESSAGE(ps.GetPeerCount() == 0, "PeerStore RemoveAllPeers failed");
 }
 
-BOOST_AUTO_TEST_SUITE_END ()
+BOOST_AUTO_TEST_SUITE_END()

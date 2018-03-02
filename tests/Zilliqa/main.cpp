@@ -17,56 +17,56 @@
 #include <execinfo.h> // for backtrace
 #include <signal.h>
 
-#include <iostream>
-#include <arpa/inet.h>
 #include <algorithm>
+#include <arpa/inet.h>
+#include <iostream>
 #include "libUtils/Logger.h"
 
-#include "libNetwork/PeerStore.h"
 #include "libNetwork/P2PComm.h"
-#include "libUtils/Logger.h"
+#include "libNetwork/PeerStore.h"
 #include "libUtils/DataConversion.h"
+#include "libUtils/Logger.h"
 #include "libZilliqa/Zilliqa.h"
 
 using namespace std;
 using namespace boost::multiprecision;
 
 /* Obtain a backtrace and print it to stdout. */
-void print_trace (void)
+void print_trace(void)
 {
-    void *array[10];
+    void* array[10];
     size_t size;
-    char **strings;
+    char** strings;
     size_t i;
 
-    size = backtrace (array, 10);
-    strings = backtrace_symbols (array, size);
+    size = backtrace(array, 10);
+    strings = backtrace_symbols(array, size);
 
-    LOG_MESSAGE ("Obtained " << size << " stack frames.\n");
+    LOG_MESSAGE("Obtained " << size << " stack frames.\n");
 
     for (i = 0; i < size; i++)
     {
         LOG_MESSAGE(strings[i])
     }
-     //printf ("%s\n", strings[i]);
-    free (strings);
+    //printf ("%s\n", strings[i]);
+    free(strings);
 }
 
 void got_terminated()
 {
     LOG_MESSAGE("Error: Abort was triggered.")
-    print_trace ();
-    raise (SIGABRT); // generate core dump thru abort
+    print_trace();
+    raise(SIGABRT); // generate core dump thru abort
 }
 
 void got_unxpected()
 {
     LOG_MESSAGE("Error: Unexpected was triggered.")
-    print_trace ();
-    raise (SIGABRT); // generate core dump thru abort
+    print_trace();
+    raise(SIGABRT); // generate core dump thru abort
 }
 
-int main(int argc, const char * argv[])
+int main(int argc, const char* argv[])
 {
     const int num_args_required = 1 + 5; // first 1 = program name
 
@@ -93,8 +93,8 @@ int main(int argc, const char * argv[])
 
         Zilliqa zilliqa(make_pair(privkey, pubkey), my_port, atoi(argv[5]) == 1);
 
-        auto dispatcher = [&zilliqa](const vector<unsigned char> & message, const Peer & from) mutable -> void { zilliqa.Dispatch(message, from); };
-        auto broadcast_list_retriever = [&zilliqa](unsigned char msg_type, unsigned char ins_type, const Peer & from) mutable -> vector<Peer> { return zilliqa.RetrieveBroadcastList(msg_type, ins_type, from); };
+        auto dispatcher = [&zilliqa](const vector<unsigned char>& message, const Peer& from) mutable -> void { zilliqa.Dispatch(message, from); };
+        auto broadcast_list_retriever = [&zilliqa](unsigned char msg_type, unsigned char ins_type, const Peer& from) mutable -> vector<Peer> { return zilliqa.RetrieveBroadcastList(msg_type, ins_type, from); };
 
         P2PComm::GetInstance().StartMessagePump(my_port.m_listenPortHost, dispatcher, broadcast_list_retriever);
     }

@@ -22,5 +22,4 @@ using namespace boost::multiprecision;
 
 BlockBase::BlockBase()
 {
-
 }

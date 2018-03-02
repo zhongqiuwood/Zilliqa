@@ -21,10 +21,10 @@
 
 using namespace std;
 
-bool ConsensusUser::ProcessSetLeader(const vector<unsigned char> & message, unsigned int offset, const Peer & from)
+bool ConsensusUser::ProcessSetLeader(const vector<unsigned char>& message, unsigned int offset, const Peer& from)
 {
     // Message = 2-byte ID of leader (0 to num nodes - 1)
-    
+
     LOG_MARKER();
 
     if ((m_consensus != nullptr) && (m_consensus->GetState() != ConsensusCommon::State::DONE) && (m_consensus->GetState() != ConsensusCommon::State::ERROR))
@@ -50,18 +50,18 @@ bool ConsensusUser::ProcessSetLeader(const vector<unsigned char> & message, unsi
     // In real usage, we don't expect to use the peerstore to assemble the list of pub keys
     // The DS block should have the info we need, and the peerstore only needs to be used to get the IP addresses
 
-    PeerStore & peerstore = PeerStore::GetStore();
-    peerstore.AddPeer(m_selfKey.second, Peer());                  // Add myself, but with dummy IP info
+    PeerStore& peerstore = PeerStore::GetStore();
+    peerstore.AddPeer(m_selfKey.second, Peer()); // Add myself, but with dummy IP info
 
     vector<Peer> tmp1 = peerstore.GetAllPeers();
     deque<Peer> peer_info(tmp1.size());
-    copy(tmp1.begin(), tmp1.end(), peer_info.begin());     // This will be sorted by PubKey
+    copy(tmp1.begin(), tmp1.end(), peer_info.begin()); // This will be sorted by PubKey
 
     vector<PubKey> tmp2 = peerstore.GetAllKeys();
     deque<PubKey> pubkeys(tmp2.size());
     copy(tmp2.begin(), tmp2.end(), pubkeys.begin()); // These are the sorted PubKeys
 
-    peerstore.RemovePeer(m_selfKey.second);                       // Remove myself
+    peerstore.RemovePeer(m_selfKey.second); // Remove myself
 
     // Now I need to find my index in the sorted list (this will be my ID for the consensus)
     uint16_t my_id = 0;
@@ -81,10 +81,8 @@ bool ConsensusUser::ProcessSetLeader(const vector<unsigned char> & message, unsi
 
     if (m_leaderOrBackup == false) // Leader
     {
-        m_consensus.reset
-        (
-            new ConsensusLeader
-            (
+        m_consensus.reset(
+            new ConsensusLeader(
                 dummy_consensus_id,
                 dummy_block_hash,
                 my_id,
@@ -93,22 +91,17 @@ bool ConsensusUser::ProcessSetLeader(const vector<unsigned char> & message, unsi
                 peer_info,
                 static_cast<unsigned char>(MessageType::CONSENSUSUSER),
                 static_cast<unsigned char>(InstructionType::CONSENSUS),
-                std::function<bool(const vector<unsigned char> & errorMsg, unsigned int, 
-                                   const Peer & from)>(),
-                std::function<bool(map<unsigned int, vector<unsigned char>>)>()
-            )
-        );
+                std::function<bool(const vector<unsigned char>& errorMsg, unsigned int,
+                                   const Peer& from)>(),
+                std::function<bool(map<unsigned int, vector<unsigned char>>)>()));
     }
     else // Backup
     {
-        auto func = [this](const vector<unsigned char> & message,
-                           vector<unsigned char> & errorMsg) mutable ->
-                           bool { return MyMsgValidatorFunc(message, errorMsg); };
+        auto func = [this](const vector<unsigned char>& message,
+                           vector<unsigned char>& errorMsg) mutable -> bool { return MyMsgValidatorFunc(message, errorMsg); };
 
-        m_consensus.reset
-        (
-            new ConsensusBackup
-            (
+        m_consensus.reset(
+            new ConsensusBackup(
                 dummy_consensus_id,
                 dummy_block_hash,
                 my_id,
@@ -118,9 +111,7 @@ bool ConsensusUser::ProcessSetLeader(const vector<unsigned char> & message, unsi
                 peer_info,
                 static_cast<unsigned char>(MessageType::CONSENSUSUSER),
                 static_cast<unsigned char>(InstructionType::CONSENSUS),
-                func
-            )
-        );
+                func));
     }
 
     if (m_consensus == nullptr)
@@ -132,7 +123,7 @@ bool ConsensusUser::ProcessSetLeader(const vector<unsigned char> & message, unsi
     return true;
 }
 
-bool ConsensusUser::ProcessStartConsensus(const vector<unsigned char> & message, unsigned int offset, const Peer & from)
+bool ConsensusUser::ProcessStartConsensus(const vector<unsigned char>& message, unsigned int offset, const Peer& from)
 {
     // Message = [message for consensus]
 
@@ -150,7 +141,7 @@ bool ConsensusUser::ProcessStartConsensus(const vector<unsigned char> & message,
         return false;
     }
 
-    ConsensusLeader * cl = dynamic_cast<ConsensusLeader*>(m_consensus.get());
+    ConsensusLeader* cl = dynamic_cast<ConsensusLeader*>(m_consensus.get());
     if (cl == NULL)
     {
         LOG_MESSAGE("Error: I'm a backup, you can't start consensus (announcement) thru me");
@@ -165,7 +156,7 @@ bool ConsensusUser::ProcessStartConsensus(const vector<unsigned char> & message,
     return true;
 }
 
-bool ConsensusUser::ProcessConsensusMessage(const vector<unsigned char> & message, unsigned int offset, const Peer & from)
+bool ConsensusUser::ProcessConsensusMessage(const vector<unsigned char>& message, unsigned int offset, const Peer& from)
 {
     LOG_MARKER();
 
@@ -187,30 +178,30 @@ bool ConsensusUser::ProcessConsensusMessage(const vector<unsigned char> & messag
     return result;
 }
 
-ConsensusUser::ConsensusUser(const pair<PrivKey, PubKey> & key, const Peer & peer) : m_selfKey(key), m_selfPeer(peer), m_consensus(nullptr)
+ConsensusUser::ConsensusUser(const pair<PrivKey, PubKey>& key, const Peer& peer)
+    : m_selfKey(key)
+    , m_selfPeer(peer)
+    , m_consensus(nullptr)
 {
     m_leaderOrBackup = false;
 }
 
 ConsensusUser::~ConsensusUser()
 {
-
 }
 
-bool ConsensusUser::Execute(const vector<unsigned char> & message, unsigned int offset, const Peer & from)
+bool ConsensusUser::Execute(const vector<unsigned char>& message, unsigned int offset, const Peer& from)
 {
     LOG_MARKER();
 
     bool result = false;
 
-    typedef bool(ConsensusUser::*InstructionHandler)(const vector<unsigned char> &, unsigned int, const Peer &);
+    typedef bool (ConsensusUser::*InstructionHandler)(const vector<unsigned char>&, unsigned int, const Peer&);
 
-    InstructionHandler ins_handlers[] =
-    {
+    InstructionHandler ins_handlers[] = {
         &ConsensusUser::ProcessSetLeader,
         &ConsensusUser::ProcessStartConsensus,
-        &ConsensusUser::ProcessConsensusMessage
-    };
+        &ConsensusUser::ProcessConsensusMessage};
 
     const unsigned char ins_byte = message.at(offset);
 
@@ -233,8 +224,8 @@ bool ConsensusUser::Execute(const vector<unsigned char> & message, unsigned int 
     return result;
 }
 
-bool ConsensusUser::MyMsgValidatorFunc(const vector<unsigned char> & message,
-                                       vector<unsigned char> & errorMsg)
+bool ConsensusUser::MyMsgValidatorFunc(const vector<unsigned char>& message,
+                                       vector<unsigned char>& errorMsg)
 {
     LOG_MARKER();
 

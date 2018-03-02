@@ -14,20 +14,20 @@
 * and which include a reference to GPLv3 in their program files.
 **/
 
-#include <thread>
-#include <chrono>
 #include <array>
-#include <functional>
 #include <boost/multiprecision/cpp_int.hpp>
+#include <chrono>
+#include <functional>
+#include <thread>
 
 #include "Node.h"
-#include "common/Serializable.h"
-#include "common/Messages.h"
 #include "common/Constants.h"
+#include "common/Messages.h"
+#include "common/Serializable.h"
 #include "depends/common/RLP.h"
+#include "depends/libDatabase/MemoryDB.h"
 #include "depends/libTrie/TrieDB.h"
 #include "depends/libTrie/TrieHash.h"
-#include "depends/libDatabase/MemoryDB.h"
 #include "libConsensus/ConsensusUser.h"
 #include "libCrypto/Sha2.h"
 #include "libData/AccountData/Account.h"
@@ -45,12 +45,11 @@
 using namespace std;
 using namespace boost::multiprecision;
 
-bool Node::ReadVariablesFromShardingMessage(const vector<unsigned char> & message, unsigned int cur_offset)
+bool Node::ReadVariablesFromShardingMessage(const vector<unsigned char>& message, unsigned int cur_offset)
 {
     LOG_MARKER();
 
-    if (IsMessageSizeInappropriate(message.size(), cur_offset, sizeof(uint256_t) + sizeof(uint32_t) +
-            sizeof(uint32_t) + sizeof(uint32_t)))
+    if (IsMessageSizeInappropriate(message.size(), cur_offset, sizeof(uint256_t) + sizeof(uint32_t) + sizeof(uint32_t) + sizeof(uint32_t)))
     {
         return false;
     }
@@ -84,7 +83,7 @@ bool Node::ReadVariablesFromShardingMessage(const vector<unsigned char> & messag
 
     LOG_MESSAGE2(to_string(m_mediator.m_currentEpochNum).c_str(), "Committee size = " << comm_size);
     LOG_MESSAGE2(to_string(m_mediator.m_currentEpochNum).c_str(), "Members:");
-    
+
     m_myShardMembersPubKeys.clear();
     m_myShardMembersNetworkInfo.clear();
 
@@ -105,16 +104,14 @@ bool Node::ReadVariablesFromShardingMessage(const vector<unsigned char> & messag
             m_myShardMembersNetworkInfo.back().m_listenPortHost = 0;
         }
 
-        LOG_MESSAGE2(to_string(m_mediator.m_currentEpochNum).c_str(), " PubKey: " << DataConversion::SerializableToHexStr(m_myShardMembersPubKeys.back()) <<
-            " IP: " << m_myShardMembersNetworkInfo.back().GetPrintableIPAddress() <<
-            " Port: " << m_myShardMembersNetworkInfo.back().m_listenPortHost);
+        LOG_MESSAGE2(to_string(m_mediator.m_currentEpochNum).c_str(), " PubKey: " << DataConversion::SerializableToHexStr(m_myShardMembersPubKeys.back()) << " IP: " << m_myShardMembersNetworkInfo.back().GetPrintableIPAddress() << " Port: " << m_myShardMembersNetworkInfo.back().m_listenPortHost);
     }
 
     return true;
 }
 
-bool Node::ProcessSharding(const vector<unsigned char> & message, unsigned int offset, 
-                           const Peer & from)
+bool Node::ProcessSharding(const vector<unsigned char>& message, unsigned int offset,
+                           const Peer& from)
 {
 #ifndef IS_LOOKUP_NODE
     // Message = [32-byte DS blocknum] [4-byte shard ID] [4-byte committee size] [33-byte public key]
@@ -129,12 +126,12 @@ bool Node::ProcessSharding(const vector<unsigned char> & message, unsigned int o
     if (!CheckState(PROCESS_SHARDING))
     {
         // LOG_MESSAGE2(to_string(m_mediator.m_currentEpochNum).c_str(), "Valid SHARDING already received. Ignoring redundant SHARDING message.");
-        LOG_MESSAGE2(to_string(m_mediator.m_currentEpochNum).c_str(), 
+        LOG_MESSAGE2(to_string(m_mediator.m_currentEpochNum).c_str(),
                      "Error: Not in TX_SUBMISSION state");
         return false;
     }
 
-    if(!ReadVariablesFromShardingMessage(message, offset))
+    if (!ReadVariablesFromShardingMessage(message, offset))
     {
         return false;
     }
@@ -163,12 +160,12 @@ bool Node::ProcessSharding(const vector<unsigned char> & message, unsigned int o
     // SetState(TX_SUBMISSION);
 
     // auto main_func = [this]() mutable -> void { SubmitTransactions(); };
-    // auto expiry_func = [this]() mutable -> void { 
-    //   auto main_func = [this]() mutable -> void { 
+    // auto expiry_func = [this]() mutable -> void {
+    //   auto main_func = [this]() mutable -> void {
     //     unique_lock<shared_timed_mutex> lock(m_mutexProducerConsumer);
-    //     SetState(TX_SUBMISSION_BUFFER);  
+    //     SetState(TX_SUBMISSION_BUFFER);
     //   };
-    //   auto expiry_func = [this]() mutable -> void { 
+    //   auto expiry_func = [this]() mutable -> void {
     //     RunConsensusOnMicroBlock();
     //   };
 
@@ -184,11 +181,11 @@ bool Node::ProcessSharding(const vector<unsigned char> & message, unsigned int o
     this_thread::sleep_for(chrono::seconds(15));
     LOG_MESSAGE("I have woken up from the sleep of 15 seconds");
 
-    auto main_func2 = [this]() mutable -> void { 
+    auto main_func2 = [this]() mutable -> void {
         unique_lock<shared_timed_mutex> lock(m_mutexProducerConsumer);
-        SetState(TX_SUBMISSION_BUFFER); 
-    };   
-    DetachedFunction(1, main_func2); 
+        SetState(TX_SUBMISSION_BUFFER);
+    };
+    DetachedFunction(1, main_func2);
 
     LOG_MESSAGE("I am going to sleep for 30 seconds");
     this_thread::sleep_for(chrono::seconds(30));
