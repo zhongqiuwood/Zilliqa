@@ -22,19 +22,49 @@
 #include <vector>
 
 #include "libData/AccountData/Transaction.h"
+#include "depends/libDatabase/MemoryDB.h"
+#include "depends/libTrie/TrieDB.h"
 
 TxnHash ComputeTransactionsRoot(const std::vector<TxnHash> & transactionHashes);
 
 TxnHash ComputeTransactionsRoot
-(   
+(
     const std::list<Transaction> & receivedTransactions,
     const std::list<Transaction> & submittedTransactions
 );
 
 TxnHash ComputeTransactionsRoot
-(   
+(
     const std::unordered_map<TxnHash, Transaction> & receivedTransactions,
     const std::unordered_map<TxnHash, Transaction> & submittedTransactions
 );
+
+/// Construct a Merkle Tree over a list of sequential containers and return
+/// the root of the Merkle Tree. The conatiners are passed in order and each one
+/// only needs to be one type of the sequential containers (vector, list, array)
+/// with element of type 'Transaction'
+template <typename ...Container>
+TxnHash ComputeTransactionsRoot(const Container&... conts) {
+    LOG_MARKER();
+
+    dev::MemoryDB tm;
+    dev::GenericTrieDB<dev::MemoryDB> txnTrie(&tm);
+    txnTrie.init();
+
+    size_t txnCount = 0;
+
+    (void) std::initializer_list<int> {
+        ([](const auto& list, decltype(txnCount) &txnCount, decltype(txnTrie) &txnTrie){
+            dev::RLPStream streamer; // reuse this for better efficiency
+            for(auto &item: list) {
+                streamer.clear();
+                streamer << txnCount++;
+                txnTrie.insert(&streamer.out(), item.GetTranID().asBytes());
+            }
+        }(conts, txnCount, txnTrie), 0)...
+    };
+
+    return TxnHash{txnTrie.root()};
+}
 
 #endif // __TXNROOTCOMPUTATION_H__
