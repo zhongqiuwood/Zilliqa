@@ -39,12 +39,25 @@ TxnHash ComputeTransactionsRoot
     const std::unordered_map<TxnHash, Transaction> & submittedTransactions
 );
 
-/// Construct a Merkle Tree over a list of sequential containers and return
-/// the root of the Merkle Tree. The conatiners are passed in order and each one
-/// only needs to be one type of the sequential containers (vector, list, array)
-/// with element of type 'Transaction'
+// not supposed to be used by other libraries
+namespace _internal {
+template<typename T>
+const TxnHash & GetTranID(T item);
+
+inline const TxnHash & GetTranID(const Transaction &item) {
+    return item.GetTranID();
+}
+
+inline const TxnHash & GetTranID(const std::pair<const TxnHash, Transaction> item) {
+    return item.second.GetTranID();
+}
+};
+
+/// Construct a Merkle Tree over a list of containers and return the root.
+/// The conatiners are passed in order and each one can be list or map.
 template <typename ...Container>
 TxnHash ComputeTransactionsRoot(const Container&... conts) {
+    using namespace _internal;
     LOG_MARKER();
 
     dev::MemoryDB tm;
@@ -59,7 +72,7 @@ TxnHash ComputeTransactionsRoot(const Container&... conts) {
             for(auto &item: list) {
                 streamer.clear();
                 streamer << txnCount++;
-                txnTrie.insert(&streamer.out(), item.GetTranID().asBytes());
+                txnTrie.insert(&streamer.out(), GetTranID(item).asBytes());
             }
         }(conts, txnCount, txnTrie), 0)...
     };

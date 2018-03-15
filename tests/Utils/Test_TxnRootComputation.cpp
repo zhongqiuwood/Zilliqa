@@ -73,19 +73,88 @@ std::list<Transaction> generateDummyTransactions(size_t n) {
     return txns;
 }
 
+BOOST_AUTO_TEST_CASE(testUnorderdMapWithDifferentInsertionOrder)
+{
+    auto txnList1 = generateDummyTransactions(100);
+    auto txnList2 = generateDummyTransactions(100);
+
+    // Simulating primary's transactions
+    std::unordered_map<TxnHash, Transaction> primaryReceivedTxns;
+    std::unordered_map<TxnHash, Transaction> primarySubmittedTxns;
+
+    for(auto &txn: txnList1) {
+       primaryReceivedTxns[txn.GetTranID()] = txn; 
+    }
+    for(auto &txn: txnList2) {
+       primarySubmittedTxns[txn.GetTranID()] = txn; 
+    }
+
+    // Simulating backup's transactions
+    std::unordered_map<TxnHash, Transaction> backupReceivedTxns;
+    std::unordered_map<TxnHash, Transaction> backupSubmittedTxns;
+
+    for(auto &txn: txnList2) {
+       backupReceivedTxns[txn.GetTranID()] = txn; 
+    }
+    for(auto &txn: txnList1) {
+       backupSubmittedTxns[txn.GetTranID()] = txn; 
+    }
+
+    // compute Merkle Tree and compare the root hashes
+    
+    auto primaryRoot = ComputeTransactionsRoot(primaryReceivedTxns, primarySubmittedTxns);
+    auto backupRoot = ComputeTransactionsRoot(backupReceivedTxns, backupSubmittedTxns);
+
+    BOOST_ASSERT(primaryRoot !=  backupRoot);
+}
+
+BOOST_AUTO_TEST_CASE(testMapsWithDifferentInsertionOrder)
+{
+    auto txnList1 = generateDummyTransactions(100);
+    auto txnList2 = generateDummyTransactions(100);
+
+    // simulating primary's transactions
+    std::map<TxnHash, Transaction> primaryTxns;
+    std::map<TxnHash, Transaction> emptyTxns;
+
+    for(auto &txn: txnList1) {
+       primaryTxns[txn.GetTranID()] = txn; 
+    }
+    for(auto &txn: txnList2) {
+       primaryTxns[txn.GetTranID()] = txn; 
+    }
+
+    // simulating backup's transactions
+    std::map<TxnHash, Transaction> backupTxns;
+
+    for(auto &txn: txnList2) {
+       backupTxns[txn.GetTranID()] = txn; 
+    }
+    for(auto &txn: txnList1) {
+       backupTxns[txn.GetTranID()] = txn; 
+    }
+
+    // compute Merkle Tree and compare the root hashes
+    auto primaryRoot = ComputeTransactionsRoot(primaryTxns, emptyTxns);
+    auto backupRoot = ComputeTransactionsRoot(backupTxns, emptyTxns);
+
+    BOOST_CHECK_EQUAL(primaryRoot, backupRoot);
+}
+
 BOOST_AUTO_TEST_CASE(compareAllSequentialListVersions)
 {
     auto txnList1 = generateDummyTransactions(100);
     auto txnList2 = generateDummyTransactions(100);
 
-    std::vector<TxnHash> txnHashVec;
-    std::vector<Transaction> txnVec;
-    std::vector<Transaction> txnVec2;
+    std::vector<TxnHash> txnHashVec; // join the hashes of two lists;
+    std::vector<Transaction> txnVec; // join two lists;
+    std::vector<Transaction> txnVec2; // only list 2
 
     for(auto &txn: txnList1) {
         txnVec.push_back(txn);
         txnHashVec.push_back(txn.GetTranID());
     }
+
     for(auto &txn: txnList2) {
         txnVec.push_back(txn);
         txnHashVec.push_back(txn.GetTranID());
