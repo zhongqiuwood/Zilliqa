@@ -198,11 +198,11 @@ bool Node::ComposeMicroBlock()
         for(const auto & txn: coinbaseTxns)
         {
             txnHashVec.emplace_back(txn.GetTranID());
-        } for (const auto & tx : receivedTransactions)
+        }
+        for (const auto & tx : receivedTransactions)
         {
             txnHashVec.emplace_back(tx.first);
         }
-
         for (const auto & tx : submittedTransactions)
         {
             txnHashVec.emplace_back(tx.first);
