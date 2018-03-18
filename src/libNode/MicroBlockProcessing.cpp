@@ -154,6 +154,12 @@ bool Node::ProcessMicroblockConsensus(const vector<unsigned char> & message, uns
 #endif // IS_LOOKUP_NODE
 }
 
+std::vector<Transaction> derivePrevBlockCoinbaseTransactions() {
+    std::vector<Transaction> dummy;
+
+    return dummy;
+}
+
 #ifndef IS_LOOKUP_NODE
 bool Node::ComposeMicroBlock()
 {
@@ -178,34 +184,34 @@ bool Node::ComposeMicroBlock()
 
     // TxBlock
     array<unsigned char, BLOCK_SIG_SIZE> signature;
-    vector<TxnHash> tranHashes;
+    vector<TxnHash> txnHashVec;
 
-    unsigned int index = 0;
     {
         lock(m_mutexReceivedTransactions, m_mutexSubmittedTransactions);
         lock_guard<mutex> g(m_mutexReceivedTransactions, adopt_lock);
         lock_guard<mutex> g2(m_mutexSubmittedTransactions, adopt_lock);
 
+        auto coinbaseTxns = derivePrevBlockCoinbaseTransactions();
         auto & receivedTransactions = m_receivedTransactions[blockNum];
         auto & submittedTransactions = m_submittedTransactions[blockNum];
 
-        txRootHash = ComputeTransactionsRoot(receivedTransactions, submittedTransactions);
-
-        numTxs = receivedTransactions.size() + submittedTransactions.size();
-        tranHashes.resize(numTxs);
-        for (const auto & tx : receivedTransactions)
+        for(const auto & txn: coinbaseTxns)
         {
-            const auto & txid = tx.first.asArray();
-            copy(txid.begin(), txid.end(), tranHashes.at(index).asArray().begin());
-            index++;
+            txnHashVec.emplace_back(txn.GetTranID());
+        } for (const auto & tx : receivedTransactions)
+        {
+            txnHashVec.emplace_back(tx.first);
         }
 
         for (const auto & tx : submittedTransactions)
         {
-            const auto & txid = tx.first.asArray();
-            copy(txid.begin(), txid.end(), tranHashes.at(index).asArray().begin());
-            index++;
+            txnHashVec.emplace_back(tx.first);
         }
+
+        txRootHash = ComputeTransactionsRoot(txnHashVec);
+
+        numTxs = coinbaseTxns.size() + receivedTransactions.size() + submittedTransactions.size();
+        txnHashVec.reserve(numTxs);
     }
 
     LOG_MESSAGE2(to_string(m_mediator.m_currentEpochNum).c_str(), "Creating new micro block.")
@@ -216,7 +222,7 @@ bool Node::ComposeMicroBlock()
             MicroBlockHeader(type, version, gasLimit, gasUsed, prevHash, blockNum, timestamp, 
                              txRootHash, numTxs, minerPubKey, dsBlockNum, dsBlockHeader),
             signature,
-            tranHashes
+            txnHashVec
         )
     );
 
@@ -520,6 +526,7 @@ bool Node::CheckLegitimacyOfTxnHashes(vector<unsigned char> & errorMsg)
     lock_guard<mutex> g(m_mutexReceivedTransactions, adopt_lock);
     lock_guard<mutex> g2(m_mutexSubmittedTransactions, adopt_lock);
 
+    auto const coinbaseTxns = derivePrevBlockCoinbaseTransactions();
     auto const & receivedTransactions = m_receivedTransactions[m_mediator.m_currentEpochNum];
     auto const & submittedTransactions = m_submittedTransactions[m_mediator.m_currentEpochNum];
 
@@ -534,6 +541,7 @@ bool Node::CheckLegitimacyOfTxnHashes(vector<unsigned char> & errorMsg)
         {
             continue;
         }
+
 
         // Check if transaction is part of received Tx list
         if(receivedTransactions.find(hash) == receivedTransactions.end())
