@@ -73,7 +73,11 @@ BOOST_AUTO_TEST_CASE(testDSBlockStoring)
     std::pair<PrivKey, PubKey> pubKey1 = Schnorr::GetInstance().GenKeyPair();
 
     DSBlockHeader header1(20, prevHash1, 12344, pubKey1.first, pubKey1.second,
+<<<<<<< HEAD
                           0, 789);
+=======
+                          0, 789, 0);
+>>>>>>> initial code for ds viewchange
 
     DSBlock dsblock(header1, signature1);
 

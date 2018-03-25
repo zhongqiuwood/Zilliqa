@@ -38,6 +38,7 @@ AccountStore::~AccountStore()
     // boost::filesystem::remove_all("./state");
 }
 
+<<<<<<< HEAD
 void AccountStore::Init()
 {
     m_db.ResetDB();
@@ -46,6 +47,8 @@ void AccountStore::Init()
     prevRoot = m_state.root();
 }
 
+=======
+>>>>>>> initial code for ds viewchange
 unsigned int AccountStore::Serialize(vector<unsigned char>& dst,
                                      unsigned int offset) const
 {

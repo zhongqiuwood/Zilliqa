@@ -54,8 +54,12 @@ class Zilliqa
 public:
     /// Constructor.
     Zilliqa(const std::pair<PrivKey, PubKey>& key, const Peer& peer,
+<<<<<<< HEAD
             bool loadConfig, bool toSyncWithNetwork,
             bool toRetrieveHistory = false);
+=======
+            bool loadConfig, bool toSyncWithNetwork);
+>>>>>>> initial code for ds viewchange
 
     /// Destructor.
     ~Zilliqa();

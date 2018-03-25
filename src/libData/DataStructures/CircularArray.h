@@ -25,8 +25,12 @@
 /// Utility class - circular array data queue.
 template<class T> class CircularArray
 {
+<<<<<<< HEAD
     std::vector<T> m_array;
 
+=======
+    T* m_array;
+>>>>>>> initial code for ds viewchange
     int m_capacity;
     boost::multiprecision::uint256_t m_size;
 
@@ -52,12 +56,26 @@ public:
     CircularArray& operator=(const CircularArray<T>& circularArray) = delete;
 
     /// Destructor.
+<<<<<<< HEAD
     ~CircularArray() {}
+=======
+    ~CircularArray()
+    {
+        if (m_array != nullptr)
+        {
+            delete[] m_array;
+        }
+    }
+>>>>>>> initial code for ds viewchange
 
     /// Index operator.
     T& operator[](boost::multiprecision::uint256_t index)
     {
+<<<<<<< HEAD
         if (!m_array.size())
+=======
+        if (m_array == nullptr)
+>>>>>>> initial code for ds viewchange
         {
             LOG_MESSAGE("Error: m_array is empty")
             throw;
@@ -68,7 +86,11 @@ public:
     /// Adds an element to the array at the specified index.
     void insert_new(boost::multiprecision::uint256_t index, const T& element)
     {
+<<<<<<< HEAD
         if (!m_array.size())
+=======
+        if (m_array == nullptr)
+>>>>>>> initial code for ds viewchange
         {
             LOG_MESSAGE("Error: m_array is empty")
             throw;
@@ -80,7 +102,11 @@ public:
     /// Returns the element at the back of the array.
     T& back()
     {
+<<<<<<< HEAD
         if (!m_array.size())
+=======
+        if (m_array == nullptr)
+>>>>>>> initial code for ds viewchange
         {
             LOG_MESSAGE("Error: m_array is empty")
             throw;
@@ -91,7 +117,11 @@ public:
     /// Adds an element to the end of the array.
     void push_back(T element)
     {
+<<<<<<< HEAD
         if (!m_array.size())
+=======
+        if (m_array == nullptr)
+>>>>>>> initial code for ds viewchange
         {
             LOG_MESSAGE("Error: m_array is empty")
             throw;

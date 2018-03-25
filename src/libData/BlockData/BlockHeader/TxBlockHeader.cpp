@@ -23,6 +23,10 @@ using namespace boost::multiprecision;
 TxBlockHeader::TxBlockHeader()
 {
     m_blockNum = (boost::multiprecision::uint256_t)-1;
+<<<<<<< HEAD
+=======
+    m_viewChangeCounter = 0;
+>>>>>>> initial code for ds viewchange
 }
 
 TxBlockHeader::TxBlockHeader(const vector<unsigned char>& src,
@@ -40,7 +44,14 @@ TxBlockHeader::TxBlockHeader(
     const uint256_t& blockNum, const uint256_t& timestamp,
     const TxnHash& txRootHash, const StateHash& stateRootHash, uint32_t numTxs,
     uint32_t numMicroBlockHashes, const PubKey& minerPubKey,
+<<<<<<< HEAD
     const uint256_t& dsBlockNum, const BlockHash& dsBlockHeader)
+=======
+    const uint256_t& dsBlockNum, const BlockHash& dsBlockHeader,
+    unsigned int viewChangeCounter
+
+    )
+>>>>>>> initial code for ds viewchange
     : m_type(type)
     , m_version(version)
     , m_gasLimit(gasLimit)
@@ -55,6 +66,10 @@ TxBlockHeader::TxBlockHeader(
     , m_minerPubKey(minerPubKey)
     , m_dsBlockNum(dsBlockNum)
     , m_dsBlockHeader(dsBlockHeader)
+<<<<<<< HEAD
+=======
+    , m_viewChangeCounter(viewChangeCounter)
+>>>>>>> initial code for ds viewchange
 {
 }
 
@@ -105,7 +120,14 @@ unsigned int TxBlockHeader::Serialize(vector<unsigned char>& dst,
     curOffset += UINT256_SIZE;
     copy(m_dsBlockHeader.asArray().begin(), m_dsBlockHeader.asArray().end(),
          dst.begin() + curOffset);
+<<<<<<< HEAD
 
+=======
+    curOffset += BLOCK_HASH_SIZE;
+    SetNumber<unsigned int>(dst, curOffset, m_viewChangeCounter,
+                            sizeof(unsigned int));
+    curOffset += sizeof(unsigned int);
+>>>>>>> initial code for ds viewchange
     return size_needed;
 }
 
@@ -153,6 +175,13 @@ int TxBlockHeader::Deserialize(const vector<unsigned char>& src,
         curOffset += UINT256_SIZE;
         copy(src.begin() + curOffset, src.begin() + curOffset + BLOCK_HASH_SIZE,
              m_dsBlockHeader.asArray().begin());
+<<<<<<< HEAD
+=======
+        curOffset += BLOCK_HASH_SIZE;
+        m_viewChangeCounter
+            = GetNumber<unsigned int>(src, curOffset, sizeof(unsigned int));
+        curOffset += sizeof(unsigned int);
+>>>>>>> initial code for ds viewchange
     }
     catch (const std::exception& e)
     {
@@ -194,10 +223,20 @@ const uint32_t& TxBlockHeader::GetNumMicroBlockHashes() const
 const PubKey& TxBlockHeader::GetMinerPubKey() const { return m_minerPubKey; }
 
 const uint256_t& TxBlockHeader::GetDSBlockNum() const { return m_dsBlockNum; }
+<<<<<<< HEAD
+
+const BlockHash& TxBlockHeader::GetDSBlockHeader() const
+=======
 
 const BlockHash& TxBlockHeader::GetDSBlockHeader() const
 {
     return m_dsBlockHeader;
+}
+
+const unsigned int TxBlockHeader::GetViewChangeCounter() const
+>>>>>>> initial code for ds viewchange
+{
+    return m_viewChangeCounter;
 }
 
 bool TxBlockHeader::operator==(const TxBlockHeader& header) const
@@ -214,7 +253,11 @@ bool TxBlockHeader::operator==(const TxBlockHeader& header) const
             && (m_numMicroBlockHashes == header.m_numMicroBlockHashes)
             && (m_minerPubKey == header.m_minerPubKey)
             && (m_dsBlockHeader == header.m_dsBlockHeader)
+<<<<<<< HEAD
             && (m_dsBlockHeader == m_dsBlockHeader));
+=======
+            && (m_viewChangeCounter == header.m_viewChangeCounter));
+>>>>>>> initial code for ds viewchange
 }
 
 bool TxBlockHeader::operator<(const TxBlockHeader& header) const

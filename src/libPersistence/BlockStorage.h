@@ -27,7 +27,10 @@
 
 typedef std::shared_ptr<DSBlock> DSBlockSharedPtr;
 typedef std::shared_ptr<TxBlock> TxBlockSharedPtr;
+<<<<<<< HEAD
 typedef std::shared_ptr<MicroBlock> MicroBlockSharedPtr;
+=======
+>>>>>>> initial code for ds viewchange
 typedef std::shared_ptr<Transaction> TxBodySharedPtr;
 
 /// Manages persistent storage of DS and Tx blocks.
@@ -36,6 +39,7 @@ class BlockStorage
     LevelDB m_metadataDB;
     LevelDB m_dsBlockchainDB;
     LevelDB m_txBlockchainDB;
+<<<<<<< HEAD
 #ifndef IS_LOOKUP_NODE
     std::list<LevelDB> m_txBodyDBs;
 #else // IS_LOOKUP_NODE
@@ -52,12 +56,22 @@ class BlockStorage
         , m_txBodyTmpDB("txBodiesTmp")
 #endif // IS_LOOKUP_NODE
               {};
+=======
+    std::shared_timed_mutex m_putBlockMutex;
+
+    BlockStorage()
+        : m_metadataDB("metadata")
+        , m_txBodyDB("txBodies")
+        , m_dsBlockchainDB("dsBlocks")
+        , m_txBlockchainDB("txBlocks"){};
+>>>>>>> initial code for ds viewchange
     ~BlockStorage() = default;
     bool PutBlock(const boost::multiprecision::uint256_t& blockNum,
                   const std::vector<unsigned char>& block,
                   const BlockType& blockType);
 
 public:
+<<<<<<< HEAD
     enum DBTYPE
     {
         META = 0x00,
@@ -84,6 +98,10 @@ public:
     /// Get the size of current TxBodyDB
     unsigned int GetTxBodyDBSize();
 #endif // IS_LOOKUP_NODE
+=======
+    /// Returns the singleton BlockStorage instance.
+    static BlockStorage& GetBlockStorage();
+>>>>>>> initial code for ds viewchange
 
     /// Adds a DS block to storage.
     bool PutDSBlock(const boost::multiprecision::uint256_t& blockNum,
@@ -92,6 +110,7 @@ public:
     /// Adds a Tx block to storage.
     bool PutTxBlock(const boost::multiprecision::uint256_t& blockNum,
                     const std::vector<unsigned char>& block);
+<<<<<<< HEAD
 
     // /// Adds a micro block to storage.
     // bool PutMicroBlock(const dev::h256 & key, const std::vector<unsigned char> & block);
@@ -99,6 +118,8 @@ public:
     /// Adds a transaction body to storage.
     bool PutTxBody(const dev::h256& key,
                    const std::vector<unsigned char>& body);
+=======
+>>>>>>> initial code for ds viewchange
 
     /// Retrieves the requested DS block.
     bool GetDSBlock(const boost::multiprecision::uint256_t& blocknum,
@@ -108,6 +129,7 @@ public:
     bool GetTxBlock(const boost::multiprecision::uint256_t& blocknum,
                     TxBlockSharedPtr& block);
 
+<<<<<<< HEAD
     // /// Retrieves the requested Micro block
     // bool GetMicroBlock(const dev::h256 & key, MicroBlockSharedPtr & block);
 
@@ -125,6 +147,14 @@ public:
 
     /// Deletes the requested transaction body
     bool DeleteTxBody(const dev::h256& key);
+=======
+    /// Adds a transaction body to storage.
+    bool PutTxBody(const dev::h256& key,
+                   const std::vector<unsigned char>& body);
+
+    /// Retrieves the requested transaction body.
+    bool GetTxBody(const dev::h256& key, TxBodySharedPtr& body);
+>>>>>>> initial code for ds viewchange
 
     // /// Adds a transaction body to storage.
     // bool PutTxBody(const std::string & key, const std::vector<unsigned char> & body);

@@ -116,12 +116,19 @@ if(CLANG_TIDY)
         )
         if(CLANG_APPLY_REPLACEMENTS)
             add_custom_target(
+<<<<<<< HEAD
                 clang-tidy-fix
                 COMMAND "${RUN_CLANG_TIDY}"
                 -clang-tidy-binary ${CLANG_TIDY}
                 -clang-apply-replacements-binary ${CLANG_APPLY_REPLACEMENTS}
                 -fix
                 -format
+=======
+                clang-tidy-apply
+                COMMAND "${RUN_CLANG_TIDY}"
+                -clang-tidy-binary ${CLANG_TIDY}
+                -clang-apply-replacements-binary ${CLANG_APPLY_REPLACEMENTS}
+>>>>>>> initial code for ds viewchange
                 -config=''
                 -style='file'
                 ${ALL_CXX_SOURCES}

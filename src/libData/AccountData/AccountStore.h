@@ -54,15 +54,21 @@ class AccountStore : public Serializable
     static bool Compare(const Account& l, const Account& r);
 
     bool UpdateStateTrie(const Address& address, const Account& account);
+<<<<<<< HEAD
 
     /// Store the trie root to leveldb
     void MoveRootToDisk(const dev::h256& root);
+=======
+>>>>>>> initial code for ds viewchange
 
 public:
     /// Returns the singleton AccountStore instance.
     static AccountStore& GetInstance();
+<<<<<<< HEAD
     /// Empty the state trie, must be called explicitly otherwise will retrieve the historical data
     void Init();
+=======
+>>>>>>> initial code for ds viewchange
     /// Implements the Serialize function inherited from Serializable.
     unsigned int Serialize(std::vector<unsigned char>& dst,
                            unsigned int offset) const;

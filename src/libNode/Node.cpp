@@ -47,6 +47,7 @@
 using namespace std;
 using namespace boost::multiprecision;
 
+<<<<<<< HEAD
 Node::Node(Mediator& mediator, bool toRetrieveHistory)
     : m_mediator(mediator)
 {
@@ -89,12 +90,29 @@ Node::Node(Mediator& mediator, bool toRetrieveHistory)
         = (uint64_t)m_mediator.m_txBlockChain.GetBlockCount();
     m_mediator.UpdateDSBlockRand(runInitializeGenesisBlocks);
     m_mediator.UpdateTxBlockRand(runInitializeGenesisBlocks);
+=======
+Node::Node(Mediator& mediator)
+    : m_mediator(mediator)
+{
+    // m_state = IDLE;
+    // Zilliqa first epoch start from 1 not 0. So for the first DS epoch, there will be 1 less mini epoch only for the first DS epoch.
+    // Hence, we have to set consensusID for first epoch to 1.
+    m_consensusID = 1;
+    m_consensusLeaderID = 1;
+    m_synchronizer.InitializeGenesisBlocks(m_mediator.m_dsBlockChain,
+                                           m_mediator.m_txBlockChain);
+    m_mediator.m_currentEpochNum
+        = (uint64_t)m_mediator.m_txBlockChain.GetBlockCount();
+    m_mediator.UpdateDSBlockRand(true);
+    m_mediator.UpdateTxBlockRand(true);
+>>>>>>> initial code for ds viewchange
     SetState(POW1_SUBMISSION);
     POW::GetInstance().EthashConfigureLightClient(
         (uint64_t)m_mediator.m_dsBlockChain.GetBlockCount());
 }
 
 Node::~Node() {}
+<<<<<<< HEAD
 
 bool Node::StartRetrieveHistory()
 {
@@ -137,12 +155,17 @@ bool Node::StartRetrieveHistory()
     }
     return res;
 }
+=======
+>>>>>>> initial code for ds viewchange
 
 #ifndef IS_LOOKUP_NODE
 
 void Node::StartSynchronization()
 {
+<<<<<<< HEAD
     m_isNewNode = true;
+=======
+>>>>>>> initial code for ds viewchange
     auto func = [this]() -> void {
         while (!m_mediator.m_isConnectedToNetwork)
         {
@@ -220,6 +243,7 @@ bool Node::CheckState(Action action)
                 to_string(m_mediator.m_currentEpochNum).c_str(),
                 "Error: Doing STARTPOW1 but already in WAITING_FINALBLOCK");
             result = false;
+<<<<<<< HEAD
             break;
         case ERROR:
             LOG_MESSAGE("Error: Doing STARTPOW1 but receiving ERROR message");
@@ -377,7 +401,169 @@ bool Node::CheckState(Action action)
             LOG_MESSAGE("Error: Doing PROCESS_MICROBLOCKSUBMISSION but "
                         "receiving ERROR message");
             result = false;
+=======
+>>>>>>> initial code for ds viewchange
             break;
+        case ERROR:
+        default:
+            LOG_MESSAGE2(to_string(m_mediator.m_currentEpochNum).c_str(),
+                         "Error: Unrecognized or error state");
+            result = false;
+            break;
+        }
+        break;
+<<<<<<< HEAD
+    case PROCESS_FINALBLOCK:
+        switch (m_state)
+        {
+        case POW1_SUBMISSION:
+            LOG_MESSAGE2(to_string(m_mediator.m_currentEpochNum).c_str(),
+                         "Error: Doing WAITING_FINALBLOCK but already in "
+                         "POW1_SUBMISSION");
+            result = false;
+            break;
+        case POW2_SUBMISSION:
+            LOG_MESSAGE2(to_string(m_mediator.m_currentEpochNum).c_str(),
+                         "Error: Doing WAITING_FINALBLOCK but already in "
+                         "POW2_SUBMISSION");
+            result = false;
+            break;
+=======
+    case STARTPOW2:
+        switch (m_state)
+        {
+        case POW1_SUBMISSION:
+            LOG_MESSAGE2(
+                to_string(m_mediator.m_currentEpochNum).c_str(),
+                "Error: Doing STARTPOW2 but already in POW1_SUBMISSION");
+            result = false;
+            break;
+        case POW2_SUBMISSION:
+            break;
+        case TX_SUBMISSION:
+            LOG_MESSAGE2(to_string(m_mediator.m_currentEpochNum).c_str(),
+                         "Error: Doing STARTPOW2 but already in TX_SUBMISSION");
+            result = false;
+            break;
+        case TX_SUBMISSION_BUFFER:
+            LOG_MESSAGE2(
+                to_string(m_mediator.m_currentEpochNum).c_str(),
+                "Error: Doing STARTPOW2 but already in TX_SUBMISSION_BUFFER");
+            result = false;
+            break;
+        case MICROBLOCK_CONSENSUS_PREP:
+            LOG_MESSAGE2(to_string(m_mediator.m_currentEpochNum).c_str(),
+                         "Error: Doing STARTPOW2 but already in "
+                         "MICROBLOCK_CONSENSUS_PREP");
+            result = false;
+            break;
+        case MICROBLOCK_CONSENSUS:
+            LOG_MESSAGE2(
+                to_string(m_mediator.m_currentEpochNum).c_str(),
+                "Error: Doing STARTPOW2 but already in MICROBLOCK_CONSENSUS");
+            result = false;
+            break;
+        case WAITING_FINALBLOCK:
+            LOG_MESSAGE2(
+                to_string(m_mediator.m_currentEpochNum).c_str(),
+                "Error: Doing STARTPOW2 but already in WAITING_FINALBLOCK");
+            result = false;
+            break;
+        case ERROR:
+        default:
+            LOG_MESSAGE2(to_string(m_mediator.m_currentEpochNum).c_str(),
+                         "Error: Unrecognized or error state");
+            result = false;
+            break;
+        }
+        break;
+    case PROCESS_SHARDING:
+        switch (m_state)
+        {
+        case POW1_SUBMISSION:
+            LOG_MESSAGE2(
+                to_string(m_mediator.m_currentEpochNum).c_str(),
+                "Error: Doing PROCESS_SHARDING but already in POW1_SUBMISSION");
+            result = false;
+            break;
+        case POW2_SUBMISSION:
+            LOG_MESSAGE2(
+                to_string(m_mediator.m_currentEpochNum).c_str(),
+                "Error: Doing PROCESS_SHARDING but already in POW2_SUBMISSION");
+            result = false;
+            break;
+        case TX_SUBMISSION:
+            break;
+        case TX_SUBMISSION_BUFFER:
+            break;
+        case MICROBLOCK_CONSENSUS_PREP:
+            LOG_MESSAGE2(to_string(m_mediator.m_currentEpochNum).c_str(),
+                         "Error: Doing PROCESS_SHARDING but already in "
+                         "MICROBLOCK_CONSENSUS_PREP");
+            result = false;
+            break;
+        case MICROBLOCK_CONSENSUS:
+            LOG_MESSAGE2(to_string(m_mediator.m_currentEpochNum).c_str(),
+                         "Error: Doing PROCESS_SHARDING but already in "
+                         "MICROBLOCK_CONSENSUS");
+            result = false;
+            break;
+        case WAITING_FINALBLOCK:
+            LOG_MESSAGE2(to_string(m_mediator.m_currentEpochNum).c_str(),
+                         "Error: Doing PROCESS_SHARDING but already in "
+                         "WAITING_FINALBLOCK");
+            result = false;
+            break;
+        case ERROR:
+        default:
+            LOG_MESSAGE2(to_string(m_mediator.m_currentEpochNum).c_str(),
+                         "Error: Unrecognized or error state");
+            result = false;
+            break;
+        }
+        break;
+    case PROCESS_MICROBLOCKCONSENSUS:
+        switch (m_state)
+        {
+        case POW1_SUBMISSION:
+            LOG_MESSAGE2(to_string(m_mediator.m_currentEpochNum).c_str(),
+                         "Error: Doing PROCESS_MICROBLOCKCONSENSUS but already "
+                         "in POW1_SUBMISSION");
+            result = false;
+            break;
+        case POW2_SUBMISSION:
+            LOG_MESSAGE2(to_string(m_mediator.m_currentEpochNum).c_str(),
+                         "Error: Doing PROCESS_MICROBLOCKCONSENSUS but already "
+                         "in POW2_SUBMISSION");
+            result = false;
+            break;
+        case TX_SUBMISSION:
+            LOG_MESSAGE2(to_string(m_mediator.m_currentEpochNum).c_str(),
+                         "Error: Doing PROCESS_MICROBLOCKCONSENSUS but already "
+                         "in TX_SUBMISSION");
+            result = false;
+            break;
+        case TX_SUBMISSION_BUFFER:
+            LOG_MESSAGE2(to_string(m_mediator.m_currentEpochNum).c_str(),
+                         "Error: Doing PROCESS_MICROBLOCKCONSENSUS but already "
+                         "in TX_SUBMISSION_BUFFER");
+            result = false;
+            break;
+        case MICROBLOCK_CONSENSUS_PREP:
+            LOG_MESSAGE2(to_string(m_mediator.m_currentEpochNum).c_str(),
+                         "Error: Doing PROCESS_MICROBLOCKCONSENSUS but already "
+                         "in MICROBLOCK_CONSENSUS_PREP");
+            result = false;
+            break;
+        case MICROBLOCK_CONSENSUS:
+            break;
+        case WAITING_FINALBLOCK:
+            LOG_MESSAGE2(to_string(m_mediator.m_currentEpochNum).c_str(),
+                         "Error: Doing PROCESS_MICROBLOCKCONSENSUS but already "
+                         "in WAITING_FINALBLOCK");
+            result = false;
+            break;
+        case ERROR:
         default:
             LOG_MESSAGE2(to_string(m_mediator.m_currentEpochNum).c_str(),
                          "Error: Unrecognized or error state");
@@ -400,6 +586,7 @@ bool Node::CheckState(Action action)
                          "POW2_SUBMISSION");
             result = false;
             break;
+>>>>>>> initial code for ds viewchange
         case TX_SUBMISSION:
             LOG_MESSAGE2(
                 to_string(m_mediator.m_currentEpochNum).c_str(),
@@ -427,10 +614,13 @@ bool Node::CheckState(Action action)
         case WAITING_FINALBLOCK:
             break;
         case ERROR:
+<<<<<<< HEAD
             LOG_MESSAGE(
                 "Error: Doing WAITING_FINALBLOCK but receiving ERROR message");
             result = false;
             break;
+=======
+>>>>>>> initial code for ds viewchange
         default:
             LOG_MESSAGE2(to_string(m_mediator.m_currentEpochNum).c_str(),
                          "Error: Unrecognized or error state");
@@ -662,9 +852,14 @@ bool Node::ProcessCreateTransaction(const vector<unsigned char>& message,
     for (unsigned i = 0; i < 10000; i++)
     {
         Transaction txn(version, nonce, toAddr, fromPubKey, amount, signature);
+<<<<<<< HEAD
         // LOG_MESSAGE2(to_string(m_mediator.m_currentEpochNum).c_str(),
         // "Created txns: " << txn.GetTranID())
         // LOG_MESSAGE(txn.GetSerializedSize());
+=======
+        LOG_MESSAGE2(to_string(m_mediator.m_currentEpochNum).c_str(),
+                     "Created txns: " << txn.GetTranID())
+>>>>>>> initial code for ds viewchange
         m_createdTransactions.push_back(txn);
         nonce++;
         amount++;

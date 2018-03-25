@@ -28,11 +28,16 @@
 #define BOOST_TEST_DYN_LINK
 #include <boost/test/unit_test.hpp>
 
+<<<<<<< HEAD
 using namespace std;
 using namespace boost::multiprecision;
 
 BOOST_AUTO_TEST_SUITE(persistencetest)
 
+=======
+BOOST_AUTO_TEST_SUITE(persistencetest)
+
+>>>>>>> initial code for ds viewchange
 BOOST_AUTO_TEST_CASE(testReadWriteSimpleStringToDB)
 {
     INIT_STDOUT_LOGGER();
@@ -69,7 +74,11 @@ DSBlock constructDummyDSBlock(int instanceNum)
     std::pair<PrivKey, PubKey> pubKey1 = Schnorr::GetInstance().GenKeyPair();
 
     DSBlockHeader header1(20, prevHash1, 12345 + instanceNum, pubKey1.first,
+<<<<<<< HEAD
                           pubKey1.second, 10, 789);
+=======
+                          pubKey1.second, 10, 789, 0);
+>>>>>>> initial code for ds viewchange
 
     return DSBlock(header1, signature1);
 }
@@ -383,6 +392,7 @@ BOOST_AUTO_TEST_CASE(testMultipleBlocksInMultipleFiles)
 
     //     // BlockStorage::m_blockFileSize = 128 * 1024 * 1024;
     //     BlockStorage::SetBlockFileSize(128 * ONE_MEGABYTE);
+<<<<<<< HEAD
 }
 
 BOOST_AUTO_TEST_CASE(testRetrieveAllTheDSBlocksInDB)
@@ -421,6 +431,8 @@ BOOST_AUTO_TEST_CASE(testRetrieveAllTheDSBlocksInDB)
             in_blocks == out_blocks,
             "DSBlocks shouldn't change after writting to/ reading from disk");
     }
+=======
+>>>>>>> initial code for ds viewchange
 }
 
 BOOST_AUTO_TEST_SUITE_END()

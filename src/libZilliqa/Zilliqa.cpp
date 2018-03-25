@@ -20,6 +20,12 @@
 #include "Zilliqa.h"
 #include "common/Constants.h"
 #include "common/Messages.h"
+<<<<<<< HEAD
+=======
+#include "libUtils/Logger.h"
+
+#include "common/Constants.h"
+>>>>>>> initial code for ds viewchange
 #include "common/Serializable.h"
 #include "libCrypto/Schnorr.h"
 #include "libCrypto/Sha2.h"
@@ -56,13 +62,21 @@ void Zilliqa::LogSelfNodeInfo(const std::pair<PrivKey, PubKey>& key,
 }
 
 Zilliqa::Zilliqa(const std::pair<PrivKey, PubKey>& key, const Peer& peer,
+<<<<<<< HEAD
                  bool loadConfig, bool toSyncWithNetwork,
                  bool toRetrieveHistory)
+=======
+                 bool loadConfig, bool toSyncWithNetwork)
+>>>>>>> initial code for ds viewchange
     : m_pm(key, peer, loadConfig)
     , m_mediator(key, peer)
     , m_ds(m_mediator)
     , m_lookup(m_mediator)
+<<<<<<< HEAD
     , m_n(m_mediator, toRetrieveHistory)
+=======
+    , m_n(m_mediator)
+>>>>>>> initial code for ds viewchange
     , m_cu(key, peer)
 #ifdef IS_LOOKUP_NODE
     , m_httpserver(SERVER_PORT)
@@ -87,8 +101,12 @@ Zilliqa::Zilliqa(const std::pair<PrivKey, PubKey>& key, const Peer& peer,
 
 #ifndef IS_LOOKUP_NODE
     LOG_MESSAGE("I am a normal node.");
+<<<<<<< HEAD
 
     if (toSyncWithNetwork && !toRetrieveHistory)
+=======
+    if (toSyncWithNetwork)
+>>>>>>> initial code for ds viewchange
     {
         m_n.StartSynchronization();
     }

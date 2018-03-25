@@ -23,8 +23,11 @@ using namespace boost::multiprecision;
 TxBlockChain::TxBlockChain() { m_txBlocks.resize(TX_BLOCKCHAIN_SIZE); }
 
 TxBlockChain::~TxBlockChain() {}
+<<<<<<< HEAD
 
 void TxBlockChain::Reset() { m_txBlocks.resize(TX_BLOCKCHAIN_SIZE); }
+=======
+>>>>>>> initial code for ds viewchange
 
 uint256_t TxBlockChain::GetBlockCount()
 {

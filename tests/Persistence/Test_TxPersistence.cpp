@@ -58,7 +58,11 @@ TxBlock constructDummyTxBlock(int instanceNum)
     TxBlockHeader header(TXBLOCKTYPE::FINAL, BLOCKVERSION::VERSION1, 1, 1,
                          BlockHash(), instanceNum, get_time_as_int(), TxnHash(),
                          StateHash(), 5, 6, pubKey1.second, instanceNum,
+<<<<<<< HEAD
                          BlockHash());
+=======
+                         BlockHash(), 0);
+>>>>>>> initial code for ds viewchange
 
     array<unsigned char, BLOCK_SIG_SIZE> emptySig{};
 
@@ -325,6 +329,7 @@ BOOST_AUTO_TEST_CASE(testMultipleBlocksInMultipleFiles)
     // BlockStorage::SetBlockFileSize(128 * ONE_MEGABYTE);
 }
 
+<<<<<<< HEAD
 BOOST_AUTO_TEST_CASE(testRetrieveAllTheTxBlocksInDB)
 {
     INIT_STDOUT_LOGGER();
@@ -363,4 +368,6 @@ BOOST_AUTO_TEST_CASE(testRetrieveAllTheTxBlocksInDB)
     }
 }
 
+=======
+>>>>>>> initial code for ds viewchange
 BOOST_AUTO_TEST_SUITE_END()

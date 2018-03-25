@@ -49,7 +49,13 @@ void DirectoryService::StoreDSBlockToStorage()
             << m_pendingDSBlock->GetHeader().GetBlockNum()
             << " with Nonce: " << m_pendingDSBlock->GetHeader().GetNonce()
             << ", Difficulty: " << m_pendingDSBlock->GetHeader().GetDifficulty()
+<<<<<<< HEAD
             << ", Timestamp: " << m_pendingDSBlock->GetHeader().GetTimestamp());
+=======
+            << ", Timestamp: " << m_pendingDSBlock->GetHeader().GetTimestamp()
+            << ", vc count: "
+            << m_pendingDSBlock->GetHeader().GetViewChangeCount());
+>>>>>>> initial code for ds viewchange
 
     if (result == -1)
     {
@@ -63,8 +69,11 @@ void DirectoryService::StoreDSBlockToStorage()
     m_pendingDSBlock->Serialize(serializedDSBlock, 0);
     BlockStorage::GetBlockStorage().PutDSBlock(
         m_pendingDSBlock->GetHeader().GetBlockNum(), serializedDSBlock);
+<<<<<<< HEAD
     BlockStorage::GetBlockStorage().PushBackTxBodyDB(
         m_pendingDSBlock->GetHeader().GetBlockNum());
+=======
+>>>>>>> initial code for ds viewchange
 }
 
 bool DirectoryService::SendDSBlockToLookupNodes(DSBlock& lastDSBlock,
@@ -435,6 +444,8 @@ bool DirectoryService::ProcessDSBlockConsensus(
 
     if (state == ConsensusCommon::State::DONE)
     {
+        m_viewChangeCounter = 0;
+        cv_RecoveryDSBlockConsensus.notify_all();
         ProcessDSBlockConsensusWhenDone(message, offset);
     }
     else if (state == ConsensusCommon::State::ERROR)
@@ -446,7 +457,13 @@ bool DirectoryService::ProcessDSBlockConsensus(
             "DEBUG for verify sig m_allPoWConns  size is "
                 << m_allPoWConns.size()
                 << ". Please check numbers of pow1 receivied by this node");
+<<<<<<< HEAD
         throw exception();
+=======
+
+        // Wait for view change to happen
+        //throw exception();
+>>>>>>> initial code for ds viewchange
     }
     else
     {

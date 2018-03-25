@@ -14,7 +14,10 @@
 * and which include a reference to GPLv3 in their program files.
 **/
 
+<<<<<<< HEAD
 #include "common/Constants.h"
+=======
+>>>>>>> initial code for ds viewchange
 #include "libCrypto/Schnorr.h"
 #include "libData/AccountData/Address.h"
 #include "libData/AccountData/Transaction.h"
@@ -24,8 +27,11 @@
 #include <array>
 #include <string>
 #include <vector>
+<<<<<<< HEAD
 
 #include <boost/filesystem.hpp>
+=======
+>>>>>>> initial code for ds viewchange
 
 #define BOOST_TEST_MODULE persistencetest
 #define BOOST_TEST_DYN_LINK
@@ -78,6 +84,7 @@ BOOST_AUTO_TEST_CASE(testSerializationDeserialization)
     BOOST_CHECK_MESSAGE(body1.GetTranID() == body2.GetTranID(),
                         "Error: Transaction id shouldn't change after "
                         "serailization and deserialization");
+<<<<<<< HEAD
 }
 
 #ifndef IS_LOOKUP_NODE
@@ -151,6 +158,8 @@ BOOST_AUTO_TEST_CASE(testTxBodyDBPop)
 
     BOOST_CHECK_MESSAGE(!boost::filesystem::exists(p_txbodyDB),
                         "Error: TX_BODY subdirectory is not deleted");
+=======
+>>>>>>> initial code for ds viewchange
 }
 #endif // IS_LOOKUP_NODE
 

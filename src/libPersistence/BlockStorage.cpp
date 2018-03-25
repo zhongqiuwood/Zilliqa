@@ -38,6 +38,7 @@ BlockStorage& BlockStorage::GetBlockStorage()
     return bs;
 }
 
+<<<<<<< HEAD
 #ifndef IS_LOOKUP_NODE
 bool BlockStorage::PushBackTxBodyDB(
     const boost::multiprecision::uint256_t& blockNum)
@@ -86,6 +87,8 @@ bool BlockStorage::PopFrontTxBodyDB(bool mandatory)
 unsigned int BlockStorage::GetTxBodyDBSize() { return m_txBodyDBs.size(); }
 #endif // IS_LOOKUP_NODE
 
+=======
+>>>>>>> initial code for ds viewchange
 bool BlockStorage::PutBlock(const boost::multiprecision::uint256_t& blockNum,
                             const vector<unsigned char>& body,
                             const BlockType& blockType)
@@ -129,6 +132,7 @@ bool BlockStorage::PutTxBlock(const boost::multiprecision::uint256_t& blockNum,
     return PutBlock(blockNum, body, BlockType::Tx);
 }
 
+<<<<<<< HEAD
 bool BlockStorage::PutTxBody(const dev::h256& key,
                              const vector<unsigned char>& body)
 {
@@ -143,6 +147,8 @@ bool BlockStorage::PutTxBody(const dev::h256& key,
     return (ret == 0);
 }
 
+=======
+>>>>>>> initial code for ds viewchange
 bool BlockStorage::GetDSBlock(const boost::multiprecision::uint256_t& blockNum,
                               DSBlockSharedPtr& block)
 {
@@ -183,13 +189,26 @@ bool BlockStorage::GetTxBlock(const boost::multiprecision::uint256_t& blockNum,
     return true;
 }
 
+<<<<<<< HEAD
+=======
+bool BlockStorage::PutTxBody(const dev::h256& key,
+                             const vector<unsigned char>& body)
+{
+    int ret = m_txBodyDB.Insert(key, body);
+    return (ret == 0);
+}
+
+>>>>>>> initial code for ds viewchange
 bool BlockStorage::GetTxBody(const dev::h256& key, TxBodySharedPtr& body)
 {
 #ifndef IS_LOOKUP_NODE
     string bodyString = m_txBodyDBs.back().Lookup(key);
 #else // IS_LOOKUP_NODE
     string bodyString = m_txBodyDB.Lookup(key);
+<<<<<<< HEAD
 #endif
+=======
+>>>>>>> initial code for ds viewchange
 
     if (bodyString.empty())
     {

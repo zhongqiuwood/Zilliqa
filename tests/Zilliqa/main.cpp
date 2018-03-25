@@ -45,8 +45,12 @@ int main(int argc, const char* argv[])
         cout << "[USAGE] " << argv[0]
              << " <32-byte private_key> <33-byte public_key> "
                 "<listen_ip_address> <listen_port> <1 if loadConfig, 0 "
+<<<<<<< HEAD
                 "otherwise> <1 if sync, 0 otherwise> <1 if recovery, 0 "
                 "otherwise>"
+=======
+                "otherwise> <1 if sync, 0 otherwise>"
+>>>>>>> initial code for ds viewchange
              << endl;
     }
     else
@@ -79,7 +83,11 @@ int main(int argc, const char* argv[])
                      static_cast<unsigned int>(atoi(argv[4])));
 
         Zilliqa zilliqa(make_pair(privkey, pubkey), my_port, atoi(argv[5]) == 1,
+<<<<<<< HEAD
                         atoi(argv[6]) == 1, atoi(argv[7]) == 1);
+=======
+                        atoi(argv[6]) == 1);
+>>>>>>> initial code for ds viewchange
 
         auto dispatcher = [&zilliqa](const vector<unsigned char>& message,
                                      const Peer& from) mutable -> void {

@@ -59,10 +59,13 @@ bool ConsensusBackup::CheckState(Action action)
             result = false;
             break;
         case ERROR:
+<<<<<<< HEAD
             LOG_MESSAGE(
                 "Error: Processing announce but receiving ERROR message.");
             result = false;
             break;
+=======
+>>>>>>> initial code for ds viewchange
         default:
             LOG_MESSAGE("Error: Unrecognized or error state");
             result = false;
@@ -99,10 +102,13 @@ bool ConsensusBackup::CheckState(Action action)
             result = false;
             break;
         case ERROR:
+<<<<<<< HEAD
             LOG_MESSAGE(
                 "Error: Processing challenge but receiving ERROR message.");
             result = false;
             break;
+=======
+>>>>>>> initial code for ds viewchange
         default:
             LOG_MESSAGE("Error: Unrecognized or error state");
             result = false;
@@ -137,16 +143,96 @@ bool ConsensusBackup::CheckState(Action action)
             result = false;
             break;
         case ERROR:
+<<<<<<< HEAD
             LOG_MESSAGE(
                 "Error: Processing collectivesig but receiving ERROR message.");
-            result = false;
-            break;
+=======
         default:
             LOG_MESSAGE("Error: Unrecognized or error state");
             result = false;
             break;
         }
         break;
+    case PROCESS_FINALCHALLENGE:
+        switch (m_state)
+        {
+        case INITIAL:
+            LOG_MESSAGE(
+                "Error: Processing finalchallenge but commit not yet done");
+            result = false;
+            break;
+        case COMMIT_DONE:
+            LOG_MESSAGE(
+                "Error: Processing finalchallenge but response not yet done");
+            result = false;
+            break;
+        case RESPONSE_DONE:
+            LOG_MESSAGE(
+                "Processing finalchallenge but finalcommit not yet done");
+            // LOG_MESSAGE("Error: Processing finalchallenge but finalcommit not yet done");
+            // result = false;
+            break;
+        case FINALCOMMIT_DONE:
+            break;
+        case FINALRESPONSE_DONE:
+            LOG_MESSAGE("Error: Processing finalchallenge but finalresponse "
+                        "already done");
+            result = false;
+            break;
+        case DONE:
+            LOG_MESSAGE(
+                "Error: Processing finalchallenge but consensus already done");
+            result = false;
+            break;
+        case ERROR:
+        default:
+            LOG_MESSAGE("Error: Unrecognized or error state");
+            result = false;
+            break;
+        }
+        break;
+    case PROCESS_FINALCOLLECTIVESIG:
+        switch (m_state)
+        {
+        case INITIAL:
+            LOG_MESSAGE(
+                "Error: Processing finalcollectivesig but commit not yet done");
+            result = false;
+            break;
+        case COMMIT_DONE:
+            LOG_MESSAGE("Error: Processing finalcollectivesig but response not "
+                        "yet done");
+            // TODO: check this logic again.
+            // Issue #43
+            // Node cannot proceed if finalcollectivesig arrive earler (and get ignore by the node)
+            //result = false;
+            break;
+        case RESPONSE_DONE:
+            LOG_MESSAGE("Error: Processing finalcollectivesig but finalcommit "
+                        "not yet done");
+            // TODO: check this logic again.
+            // Issue #43
+            // Node cannot proceed if finalcollectivesig arrive earler (and get ignore by the node)
+            //result = false;
+            break;
+        case FINALCOMMIT_DONE:
+            break;
+        case FINALRESPONSE_DONE:
+            break;
+        case DONE:
+            LOG_MESSAGE("Error: Processing finalcollectivesig but consensus "
+                        "already done");
+>>>>>>> initial code for ds viewchange
+            result = false;
+            break;
+        case ERROR:
+        default:
+            LOG_MESSAGE("Error: Unrecognized or error state");
+            result = false;
+            break;
+        }
+        break;
+<<<<<<< HEAD
     case PROCESS_FINALCHALLENGE:
         switch (m_state)
         {
@@ -233,6 +319,8 @@ bool ConsensusBackup::CheckState(Action action)
             break;
         }
         break;
+=======
+>>>>>>> initial code for ds viewchange
     default:
         LOG_MESSAGE("Error: Unrecognized action");
         result = false;

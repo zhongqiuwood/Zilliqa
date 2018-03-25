@@ -47,12 +47,21 @@ class TxBlockHeader : public BlockHeaderBase
     boost::multiprecision::uint256_t
         m_dsBlockNum; // DS Block index at the time this Tx Block was proposed
     BlockHash m_dsBlockHeader; // DS Block hash
+<<<<<<< HEAD
+=======
+    unsigned int m_viewChangeCounter; // View change counter
+>>>>>>> initial code for ds viewchange
 
 public:
     static const unsigned int SIZE = sizeof(uint8_t) + sizeof(uint32_t)
         + UINT256_SIZE + UINT256_SIZE + BLOCK_HASH_SIZE + UINT256_SIZE
         + UINT256_SIZE + TRAN_HASH_SIZE + TRAN_HASH_SIZE + sizeof(uint32_t)
+<<<<<<< HEAD
         + sizeof(uint32_t) + PUB_KEY_SIZE + UINT256_SIZE + BLOCK_HASH_SIZE;
+=======
+        + sizeof(uint32_t) + PUB_KEY_SIZE + UINT256_SIZE + BLOCK_HASH_SIZE
+        + sizeof(unsigned int);
+>>>>>>> initial code for ds viewchange
 
     /// Default constructor.
     TxBlockHeader();
@@ -71,7 +80,12 @@ public:
                   const uint32_t numTxs, const uint32_t numMicroBlockHashes,
                   const PubKey& minerPubKey,
                   const boost::multiprecision::uint256_t& dsBlockNum,
+<<<<<<< HEAD
                   const BlockHash& dsBlockHeader);
+=======
+                  const BlockHash& dsBlockHeader,
+                  const unsigned int viewChangeCounter);
+>>>>>>> initial code for ds viewchange
 
     /// Implements the Serialize function inherited from Serializable.
     unsigned int Serialize(std::vector<unsigned char>& dst,
@@ -121,6 +135,12 @@ public:
 
     /// Returns the digest of the parent DS block header.
     const BlockHash& GetDSBlockHeader() const;
+<<<<<<< HEAD
+=======
+
+    /// Returns the view change counter for final block consensus
+    const unsigned int GetViewChangeCounter() const;
+>>>>>>> initial code for ds viewchange
 
     /// Equality comparison operator.
     bool operator==(const TxBlockHeader& header) const;
@@ -151,7 +171,12 @@ inline std::ostream& operator<<(std::ostream& os, const TxBlockHeader& t)
        << "m_minerPubKey : " << t.m_minerPubKey << std::endl
        << "m_dsBlockNum : " << t.m_dsBlockNum.convert_to<std::string>()
        << std::endl
+<<<<<<< HEAD
        << "m_dsBlockHeader : " << t.m_dsBlockHeader.hex() << std::endl;
+=======
+       << "m_dsBlockHeader : " << t.m_dsBlockHeader.hex() << std::endl
+       << "m_viewChangeCounter: " << t.m_viewChangeCounter;
+>>>>>>> initial code for ds viewchange
     return os;
 }
 

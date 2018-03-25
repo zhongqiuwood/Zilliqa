@@ -37,6 +37,7 @@ bool ConsensusLeader::CheckState(Action action)
         case INITIAL:
             break;
         case ANNOUNCE_DONE:
+<<<<<<< HEAD
             LOG_MESSAGE("Error: Processing announce but announce already done");
             result = false;
             break;
@@ -48,10 +49,22 @@ bool ConsensusLeader::CheckState(Action action)
         case COLLECTIVESIG_DONE:
             LOG_MESSAGE(
                 "Error: Processing announce but collectivesig already done");
+=======
+            LOG_MESSAGE("Error: Doing announce but announce already done");
+            result = false;
+            break;
+        case CHALLENGE_DONE:
+            LOG_MESSAGE("Error: Doing announce but challenge already done");
+            result = false;
+            break;
+        case COLLECTIVESIG_DONE:
+            LOG_MESSAGE("Error: Doing announce but collectivesig already done");
+>>>>>>> initial code for ds viewchange
             result = false;
             break;
         case FINALCHALLENGE_DONE:
             LOG_MESSAGE(
+<<<<<<< HEAD
                 "Error: Processing announce but finalchallenge already done");
             result = false;
             break;
@@ -65,6 +78,16 @@ bool ConsensusLeader::CheckState(Action action)
                         "ERROR message.");
             result = false;
             break;
+=======
+                "Error: Doing announce but finalchallenge already done");
+            result = false;
+            break;
+        case DONE:
+            LOG_MESSAGE("Error: Doing announce but consensus already done");
+            result = false;
+            break;
+        case ERROR:
+>>>>>>> initial code for ds viewchange
         default:
             LOG_MESSAGE("Error: Unrecognized or error state");
             result = false;
@@ -100,16 +123,54 @@ bool ConsensusLeader::CheckState(Action action)
             result = false;
             break;
         case ERROR:
+<<<<<<< HEAD
             LOG_MESSAGE("Error: Processing commit but receiving "
                         "ERROR message.");
-            result = false;
-            break;
+=======
         default:
             LOG_MESSAGE("Error: Unrecognized or error state");
             result = false;
             break;
         }
         break;
+    case PROCESS_RESPONSE:
+        switch (m_state)
+        {
+        case INITIAL:
+            LOG_MESSAGE("Error: Processing response but announce not yet done");
+            result = false;
+            break;
+        case ANNOUNCE_DONE:
+            LOG_MESSAGE(
+                "Error: Processing response but challenge not yet done");
+            result = false;
+            break;
+        case CHALLENGE_DONE:
+            break;
+        case COLLECTIVESIG_DONE:
+            LOG_MESSAGE(
+                "Error: Processing response but collectivesig already done");
+            result = false;
+            break;
+        case FINALCHALLENGE_DONE:
+            LOG_MESSAGE(
+                "Error: Processing response but finalchallenge already done");
+            result = false;
+            break;
+        case DONE:
+            LOG_MESSAGE(
+                "Error: Processing response but consensus already done");
+>>>>>>> initial code for ds viewchange
+            result = false;
+            break;
+        case ERROR:
+        default:
+            LOG_MESSAGE("Error: Unrecognized or error state");
+            result = false;
+            break;
+        }
+        break;
+<<<<<<< HEAD
     case PROCESS_RESPONSE:
         switch (m_state)
         {
@@ -150,6 +211,8 @@ bool ConsensusLeader::CheckState(Action action)
             break;
         }
         break;
+=======
+>>>>>>> initial code for ds viewchange
     case PROCESS_FINALCOMMIT:
         switch (m_state)
         {
@@ -181,10 +244,13 @@ bool ConsensusLeader::CheckState(Action action)
             result = false;
             break;
         case ERROR:
+<<<<<<< HEAD
             LOG_MESSAGE("Error: Processing finalcommit but receiving "
                         "ERROR message.");
             result = false;
             break;
+=======
+>>>>>>> initial code for ds viewchange
         default:
             LOG_MESSAGE("Error: Unrecognized or error state");
             result = false;
@@ -222,10 +288,13 @@ bool ConsensusLeader::CheckState(Action action)
             result = false;
             break;
         case ERROR:
+<<<<<<< HEAD
             LOG_MESSAGE("Error: Processing finalresponse but receiving "
                         "ERROR message.");
             result = false;
             break;
+=======
+>>>>>>> initial code for ds viewchange
         default:
             LOG_MESSAGE("Error: Unrecognized or error state");
             result = false;

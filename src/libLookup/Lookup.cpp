@@ -792,7 +792,10 @@ bool Lookup::ProcessGetStateFromSeed(const vector<unsigned char>& message,
     unsigned int curr_offset = MessageOffset::BODY;
     curr_offset
         += AccountStore::GetInstance().Serialize(setStateMessage, curr_offset);
+<<<<<<< HEAD
     AccountStore::GetInstance().PrintAccountState();
+=======
+>>>>>>> initial code for ds viewchange
     P2PComm::GetInstance().SendBroadcastMessage(node, setStateMessage);
     // #endif // IS_LOOKUP_NODE
 
@@ -1211,6 +1214,7 @@ bool Lookup::ProcessSetTxBlockFromSeed(const vector<unsigned char>& message,
     boost::multiprecision::uint256_t lowBlockNum
         = Serializable::GetNumber<uint256_t>(message, offset, UINT256_SIZE);
     offset += UINT256_SIZE;
+<<<<<<< HEAD
 
     // 32-byte upper-limit block number
     boost::multiprecision::uint256_t highBlockNum
@@ -1223,6 +1227,20 @@ bool Lookup::ProcessSetTxBlockFromSeed(const vector<unsigned char>& message,
                      << lowBlockNum.convert_to<string>() << " to "
                      << highBlockNum.convert_to<string>());
 
+=======
+
+    // 32-byte upper-limit block number
+    boost::multiprecision::uint256_t highBlockNum
+        = Serializable::GetNumber<uint256_t>(message, offset, UINT256_SIZE);
+    offset += UINT256_SIZE;
+
+    LOG_MESSAGE2(to_string(m_mediator.m_currentEpochNum).c_str(),
+                 "ProcessSetTxBlockFromSeed sent by "
+                     << from << " for blocks "
+                     << lowBlockNum.convert_to<string>() << " to "
+                     << highBlockNum.convert_to<string>());
+
+>>>>>>> initial code for ds viewchange
     uint64_t latestSynBlockNum
         = (uint64_t)m_mediator.m_txBlockChain.GetBlockCount();
     if (latestSynBlockNum >= highBlockNum)

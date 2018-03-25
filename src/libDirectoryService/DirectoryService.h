@@ -127,6 +127,36 @@ class DirectoryService : public Executable, public Broadcastable
     std::vector<unsigned char> m_finalBlockMessage;
     std::vector<Peer> m_sharingAssignment;
 
+<<<<<<< HEAD
+=======
+    // Recovery (simplified view change)
+    std::atomic<unsigned int> m_viewChangeCounter;
+    std::atomic<bool> m_initiatedViewChange;
+    std::mutex m_mutexProcessViewChangeRequests;
+    std::mutex m_mutexRecoveryDSBlockConsensus;
+    std::condition_variable cv_RecoveryDSBlockConsensus;
+    std::mutex m_mutexRecoveryShardingConsensus;
+    std::condition_variable cv_RecoveryShardingConsensus;
+    std::mutex m_mutexRecoveryFinalBlockConsensus;
+    std::condition_variable cv_RecoveryFinalBlockConsensus;
+
+    const double VC_TOLERANCE_FRACTION = (double)0.667;
+    std::atomic<uint64_t> m_viewChangeEpoch;
+    std::unordered_map<unsigned int, unsigned int> m_viewChangeRequestTracker;
+    std::vector<Peer> m_viewChangeRequesters;
+    std::mutex m_mutexViewChangeRequesters;
+
+    std::condition_variable cv_viewChangeDSBlock;
+    std::mutex m_MutexCVViewChangeDSBlock;
+    std::condition_variable cv_viewChangeSharding;
+    std::mutex m_MutexCVViewChangeSharding;
+    std::condition_variable cv_viewChangeFinalBlock;
+    std::mutex m_MutexCVViewChangeFinalBlock;
+
+    // TO Remove
+    //bool temp_todie;
+
+>>>>>>> initial code for ds viewchange
     Mediator& m_mediator;
 
     const uint32_t RESHUFFLE_INTERVAL = 500;
@@ -273,8 +303,11 @@ class DirectoryService : public Executable, public Broadcastable
 
     void StoreFinalBlockToDisk();
 
+<<<<<<< HEAD
     // void StoreMicroBlocksToDisk();
 
+=======
+>>>>>>> initial code for ds viewchange
     // Used to reconsile view of m_AllPowConn is different.
     void RequestAllPoWConn();
     void LastDSBlockRequest();
@@ -282,6 +315,17 @@ class DirectoryService : public Executable, public Broadcastable
                                    unsigned int offset, const Peer& from);
     bool ProcessLastDSBlockResponse(const vector<unsigned char>& message,
                                     unsigned int offset, const Peer& from);
+<<<<<<< HEAD
+=======
+
+    // View change
+    void InitViewChange();
+    bool ProcessInitViewChange(const vector<unsigned char>& message,
+                               unsigned int offset, const Peer& from);
+    bool ProcessInitViewChangeResponse(const vector<unsigned char>& message,
+                                       unsigned int offset, const Peer& from);
+
+>>>>>>> initial code for ds viewchange
 #endif // IS_LOOKUP_NODE
 
 public:

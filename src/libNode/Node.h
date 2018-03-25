@@ -106,9 +106,12 @@ class Node : public Executable, public Broadcastable
     // Consensus variables
     std::shared_ptr<ConsensusCommon> m_consensusObject;
 
+<<<<<<< HEAD
     // Persistence Retriever
     std::shared_ptr<Retriever> m_retriever;
 
+=======
+>>>>>>> initial code for ds viewchange
     std::vector<unsigned char> m_consensusBlockHash;
     std::atomic<uint32_t> m_consensusMyID;
     std::shared_ptr<MicroBlock> m_microblock;
@@ -212,8 +215,11 @@ class Node : public Executable, public Broadcastable
     ReadAuxilliaryInfoFromFinalBlockMsg(const vector<unsigned char>& message,
                                         unsigned int& cur_offset,
                                         uint8_t& shard_id);
+<<<<<<< HEAD
     void StoreState();
     // void StoreMicroBlocks();
+=======
+>>>>>>> initial code for ds viewchange
     void StoreFinalBlock(const TxBlock& txBlock);
     void InitiatePoW1();
     void UpdateStateForNextConsensusRound();
@@ -235,7 +241,10 @@ class Node : public Executable, public Broadcastable
     bool LoadForwardedTxnsAndCheckRoot(
         const vector<unsigned char>& message, unsigned int cur_offset,
         TxnHash& microBlockTxHash, vector<Transaction>& txnsInForwardedMessage);
+<<<<<<< HEAD
     // vector<TxnHash> & txnHashesInForwardedMessage);
+=======
+>>>>>>> initial code for ds viewchange
     void CommitForwardedTransactions(
         const vector<Transaction>& txnsInForwardedMessage,
         const boost::multiprecision::uint256_t& blocknum);
@@ -335,7 +344,11 @@ public:
     std::atomic<NodeState> m_state;
 
     /// Constructor. Requires mediator reference to access DirectoryService and other global members.
+<<<<<<< HEAD
     Node(Mediator& mediator, bool toRetrieveHistory);
+=======
+    Node(Mediator& mediator);
+>>>>>>> initial code for ds viewchange
 
     /// Destructor.
     ~Node();
@@ -350,10 +363,13 @@ public:
     /// Implements the GetBroadcastList function inherited from Broadcastable.
     std::vector<Peer> GetBroadcastList(unsigned char ins_type,
                                        const Peer& broadcast_originator);
+<<<<<<< HEAD
 
     Mediator& GetMediator() { return m_mediator; }
 
     bool StartRetrieveHistory();
+=======
+>>>>>>> initial code for ds viewchange
 
 #ifndef IS_LOOKUP_NODE
 

@@ -86,19 +86,25 @@ bool Node::ReadAuxilliaryInfoFromFinalBlockMsg(
     return true;
 }
 
+<<<<<<< HEAD
 void Node::StoreState()
 {
     LOG_MARKER();
     AccountStore::GetInstance().MoveUpdatesToDisk();
 }
 
+=======
+>>>>>>> initial code for ds viewchange
 void Node::StoreFinalBlock(const TxBlock& txBlock)
 {
     m_mediator.m_txBlockChain.AddBlock(txBlock);
     m_mediator.m_currentEpochNum
         = (uint64_t)m_mediator.m_txBlockChain.GetBlockCount();
 
+<<<<<<< HEAD
     // At this point, the transactions in the last Epoch is no longer useful, thus erase.
+=======
+>>>>>>> initial code for ds viewchange
     m_committedTransactions.erase(m_mediator.m_currentEpochNum - 2);
 
     LOG_MESSAGE2(
@@ -121,7 +127,25 @@ void Node::StoreFinalBlock(const TxBlock& txBlock)
     txBlock.Serialize(serializedTxBlock, 0);
     BlockStorage::GetBlockStorage().PutTxBlock(
         txBlock.GetHeader().GetBlockNum(), serializedTxBlock);
+<<<<<<< HEAD
 
+=======
+
+    LOG_MESSAGE(
+        "View change count:  " << txBlock.GetHeader().GetViewChangeCounter());
+
+    for (unsigned int i = 0; i < txBlock.GetHeader().GetViewChangeCounter();
+         i++)
+    {
+        m_mediator.m_DSCommitteeNetworkInfo.push_back(
+            m_mediator.m_DSCommitteeNetworkInfo.front());
+        m_mediator.m_DSCommitteeNetworkInfo.pop_front();
+        m_mediator.m_DSCommitteePubKeys.push_back(
+            m_mediator.m_DSCommitteePubKeys.front());
+        m_mediator.m_DSCommitteePubKeys.pop_front();
+    }
+
+>>>>>>> initial code for ds viewchange
     LOG_MESSAGE2(to_string(m_mediator.m_currentEpochNum).c_str(),
                  "Final block " << m_mediator.m_txBlockChain.GetLastBlock()
                                        .GetHeader()
@@ -1047,6 +1071,7 @@ bool Node::CheckStateRoot(const TxBlock& finalBlock)
     return true;
 }
 
+<<<<<<< HEAD
 // void Node::StoreMicroBlocksToDisk()
 // {
 //     LOG_MARKER();
@@ -1067,6 +1092,8 @@ bool Node::CheckStateRoot(const TxBlock& finalBlock)
 //     m_microBlocks.clear();
 // }
 
+=======
+>>>>>>> initial code for ds viewchange
 bool Node::ProcessFinalBlock(const vector<unsigned char>& message,
                              unsigned int offset, const Peer& from)
 {
@@ -1133,7 +1160,10 @@ bool Node::ProcessFinalBlock(const vector<unsigned char>& message,
     }
     else
     {
+<<<<<<< HEAD
         LOG_MESSAGE("isVacuousEpoch now");
+=======
+>>>>>>> initial code for ds viewchange
         if (!CheckStateRoot(txBlock))
         {
             return false;
@@ -1207,7 +1237,10 @@ bool Node::ProcessFinalBlock(const vector<unsigned char>& message,
 bool Node::LoadForwardedTxnsAndCheckRoot(
     const vector<unsigned char>& message, unsigned int cur_offset,
     TxnHash& microBlockTxHash, vector<Transaction>& txnsInForwardedMessage)
+<<<<<<< HEAD
 // vector<TxnHash> & txnHashesInForwardedMessage)
+=======
+>>>>>>> initial code for ds viewchange
 {
     LOG_MARKER();
 
@@ -1258,6 +1291,7 @@ void Node::CommitForwardedTransactions(
             AccountStore::GetInstance().UpdateAccounts(tx);
         }
 
+<<<<<<< HEAD
             // LOG_MESSAGE2(to_string(m_mediator.m_currentEpochNum).c_str(),
             //              "[TXN] [" << blocknum << "] Body received = 0x" << tx.GetTranID());
 
@@ -1274,6 +1308,24 @@ void Node::CommitForwardedTransactions(
 #endif //IS_LOOKUP_NODE
 
         // Store TxBody to disk
+=======
+// LOG_MESSAGE2(to_string(m_mediator.m_currentEpochNum).c_str(),
+//              "[TXN] [" << blocknum << "] Body received = 0x" << tx.GetTranID());
+
+// Update from and to accounts
+// LOG_MESSAGE2(to_string(m_mediator.m_currentEpochNum).c_str(), "Account store updated");
+
+// LOG_MESSAGE2(to_string(m_mediator.m_currentEpochNum).c_str(),
+//              "Storing Transaction: " << tx.GetTranID() <<
+//              " with amount: " << tx.GetAmount() <<
+//              ", to: " << tx.GetToAddr() <<
+//              ", from: " << tx.GetFromAddr());
+#ifdef IS_LOOKUP_NODE
+        Server::AddToRecentTransactions(tx.GetTranID());
+#endif //IS_LOOKUP_NODE                                                        \
+    // Store TxBody to disk
+
+>>>>>>> initial code for ds viewchange
         vector<unsigned char> serializedTxBody;
         tx.Serialize(serializedTxBody, 0);
         BlockStorage::GetBlockStorage().PutTxBody(tx.GetTranID(),
@@ -1396,8 +1448,12 @@ bool Node::ProcessForwardTransaction(const vector<unsigned char>& message,
     // vector<TxnHash> txnHashesInForwardedMessage;
 
     if (!LoadForwardedTxnsAndCheckRoot(
+<<<<<<< HEAD
             message, cur_offset, microBlockTxRootHash,
             txnsInForwardedMessage /*, txnHashesInForwardedMessage*/))
+=======
+            message, cur_offset, microBlockTxRootHash, txnsInForwardedMessage))
+>>>>>>> initial code for ds viewchange
     {
         return false;
     }
@@ -1410,8 +1466,11 @@ bool Node::ProcessForwardTransaction(const vector<unsigned char>& message,
         return false;
     }
 
+<<<<<<< HEAD
     // StoreTxInMicroBlock(microBlockTxRootHash, txnHashesInForwardedMessage)
 
+=======
+>>>>>>> initial code for ds viewchange
     CommitForwardedTransactions(txnsInForwardedMessage, blocknum);
 
 #ifndef IS_LOOKUP_NODE

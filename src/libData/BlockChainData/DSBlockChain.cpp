@@ -23,8 +23,11 @@ using namespace boost::multiprecision;
 DSBlockChain::DSBlockChain() { m_dsBlocks.resize(DS_BLOCKCHAIN_SIZE); }
 
 DSBlockChain::~DSBlockChain() {}
+<<<<<<< HEAD
 
 void DSBlockChain::Reset() { m_dsBlocks.resize(DS_BLOCKCHAIN_SIZE); }
+=======
+>>>>>>> initial code for ds viewchange
 
 uint256_t DSBlockChain::GetBlockCount()
 {

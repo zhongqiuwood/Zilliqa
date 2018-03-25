@@ -66,6 +66,7 @@ public:
 
     /// Computes an account address from a specified PubKey.
     static Address GetAddressFromPublicKey(const PubKey& pubKey);
+<<<<<<< HEAD
 
     friend inline std::ostream& operator<<(std::ostream& _out,
                                            Account const& account);
@@ -74,6 +75,11 @@ public:
     {
         return m_balance == rhs.GetBalance() && m_nonce == rhs.GetNonce();
     }
+=======
+
+    friend inline std::ostream& operator<<(std::ostream& _out,
+                                           Account const& account);
+>>>>>>> initial code for ds viewchange
 };
 
 inline std::ostream& operator<<(std::ostream& _out, Account const& account)

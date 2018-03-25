@@ -138,9 +138,14 @@ bool Node::ProcessMicroblockConsensus(const vector<unsigned char>& message,
                       << std::setw(15) << std::left
                       << m_mediator.m_selfPeer.GetPrintableIPAddress() << "]["
                       << m_mediator.m_currentEpochNum << "] DONE");
+<<<<<<< HEAD
 #endif // STAT_TEST
 
             // Multicast micro block to all DS nodes
+=======
+#endif // STAT_TEST                                                            \
+    // Multicast micro block to all DS nodes
+>>>>>>> initial code for ds viewchange
             SubmitMicroblockToDSCommittee();
         }
 

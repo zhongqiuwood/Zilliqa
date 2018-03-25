@@ -66,7 +66,11 @@ void SendDSBlockFirstToMatchDSBlockNum(Peer& lookup_node)
     std::pair<PrivKey, PubKey> pubKey1 = Schnorr::GetInstance().GenKeyPair();
 
     DSBlockHeader header1(20, prevHash1, 12344, pubKey1.first, pubKey1.second,
+<<<<<<< HEAD
                           0, 789);
+=======
+                          0, 789, 0);
+>>>>>>> initial code for ds viewchange
 
     DSBlock dsblock(header1, signature1);
 
@@ -132,7 +136,11 @@ BOOST_AUTO_TEST_CASE(testTxBlockStoring)
 
     TxBlockHeader header(TXBLOCKTYPE::FINAL, BLOCKVERSION::VERSION1, 1, 1,
                          BlockHash(), 0, get_time_as_int(), TxnHash(),
+<<<<<<< HEAD
                          StateHash(), 0, 5, pubKey1.second, 0, BlockHash());
+=======
+                         StateHash(), 0, 5, pubKey1.second, 0, BlockHash(), 0);
+>>>>>>> initial code for ds viewchange
 
     array<unsigned char, BLOCK_SIG_SIZE> emptySig{};
 

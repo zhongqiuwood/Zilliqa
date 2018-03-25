@@ -427,7 +427,11 @@ double Server::GetTxBlockRate()
         }
     }
     boost::multiprecision::uint256_t TimeDiff
+<<<<<<< HEAD
         = m_mediator.m_txBlockChain.GetLastBlock().GetHeader().GetTimestamp()
+=======
+        = m_mediator.m_dsBlockChain.GetLastBlock().GetHeader().GetTimestamp()
+>>>>>>> initial code for ds viewchange
         - m_StartTimeTx;
 
     if (TimeDiff == 0)
