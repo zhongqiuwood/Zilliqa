@@ -57,6 +57,3 @@ script:
     else
       ctest;
     fi
-
-matrix:
-  fast_finish: true
