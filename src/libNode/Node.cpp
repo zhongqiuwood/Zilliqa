@@ -1047,8 +1047,7 @@ void Node::SubmitTransactions()
             return true;
         };
 
-        // submit the created ones first, then the prefilled ones
-        if (findOneFromCreated(t) || findOneFromPrefilled(t))
+        auto submitOne = [this, &blockNum](Transaction &t)
         {
             vector<unsigned char> tx_message
                 = {MessageType::NODE, NodeInstructionType::SUBMITTRANSACTION};
@@ -1065,6 +1064,15 @@ void Node::SubmitTransactions()
             lock_guard<mutex> g(m_mutexSubmittedTransactions);
             auto& submittedTransactions = m_submittedTransactions[blockNum];
             submittedTransactions.insert(make_pair(t.GetTranID(), t));
+        };
+
+        if (findOneFromCreated(t))
+        {
+            submitOne(t);
+        }
+        else if (findOneFromPrefilled(t))
+        {
+            submitOne(t);
             txn_sent_count++;
         }
     }
