@@ -62,11 +62,13 @@ add_compile_options(-Werror)
 # add_compile_options(-Wextra) #TODO: enable it
 
 add_subdirectory (src)
+add_subdirectory (daemon)
 
 if(TESTS)
     enable_testing()
     add_subdirectory(tests)
 endif()
+
 
 # add clang-format and clang-tidy targets lastly
 include(LLVMExtraTools)
