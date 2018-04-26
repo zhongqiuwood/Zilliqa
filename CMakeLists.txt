@@ -73,6 +73,5 @@ if(TESTS)
     add_subdirectory(tests)
 endif()
 
-
 # add clang-format and clang-tidy targets lastly
 include(LLVMExtraTools)
