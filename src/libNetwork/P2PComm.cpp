@@ -595,7 +595,7 @@ void P2PComm::StartMessagePump(
         return;
     }
 
-    listen(serv_sock, 5000);
+    listen(serv_sock, 10000);
 
     struct event_base* base = event_base_new();
     struct event ev;
