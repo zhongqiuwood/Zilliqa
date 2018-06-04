@@ -43,19 +43,13 @@ BOOST_AUTO_TEST_CASE(test1)
 
     Address toAddr;
 
-    Mediator* m = nullptr;
-    unique_ptr<ValidatorBase> m_validator = make_unique<Validator>(*m);
+    NoopMediator nm;
+    DefaultAccountStoreView dasv;
+    unique_ptr<ValidatorBase> m_validator = make_unique<Validator>(nm, dasv);
 
     for (unsigned int i = 0; i < toAddr.asArray().size(); i++)
     {
         toAddr.asArray().at(i) = i + 4;
-    }
-
-    Address fromAddr;
-
-    for (unsigned int i = 0; i < fromAddr.asArray().size(); i++)
-    {
-        fromAddr.asArray().at(i) = i + 8;
     }
 
     KeyPair sender = Schnorr::GetInstance().GenKeyPair();
