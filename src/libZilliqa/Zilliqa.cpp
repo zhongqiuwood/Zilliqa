@@ -84,9 +84,7 @@ Zilliqa::Zilliqa(const std::pair<PrivKey, PubKey>& key, const Peer& peer,
 
     LogSelfNodeInfo(key, peer);
 
-#ifdef STAT_TEST
     P2PComm::GetInstance().SetSelfPeer(peer);
-#endif // STAT_TEST
 
     switch (syncType)
     {
