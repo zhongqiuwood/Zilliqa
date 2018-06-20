@@ -38,15 +38,16 @@ unsigned int MediatorAdapter::getNumShards() const
 {
     return m_mediator.m_node->getNumShards();
 }
-const char* MediatorAdapter::currentEpochNumAsString() const
+
+string MediatorAdapter::currentEpochNumAsString() const
 {
-    return to_string(m_mediator.m_currentEpochNum).c_str();
+    return to_string(m_mediator.m_currentEpochNum);
 }
 
 NoopMediator::~NoopMediator() {}
 unsigned int NoopMediator::getShardID() const { return 0; }
 unsigned int NoopMediator::getNumShards() const { return 1; }
-const char* NoopMediator::currentEpochNumAsString() const { return "42"; }
+string NoopMediator::currentEpochNumAsString() const { return "42"; }
 
 DefaultAccountStoreView::~DefaultAccountStoreView() {}
 
@@ -126,7 +127,7 @@ bool Validator::checkCreatedTransactionCommon(const Transaction& tx,
         = Transaction::GetShardIndex(fromAddr, numShards);
     if (correct_shard != shardID)
     {
-        LOG_EPOCH(WARNING, m_mediator.currentEpochNumAsString(),
+        LOG_EPOCH(WARNING, m_mediator.currentEpochNumAsString().c_str(),
                   "This tx is not sharded to me!"
                       << " From Account  = 0x" << fromAddr
                       << " Correct shard = " << correct_shard
@@ -139,7 +140,7 @@ bool Validator::checkCreatedTransactionCommon(const Transaction& tx,
     // Check if from account exists in local storage
     if (!m_accountStoreView.DoesAccountExist(fromAddr))
     {
-        LOG_EPOCH(WARNING, m_mediator.currentEpochNumAsString(),
+        LOG_EPOCH(WARNING, m_mediator.currentEpochNumAsString().c_str(),
                   "fromAddr not found: " << fromAddr
                                          << ". Transaction rejected: "
                                          << tx.GetTranID());
@@ -164,7 +165,7 @@ bool Validator::checkCreatedTransactionCommon(const Transaction& tx,
     // Check if transaction amount is valid
     if (m_accountStoreView.GetBalance(fromAddr) < tx.GetAmount())
     {
-        LOG_EPOCH(WARNING, m_mediator.currentEpochNumAsString(),
+        LOG_EPOCH(WARNING, m_mediator.currentEpochNumAsString().c_str(),
                   "Insufficient funds in source account!"
                       << " From Account  = 0x" << fromAddr << " Balance = "
                       << m_accountStoreView.GetBalance(fromAddr)
@@ -189,7 +190,7 @@ bool Validator::checkFromAccountNonce(const Transaction& tx)
 
         if (tx.GetNonce() != m_accountStoreView.GetNonce(fromAddr) + 1)
         {
-            LOG_EPOCH(WARNING, m_mediator.currentEpochNumAsString(),
+            LOG_EPOCH(WARNING, m_mediator.currentEpochNumAsString().c_str(),
                       "Tx nonce not in line with account state!"
                           << " From Account = 0x" << fromAddr
                           << " Account Nonce = "
@@ -205,7 +206,7 @@ bool Validator::checkFromAccountNonce(const Transaction& tx)
     {
         if (tx.GetNonce() != m_txnNonceMap.at(fromAddr) + 1)
         {
-            LOG_EPOCH(WARNING, m_mediator.currentEpochNumAsString(),
+            LOG_EPOCH(WARNING, m_mediator.currentEpochNumAsString().c_str(),
                       "Tx nonce not in line with account state!"
                           << " From Account = 0x" << fromAddr
                           << " Account Nonce = " << m_txnNonceMap.at(fromAddr)

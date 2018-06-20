@@ -80,10 +80,7 @@ public:
 
     virtual unsigned int getNumShards() const override { return numShards; }
 
-    virtual const char* currentEpochNumAsString() const override
-    {
-        return "42";
-    }
+    virtual string currentEpochNumAsString() const override { return "42"; }
 
     virtual bool DoesAccountExist(const Address& address) override
     {

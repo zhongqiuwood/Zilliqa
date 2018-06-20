@@ -30,7 +30,7 @@ public:
     virtual ~MediatorView() {}
     virtual unsigned int getShardID() const = 0;
     virtual unsigned int getNumShards() const = 0;
-    virtual const char* currentEpochNumAsString() const = 0;
+    virtual std::string currentEpochNumAsString() const = 0;
 };
 
 class MediatorAdapter : public MediatorView
@@ -42,7 +42,7 @@ public:
     virtual ~MediatorAdapter();
     virtual unsigned int getShardID() const override;
     virtual unsigned int getNumShards() const override;
-    virtual const char* currentEpochNumAsString() const override;
+    virtual std::string currentEpochNumAsString() const override;
 };
 
 class NoopMediator : public MediatorView
@@ -51,7 +51,7 @@ public:
     virtual ~NoopMediator();
     virtual unsigned int getShardID() const override;
     virtual unsigned int getNumShards() const override;
-    virtual const char* currentEpochNumAsString() const override;
+    virtual std::string currentEpochNumAsString() const override;
 };
 
 class AccountStoreView
