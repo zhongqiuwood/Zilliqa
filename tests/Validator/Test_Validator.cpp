@@ -33,6 +33,15 @@ using namespace std;
 
 BOOST_AUTO_TEST_SUITE(validatortest)
 
+class NoopMediator : public MediatorView
+{
+public:
+    virtual ~NoopMediator() = default;
+    virtual unsigned int getShardID() const override { return 0; }
+    virtual unsigned int getNumShards() const override { return 1; }
+    virtual string currentEpochNumAsString() const override { return "42"; }
+};
+
 class TestBench : public MediatorView, public AccountStoreView
 {
 public:

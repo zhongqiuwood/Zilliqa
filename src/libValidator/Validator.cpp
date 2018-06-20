@@ -44,11 +44,6 @@ string MediatorAdapter::currentEpochNumAsString() const
     return to_string(m_mediator.m_currentEpochNum);
 }
 
-NoopMediator::~NoopMediator() {}
-unsigned int NoopMediator::getShardID() const { return 0; }
-unsigned int NoopMediator::getNumShards() const { return 1; }
-string NoopMediator::currentEpochNumAsString() const { return "42"; }
-
 DefaultAccountStoreView::~DefaultAccountStoreView() {}
 
 bool DefaultAccountStoreView::DoesAccountExist(const Address& address)

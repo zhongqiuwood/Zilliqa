@@ -45,15 +45,6 @@ public:
     virtual std::string currentEpochNumAsString() const override;
 };
 
-class NoopMediator : public MediatorView
-{
-public:
-    virtual ~NoopMediator();
-    virtual unsigned int getShardID() const override;
-    virtual unsigned int getNumShards() const override;
-    virtual std::string currentEpochNumAsString() const override;
-};
-
 class AccountStoreView
 {
 public:
