@@ -49,6 +49,7 @@ public:
 #endif
         _jobsLeft(0)
         , _bailout(false)
+        , poolName(poolName)
     {
         _threads.reserve(threadCount);
         for (unsigned int index = 0; index < threadCount; ++index)

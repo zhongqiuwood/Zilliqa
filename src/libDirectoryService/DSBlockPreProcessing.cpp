@@ -147,8 +147,9 @@ bool DirectoryService::RunConsensusOnDSBlockWhenDSPrimary()
     return true;
 }
 
-bool DirectoryService::DSBlockValidator(const vector<unsigned char>& dsblock,
-                                        std::vector<unsigned char>& errorMsg)
+bool DirectoryService::DSBlockValidator(
+    const vector<unsigned char>& dsblock,
+    [[gnu::unused]] std::vector<unsigned char>& errorMsg)
 {
     LOG_MARKER();
 

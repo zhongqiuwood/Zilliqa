@@ -190,7 +190,7 @@ const Transaction JSONConversion::convertJsontoTx(const Json::Value& _json)
     return tx1;
 }
 
-const bool JSONConversion::checkJsonTx(const Json::Value& _json)
+bool JSONConversion::checkJsonTx(const Json::Value& _json)
 {
     bool ret = true;
 

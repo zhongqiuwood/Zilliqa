@@ -295,7 +295,8 @@ void DirectoryService::ScheduleShardingConsensus(const unsigned int wait_window)
 }
 
 void DirectoryService::ProcessDSBlockConsensusWhenDone(
-    const vector<unsigned char>& message, unsigned int offset)
+    [[gnu::unused]] const vector<unsigned char>& message,
+    [[gnu::unused]] unsigned int offset)
 {
     LOG_EPOCH(INFO, to_string(m_mediator.m_currentEpochNum).c_str(),
               "DS block consensus is DONE!!!");
@@ -415,7 +416,8 @@ void DirectoryService::ProcessDSBlockConsensusWhenDone(
 #endif // IS_LOOKUP_NODE
 
 bool DirectoryService::ProcessDSBlockConsensus(
-    const vector<unsigned char>& message, unsigned int offset, const Peer& from)
+    [[gnu::unused]] const vector<unsigned char>& message,
+    [[gnu::unused]] unsigned int offset, [[gnu::unused]] const Peer& from)
 {
 #ifndef IS_LOOKUP_NODE
     LOG_MARKER();

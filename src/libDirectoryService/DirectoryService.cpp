@@ -813,8 +813,9 @@ bool DirectoryService::CheckState(Action action)
 }
 #endif // IS_LOOKUP_NODE
 
-bool DirectoryService::ProcessSetPrimary(const vector<unsigned char>& message,
-                                         unsigned int offset, const Peer& from)
+bool DirectoryService::ProcessSetPrimary(
+    [[gnu::unused]] const vector<unsigned char>& message,
+    [[gnu::unused]] unsigned int offset, [[gnu::unused]] const Peer& from)
 {
 #ifndef IS_LOOKUP_NODE
     // Note: This function should only be invoked during bootstrap sequence
@@ -996,9 +997,9 @@ void DirectoryService::SetState(DirState state)
               "DS State is now " << m_state);
 }
 
-vector<Peer>
-DirectoryService::GetBroadcastList(unsigned char ins_type,
-                                   const Peer& broadcast_originator)
+vector<Peer> DirectoryService::GetBroadcastList(
+    [[gnu::unused]] unsigned char ins_type,
+    [[gnu::unused]] const Peer& broadcast_originator)
 {
     LOG_MARKER();
 
@@ -1079,7 +1080,8 @@ bool DirectoryService::ProcessAllPoWConnRequest(
 }
 
 bool DirectoryService::ProcessAllPoWConnResponse(
-    const vector<unsigned char>& message, unsigned int offset, const Peer& from)
+    const vector<unsigned char>& message, unsigned int offset,
+    [[gnu::unused]] const Peer& from)
 {
     LOG_MARKER();
     LOG_EPOCH(INFO, to_string(m_mediator.m_currentEpochNum).c_str(),
@@ -1191,7 +1193,8 @@ bool DirectoryService::ProcessLastDSBlockRequest(
 }
 
 bool DirectoryService::ProcessLastDSBlockResponse(
-    const vector<unsigned char>& message, unsigned int offset, const Peer& from)
+    const vector<unsigned char>& message, unsigned int offset,
+    [[gnu::unused]] const Peer& from)
 {
     LOG_MARKER();
 
@@ -1335,7 +1338,7 @@ bool DirectoryService::FinishRejoinAsDS()
 }
 #endif // IS_LOOKUP_NODE
 
-bool DirectoryService::ToBlockMessage(unsigned char ins_byte)
+bool DirectoryService::ToBlockMessage([[gnu::unused]] unsigned char ins_byte)
 {
     if (m_mediator.m_lookup->m_syncType != SyncType::NO_SYNC)
     {
