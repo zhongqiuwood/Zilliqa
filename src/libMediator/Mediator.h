@@ -20,8 +20,7 @@
 #include <deque>
 
 #include "libCrypto/Schnorr.h"
-#include "libData/BlockChainData/DSBlockChain.h"
-#include "libData/BlockChainData/TxBlockChain.h"
+#include "libData/BlockChainData/BlockChain.h"
 #include "libDirectoryService/DirectoryService.h"
 #include "libLookup/Lookup.h"
 #include "libNetwork/Peer.h"
@@ -62,16 +61,12 @@ public:
     // DS committee members
     // Fixed-sized double-ended queue depending on size of DS committee at bootstrap
     // Leader is at head of queue
-    // PoW1 winner will be pushed in at head of queue (new leader)
+    // PoW winner will be pushed in at head of queue (new leader)
     // Oldest member will be pushed out from tail of queue
 
-    /// The current members of the DS committee.
-    std::deque<Peer> m_DSCommitteeNetworkInfo;
-    std::mutex m_mutexDSCommitteeNetworkInfo;
-
-    /// The public keys of the DS committee members.
-    std::deque<PubKey> m_DSCommitteePubKeys;
-    std::mutex m_mutexDSCommitteePubKeys;
+    /// The public keys and current members of the DS committee.
+    std::deque<pair<PubKey, Peer>> m_DSCommittee;
+    std::mutex m_mutexDSCommittee;
 
     /// The current epoch randomness from the DS blockchain.
     std::array<unsigned char, POW_SIZE> m_dsBlockRand;

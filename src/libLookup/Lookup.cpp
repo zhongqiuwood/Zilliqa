@@ -34,8 +34,7 @@
 #include "libData/AccountData/Account.h"
 #include "libData/AccountData/AccountStore.h"
 #include "libData/AccountData/Transaction.h"
-#include "libData/BlockChainData/DSBlockChain.h"
-#include "libData/BlockChainData/TxBlockChain.h"
+#include "libData/BlockChainData/BlockChain.h"
 #include "libData/BlockData/Block.h"
 #include "libMediator/Mediator.h"
 #include "libNetwork/P2PComm.h"
@@ -92,7 +91,7 @@ void Lookup::SetLookupNodes()
             inet_aton(v.second.get<string>("ip").c_str(), &ip_addr);
             Peer lookup_node((uint128_t)ip_addr.s_addr,
                              v.second.get<uint32_t>("port"));
-            m_lookupNodes.push_back(lookup_node);
+            m_lookupNodes.emplace_back(lookup_node);
         }
     }
 }
@@ -119,7 +118,7 @@ void Lookup::SendMessageToLookupNodes(
                                                 << ":"
                                                 << node.m_listenPortHost);
 
-        allLookupNodes.push_back(node);
+        allLookupNodes.emplace_back(node);
     }
 
     P2PComm::GetInstance().SendBroadcastMessage(allLookupNodes, message);
@@ -140,7 +139,7 @@ void Lookup::SendMessageToLookupNodesSerial(
                                                 << ":"
                                                 << node.m_listenPortHost);
 
-        allLookupNodes.push_back(node);
+        allLookupNodes.emplace_back(node);
     }
 
     P2PComm::GetInstance().SendMessage(allLookupNodes, message);
@@ -373,10 +372,7 @@ bool Lookup::SetDSCommitteInfo()
     ptree pt;
     read_xml("config.xml", pt);
 
-    lock(m_mediator.m_mutexDSCommitteeNetworkInfo,
-         m_mediator.m_mutexDSCommitteePubKeys);
-    lock_guard<mutex> g(m_mediator.m_mutexDSCommitteeNetworkInfo, adopt_lock);
-    lock_guard<mutex> g2(m_mediator.m_mutexDSCommitteePubKeys, adopt_lock);
+    lock_guard<mutex> g(m_mediator.m_mutexDSCommittee);
 
     for (ptree::value_type const& v : pt.get_child("nodes"))
     {
@@ -385,13 +381,12 @@ bool Lookup::SetDSCommitteInfo()
             PubKey key(
                 DataConversion::HexStrToUint8Vec(v.second.get<string>("pubk")),
                 0);
-            m_mediator.m_DSCommitteePubKeys.push_back(key);
 
             struct in_addr ip_addr;
             inet_aton(v.second.get<string>("ip").c_str(), &ip_addr);
             Peer peer((uint128_t)ip_addr.s_addr,
                       v.second.get<unsigned int>("port"));
-            m_mediator.m_DSCommitteeNetworkInfo.push_back(peer);
+            m_mediator.m_DSCommittee.emplace_back(make_pair(key, peer));
         }
     }
 
@@ -464,7 +459,7 @@ bool Lookup::ProcessEntireShardingStructure(
             return false;
         }
 
-        m_shards.push_back(map<PubKey, Peer>());
+        m_shards.emplace_back();
 
         // 4-byte shard size
         uint32_t shard_size = Serializable::GetNumber<uint32_t>(
@@ -502,10 +497,10 @@ bool Lookup::ProcessEntireShardingStructure(
 
             offset += IP_SIZE + PORT_SIZE;
 
-            shard.insert(make_pair(key, peer));
+            shard.emplace(key, peer);
 
-            m_nodesInNetwork.push_back(peer);
-            t_nodesInNetwork.insert(peer);
+            m_nodesInNetwork.emplace_back(peer);
+            t_nodesInNetwork.emplace(peer);
 
             LOG_GENERAL(INFO,
                         "[SHARD "
@@ -653,43 +648,31 @@ bool Lookup::ProcessGetDSInfoFromSeed(const vector<unsigned char>& message,
     //#ifndef IS_LOOKUP_NODE
     // Message = [Port]
     LOG_MARKER();
-
-    deque<PubKey> dsPubKeys;
-    deque<Peer> dsPeers;
-    {
-        lock(m_mediator.m_mutexDSCommitteeNetworkInfo,
-             m_mediator.m_mutexDSCommitteePubKeys);
-        lock_guard<mutex> g(m_mediator.m_mutexDSCommitteeNetworkInfo,
-                            adopt_lock);
-        lock_guard<mutex> g2(m_mediator.m_mutexDSCommitteePubKeys, adopt_lock);
-
-        dsPubKeys = m_mediator.m_DSCommitteePubKeys;
-        dsPeers
-            = m_mediator
-                  .m_DSCommitteeNetworkInfo; // Data::GetInstance().GetDSPeers();
-    }
-
     // dsInfoMessage = [num_ds_peers][DSPeer][DSPeer]... num_ds_peers times
     vector<unsigned char> dsInfoMessage
         = {MessageType::LOOKUP, LookupInstructionType::SETDSINFOFROMSEED};
     unsigned int curr_offset = MessageOffset::BODY;
 
-    Serializable::SetNumber<uint32_t>(dsInfoMessage, curr_offset,
-                                      dsPeers.size(), sizeof(uint32_t));
-    curr_offset += sizeof(uint32_t);
-
-    for (unsigned int i = 0; i < dsPeers.size(); i++)
     {
-        PubKey& pubKey = dsPubKeys.at(i);
-        pubKey.Serialize(dsInfoMessage, curr_offset);
-        curr_offset += (PUB_KEY_SIZE);
+        lock_guard<mutex> g(m_mediator.m_mutexDSCommittee);
+        Serializable::SetNumber<uint32_t>(dsInfoMessage, curr_offset,
+                                          m_mediator.m_DSCommittee.size(),
+                                          sizeof(uint32_t));
+        curr_offset += sizeof(uint32_t);
 
-        Peer& peer = dsPeers.at(i);
-        peer.Serialize(dsInfoMessage, curr_offset);
-        curr_offset += (IP_SIZE + PORT_SIZE);
+        for (unsigned int i = 0; i < m_mediator.m_DSCommittee.size(); i++)
+        {
+            PubKey& pubKey = m_mediator.m_DSCommittee.at(i).first;
+            pubKey.Serialize(dsInfoMessage, curr_offset);
+            curr_offset += (PUB_KEY_SIZE);
 
-        LOG_EPOCH(INFO, to_string(m_mediator.m_currentEpochNum).c_str(),
-                  "IP:" << peer.GetPrintableIPAddress());
+            Peer& peer = m_mediator.m_DSCommittee.at(i).second;
+            peer.Serialize(dsInfoMessage, curr_offset);
+            curr_offset += (IP_SIZE + PORT_SIZE);
+
+            LOG_EPOCH(INFO, to_string(m_mediator.m_currentEpochNum).c_str(),
+                      "IP:" << peer.GetPrintableIPAddress());
+        }
     }
 
     if (IsMessageSizeInappropriate(message.size(), offset, sizeof(uint32_t)))
@@ -713,7 +696,7 @@ bool Lookup::ProcessGetDSInfoFromSeed(const vector<unsigned char>& message,
     // and ensure 2/3 of such identical message is received in order to move on.
 
     // vector<Peer> node;
-    // node.push_back(requestingNode);
+    // node.emplace_back(requestingNode);
 
     P2PComm::GetInstance().SendMessage(requestingNode, dsInfoMessage);
 
@@ -828,7 +811,7 @@ bool Lookup::ProcessGetDSBlockFromSeed(const vector<unsigned char>& message,
     // and ensure 2/3 of such identical message is received in order to move on.
 
     // vector<Peer> node;
-    // node.push_back(requestingNode);
+    // node.emplace_back(requestingNode);
 
     P2PComm::GetInstance().SendMessage(requestingNode, dsBlockMessage);
 
@@ -881,7 +864,7 @@ bool Lookup::ProcessGetStateFromSeed(const vector<unsigned char>& message,
     // and ensure 2/3 of such identical message is received in order to move on.
 
     // vector<Peer> node;
-    // node.push_back(requestingNode);
+    // node.emplace_back(requestingNode);
 
     vector<unsigned char> setStateMessage
         = {MessageType::LOOKUP, LookupInstructionType::SETSTATEFROMSEED};
@@ -1002,7 +985,7 @@ bool Lookup::ProcessGetTxBlockFromSeed(const vector<unsigned char>& message,
     // and ensure 2/3 of such identical message is received in order to move on.
 
     // vector<Peer> node;
-    // node.push_back(requestingNode);
+    // node.emplace_back(requestingNode);
 
     P2PComm::GetInstance().SendMessage(requestingNode, txBlockMessage);
 
@@ -1057,7 +1040,7 @@ bool Lookup::ProcessGetTxBodyFromSeed(const vector<unsigned char>& message,
     // and ensure 2/3 of such identical message is received in order to move on.
 
     // vector<Peer> node;
-    // node.push_back(requestingNode);
+    // node.emplace_back(requestingNode);
 
     P2PComm::GetInstance().SendMessage(requestingNode, txBodyMessage);
 
@@ -1097,7 +1080,7 @@ bool Lookup::ProcessGetNetworkId(const vector<unsigned char>& message,
     // and ensure 2/3 of such identical message is received in order to move on.
 
     // vector<Peer> node;
-    // node.push_back(requestingNode);
+    // node.emplace_back(requestingNode);
 
     P2PComm::GetInstance().SendMessage(requestingNode, networkIdMessage);
 
@@ -1130,7 +1113,7 @@ bool Lookup::ProcessSetSeedPeersFromLookup(const vector<unsigned char>& message,
             return false;
         }
 
-        m_seedNodes.push_back(peer);
+        m_seedNodes.emplace_back(peer);
         LOG_GENERAL(INFO, "Peer " + to_string(i) + ": " << string(peer));
         offset += (IP_SIZE + PORT_SIZE);
     }
@@ -1167,12 +1150,13 @@ bool Lookup::ProcessSetDSInfoFromSeed(const vector<unsigned char>& message,
         return false;
     }
 
-    deque<PubKey> dsPubKeys;
-    deque<Peer> dsPeers;
+    lock_guard<mutex> g(m_mediator.m_mutexDSCommittee);
+    m_mediator.m_DSCommittee.clear();
 
     for (unsigned int i = 0; i < numDSPeers; i++)
     {
-        dsPubKeys.push_back(PubKey(message, offset));
+        PubKey pubkey(message, offset);
+
         offset += PUB_KEY_SIZE;
 
         Peer peer(message, offset);
@@ -1182,22 +1166,12 @@ bool Lookup::ProcessSetDSInfoFromSeed(const vector<unsigned char>& message,
         {
             peer = Peer();
         }
-        dsPeers.push_back(peer);
+
+        m_mediator.m_DSCommittee.emplace_back(make_pair(pubkey, peer));
 
         LOG_EPOCH(INFO, to_string(m_mediator.m_currentEpochNum).c_str(),
                   "ProcessSetDSInfoFromSeed recvd peer " << i << ": " << peer);
     }
-
-    {
-        lock(m_mediator.m_mutexDSCommitteeNetworkInfo,
-             m_mediator.m_mutexDSCommitteePubKeys);
-        lock_guard<mutex> g(m_mediator.m_mutexDSCommitteeNetworkInfo,
-                            adopt_lock);
-        lock_guard<mutex> g2(m_mediator.m_mutexDSCommitteePubKeys, adopt_lock);
-        m_mediator.m_DSCommitteePubKeys = dsPubKeys;
-        m_mediator.m_DSCommitteeNetworkInfo = dsPeers;
-    }
-
         //    Data::GetInstance().SetDSPeers(dsPeers);
         //#endif // IS_LOOKUP_NODE
 
@@ -1451,7 +1425,10 @@ bool Lookup::ProcessSetTxBlockFromSeed(const vector<unsigned char>& message,
         }
 
         m_mediator.m_currentEpochNum
-            = (uint64_t)m_mediator.m_txBlockChain.GetBlockCount();
+            = (uint64_t)m_mediator.m_txBlockChain.GetLastBlock()
+                  .GetHeader()
+                  .GetBlockNum()
+            + 1;
         m_mediator.UpdateTxBlockRand();
 
         if (m_mediator.m_currentEpochNum % NUM_FINAL_BLOCK_PER_POW == 0)
@@ -1513,7 +1490,7 @@ bool Lookup::ProcessSetStateFromSeed(const vector<unsigned char>& message,
             {
                 if (cv_dsInfoUpdate.wait_for(
                         lock,
-                        chrono::seconds(POW1_WINDOW_IN_SECONDS
+                        chrono::seconds(POW_WINDOW_IN_SECONDS
                                         + BACKUP_POW2_WINDOW_IN_SECONDS))
                     == std::cv_status::timeout)
                 {
@@ -1648,9 +1625,6 @@ bool Lookup::InitMining()
         }
     }
 
-    m_mediator.m_currentEpochNum
-        = (uint64_t)m_mediator.m_txBlockChain.GetBlockCount();
-
     // General check
     if (m_mediator.m_currentEpochNum % NUM_FINAL_BLOCK_PER_POW != 0)
     {
@@ -1669,19 +1643,6 @@ bool Lookup::InitMining()
     auto dsBlockRand = m_mediator.m_dsBlockRand;
     array<unsigned char, 32> txBlockRand{};
 
-    // if (m_mediator.m_currentEpochNum / NUM_FINAL_BLOCK_PER_POW == curDsBlockNum)
-    // {
-    //     // DS block for the epoch has not been generated.
-    //     // Attempt PoW1
-    //     m_mediator.UpdateTxBlockRand();
-    //     dsBlockRand = m_mediator.m_dsBlockRand;
-
-    //     m_mediator.m_node->SetState(Node::POW1_SUBMISSION);
-    //     POW::GetInstance().EthashConfigureLightClient((uint64_t)m_mediator.m_dsBlockChain.GetBlockCount());
-    //     m_mediator.m_node->StartPoW1(m_mediator.m_dsBlockChain.GetBlockCount(),
-    //                                     POW1_DIFFICULTY, dsBlockRand, m_mediator.m_txBlockRand);
-    // }
-    //else if
     if (m_mediator.m_currentEpochNum / NUM_FINAL_BLOCK_PER_POW
         == curDsBlockNum - 1)
     {
@@ -1766,7 +1727,7 @@ bool Lookup::ProcessSetLookupOffline(const vector<unsigned char>& message,
                               requestingNode);
         if (iter != m_lookupNodes.end())
         {
-            m_lookupNodesOffline.push_back(requestingNode);
+            m_lookupNodesOffline.emplace_back(requestingNode);
             m_lookupNodes.erase(iter);
         }
         else
@@ -1803,7 +1764,7 @@ bool Lookup::ProcessSetLookupOnline(const vector<unsigned char>& message,
                               m_lookupNodesOffline.end(), requestingNode);
         if (iter != m_lookupNodes.end())
         {
-            m_lookupNodes.push_back(requestingNode);
+            m_lookupNodes.emplace_back(requestingNode);
             m_lookupNodesOffline.erase(iter);
         }
         else
@@ -1837,7 +1798,7 @@ bool Lookup::ProcessGetOfflineLookups(const std::vector<unsigned char>& message,
     LOG_GENERAL(INFO, requestingNode);
 
     // vector<Peer> node;
-    // node.push_back(requestingNode);
+    // node.emplace_back(requestingNode);
 
     // curLookupMessage = [num_offline_lookups][LookupPeer][LookupPeer]... num_offline_lookups times
     vector<unsigned char> offlineLookupsMessage
@@ -1901,7 +1862,7 @@ bool Lookup::ProcessSetOfflineLookups(const std::vector<unsigned char>& message,
         auto iter = std::find(m_lookupNodes.begin(), m_lookupNodes.end(), peer);
         if (iter != m_lookupNodes.end())
         {
-            m_lookupNodesOffline.push_back(peer);
+            m_lookupNodesOffline.emplace_back(peer);
             m_lookupNodes.erase(iter);
 
             LOG_EPOCH(INFO, to_string(m_mediator.m_currentEpochNum).c_str(),
@@ -1950,7 +1911,7 @@ Peer Lookup::GetLookupPeerToRsync()
     {
         if (p != m_mediator.m_selfPeer)
         {
-            t_Peers.push_back(p);
+            t_Peers.emplace_back(p);
         }
     }
 
@@ -2002,7 +1963,7 @@ bool Lookup::GetMyLookupOffline()
                           m_mediator.m_selfPeer);
     if (iter != m_lookupNodes.end())
     {
-        m_lookupNodesOffline.push_back(m_mediator.m_selfPeer);
+        m_lookupNodesOffline.emplace_back(m_mediator.m_selfPeer);
         m_lookupNodes.erase(iter);
     }
     else
@@ -2024,7 +1985,7 @@ bool Lookup::GetMyLookupOnline()
     if (iter != m_lookupNodesOffline.end())
     {
         SendMessageToLookupNodesSerial(ComposeGetLookupOnlineMessage());
-        m_lookupNodes.push_back(m_mediator.m_selfPeer);
+        m_lookupNodes.emplace_back(m_mediator.m_selfPeer);
         m_lookupNodesOffline.erase(iter);
     }
     else
