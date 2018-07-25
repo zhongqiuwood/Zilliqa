@@ -396,8 +396,8 @@ bool ConsensusLeader::ProcessMessageCommitCore(
         // 33-byte commit
         if (m_commitCounter < m_numForConsensus)
         {
-            m_commitPoints.push_back(
-                CommitPoint(commit, curr_offset - COMMIT_POINT_SIZE));
+            m_commitPoints.emplace_back(commit,
+                                        curr_offset - COMMIT_POINT_SIZE);
             m_commitPointMap.at(backup_id)
                 = CommitPoint(commit, curr_offset - COMMIT_POINT_SIZE);
             m_commitMap.at(backup_id) = true;
@@ -434,7 +434,7 @@ bool ConsensusLeader::ProcessMessageCommitCore(
 
                 // Add the leader to the responses
                 Response r(*m_commitSecret, m_challenge, m_myPrivKey);
-                m_responseData.push_back(r);
+                m_responseData.emplace_back(r);
                 m_responseDataMap.at(m_myID) = r;
                 m_responseMap.at(m_myID) = true;
                 m_responseCounter = 1;
@@ -443,12 +443,14 @@ bool ConsensusLeader::ProcessMessageCommitCore(
                 // =================================================
 
                 vector<Peer> commit_peers;
-                deque<Peer>::const_iterator j = m_peerInfo.begin();
+                deque<pair<PubKey, Peer>>::const_iterator j
+                    = m_committee.begin();
+
                 for (unsigned int i = 0; i < m_commitMap.size(); i++, j++)
                 {
                     if ((m_commitMap.at(i) == true) && (i != m_myID))
                     {
-                        commit_peers.push_back(*j);
+                        commit_peers.emplace_back(j->second);
                     }
                 }
 
@@ -523,7 +525,7 @@ bool ConsensusLeader::ProcessMessageCommitCore(
                 {
                     if ((m_commitMap.at(i) == true) && (m_responseMap.at(i) == true))
                     {
-                        m_commitPoints.push_back(m_commitPointMap.at(i));
+                        m_commitPoints.emplace_back(m_commitPointMap.at(i));
                         m_commitCounter++;
                     }
                     if ((m_commitMap.at(i) == true) && (m_responseMap.at(i) == false))
@@ -539,7 +541,7 @@ bool ConsensusLeader::ProcessMessageCommitCore(
                     {
                         if (m_commitRedundantMap.at(i) == true)
                         {
-                            m_commitPoints.push_back(m_commitRedundantPointMap.at(i));
+                            m_commitPoints.emplace_back(m_commitRedundantPointMap.at(i));
                             m_commitCounter++;
                             m_commitMap.at(i) = true;
                             m_commitRedundantMap.at(i) = false;
@@ -575,7 +577,7 @@ bool ConsensusLeader::ProcessMessageCommitCore(
                         {
                             if (m_commitMap.at(i) == true)
                             {
-                                commit_peers.push_back(m_peerInfo.at(i));
+                                commit_peers.emplace_back(m_peerInfo.at(i));
                             }
                         }
                         P2PComm::GetInstance().SendMessage(commit_peers, challenge);
@@ -680,8 +682,14 @@ bool ConsensusLeader::ProcessMessageCommitFailure(
 
         vector<unsigned char> consensusFailureMsg
             = {m_classByte, m_insByte, CONSENSUSFAILURE};
-        P2PComm::GetInstance().SendMessage(m_peerInfo, consensusFailureMsg);
+        deque<Peer> peerInfo;
 
+        for (auto const& i : m_committee)
+        {
+            peerInfo.push_back(i.second);
+        }
+
+        P2PComm::GetInstance().SendMessage(peerInfo, consensusFailureMsg);
         auto main_func = [this]() mutable -> void {
             m_shardCommitFailureHandlerFunc(m_commitFailureMap);
         };
@@ -706,7 +714,7 @@ bool ConsensusLeader::ProcessMessageCommitFailure(
         //     {
         //         if (m_commitMap.at(i) == true)
         //         {
-        //             commit_peers.push_back(*j);
+        //             commit_peers.emplace_back(*j);
         //         }
         //     }
         //     P2PComm::GetInstance().SendMessage(commit_peers, challenge);
@@ -889,7 +897,7 @@ bool ConsensusLeader::ProcessMessageResponseCore(
     curr_offset += RESPONSE_SIZE;
 
     if (MultiSig::VerifyResponse(tmp_response, m_challenge,
-                                 m_pubKeys.at(backup_id),
+                                 m_committee.at(backup_id).first,
                                  m_commitPointMap.at(backup_id))
         == false)
     {
@@ -926,7 +934,7 @@ bool ConsensusLeader::ProcessMessageResponseCore(
     }
 
     // 32-byte response
-    m_responseData.push_back(tmp_response);
+    m_responseData.emplace_back(tmp_response);
     m_responseDataMap.at(backup_id) = tmp_response;
     m_responseMap.at(backup_id) = true;
     m_responseCounter++;
@@ -972,7 +980,7 @@ bool ConsensusLeader::ProcessMessageResponseCore(
 
                 // Add the leader to the commits
                 m_commitMap.at(m_myID) = true;
-                m_commitPoints.push_back(*m_commitPoint);
+                m_commitPoints.emplace_back(*m_commitPoint);
                 m_commitPointMap.at(m_myID) = *m_commitPoint;
                 m_commitCounter = 1;
 
@@ -1004,7 +1012,14 @@ bool ConsensusLeader::ProcessMessageResponseCore(
             // }
             //this_thread::sleep_for(chrono::seconds(CONSENSUS_COSIG_WINDOW));
 
-            P2PComm::GetInstance().SendMessage(m_peerInfo, collectivesig);
+            deque<Peer> peerInfo;
+
+            for (auto const& i : m_committee)
+            {
+                peerInfo.push_back(i.second);
+            }
+
+            P2PComm::GetInstance().SendMessage(peerInfo, collectivesig);
         }
     }
 
@@ -1063,10 +1078,9 @@ bool ConsensusLeader::GenerateCollectiveSigMessage(
         m_state = ERROR;
 
         LOG_GENERAL(INFO,
-                    "num of pub keys: " << m_pubKeys.size() << " "
+                    "num of pub keys: " << m_committee.size() << " "
                                         << "num of peer_info keys: "
-                                        << m_peerInfo.size());
-
+                                        << m_committee.size());
         return false;
     }
 
@@ -1134,29 +1148,29 @@ bool ConsensusLeader::ProcessMessageFinalResponse(
 
 ConsensusLeader::ConsensusLeader(
     uint32_t consensus_id, const vector<unsigned char>& block_hash,
-    uint16_t node_id, const PrivKey& privkey, const deque<PubKey>& pubkeys,
-    const deque<Peer>& peer_info, unsigned char class_byte,
+    uint16_t node_id, const PrivKey& privkey,
+    const deque<pair<PubKey, Peer>>& committee, unsigned char class_byte,
     unsigned char ins_byte,
     NodeCommitFailureHandlerFunc nodeCommitFailureHandlerFunc,
     ShardCommitFailureHandlerFunc shardCommitFailureHandlerFunc)
-    : ConsensusCommon(consensus_id, block_hash, node_id, privkey, pubkeys,
-                      peer_info, class_byte, ins_byte)
-    , m_commitMap(pubkeys.size(), false)
-    , m_commitPointMap(pubkeys.size(), CommitPoint())
-    , m_commitRedundantMap(pubkeys.size(), false)
-    , m_commitRedundantPointMap(pubkeys.size(), CommitPoint())
-    , m_responseDataMap(pubkeys.size(), Response())
+    : ConsensusCommon(consensus_id, block_hash, node_id, privkey, committee,
+                      class_byte, ins_byte)
+    , m_commitMap(committee.size(), false)
+    , m_commitPointMap(committee.size(), CommitPoint())
+    , m_commitRedundantMap(committee.size(), false)
+    , m_commitRedundantPointMap(committee.size(), CommitPoint())
+    , m_responseDataMap(committee.size(), Response())
 {
     LOG_MARKER();
 
     m_state = INITIAL;
     // m_numForConsensus = (floor(TOLERANCE_FRACTION * (pubkeys.size() - 1)) + 1);
-    m_numForConsensus = ConsensusCommon::NumForConsensus(pubkeys.size());
-    m_numForConsensusFailure = pubkeys.size() - m_numForConsensus;
+    m_numForConsensus = ConsensusCommon::NumForConsensus(committee.size());
+    m_numForConsensusFailure = committee.size() - m_numForConsensus;
     LOG_GENERAL(INFO,
                 "TOLERANCE_FRACTION "
                     << TOLERANCE_FRACTION << " pubkeys.size() "
-                    << pubkeys.size() << " m_numForConsensus "
+                    << committee.size() << " m_numForConsensus "
                     << m_numForConsensus << " m_numForConsensusFailure "
                     << m_numForConsensusFailure);
 
@@ -1168,7 +1182,7 @@ ConsensusLeader::ConsensusLeader(
 
     // Add the leader to the commits
     m_commitMap.at(m_myID) = true;
-    m_commitPoints.push_back(*m_commitPoint);
+    m_commitPoints.emplace_back(*m_commitPoint);
     m_commitPointMap.at(m_myID) = *m_commitPoint;
     m_commitCounter = 1;
 }
@@ -1265,7 +1279,15 @@ bool ConsensusLeader::StartConsensus(const vector<unsigned char>& message,
     // Multicast to all nodes in the committee
     // =======================================
 
-    P2PComm::GetInstance().SendMessage(m_peerInfo, announcement);
+    deque<Peer> peer;
+
+    for (auto const& i : m_committee)
+    {
+        peer.push_back(i.second);
+    }
+
+    P2PComm::GetInstance().SendMessage(peer, announcement);
+
     return true;
 }
 

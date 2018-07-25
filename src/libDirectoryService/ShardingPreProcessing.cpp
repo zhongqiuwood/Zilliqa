@@ -56,7 +56,7 @@ void DirectoryService::ComputeSharding()
 
     for (unsigned int i = 0; i < numOfComms; i++)
     {
-        m_shards.push_back(map<PubKey, Peer>());
+        m_shards.emplace_back();
     }
 
     for (auto& kv : m_allPoW2s)
@@ -73,7 +73,7 @@ void DirectoryService::ComputeSharding()
         const vector<unsigned char>& sortHashVec = sha2.Finalize();
         array<unsigned char, BLOCK_HASH_SIZE> sortHash;
         copy(sortHashVec.begin(), sortHashVec.end(), sortHash.begin());
-        m_sortedPoW2s.insert(make_pair(sortHash, key));
+        m_sortedPoW2s.emplace(sortHash, key);
     }
 
     lock_guard<mutex> g(m_mutexAllPoWConns, adopt_lock);
@@ -82,8 +82,8 @@ void DirectoryService::ComputeSharding()
     {
         PubKey key = kv.second;
         map<PubKey, Peer>& shard = m_shards.at(i % numOfComms);
-        shard.insert(make_pair(key, m_allPoWConns.at(key)));
-        m_publicKeyToShardIdMap.insert(make_pair(key, i % numOfComms));
+        shard.emplace(key, m_allPoWConns.at(key));
+        m_publicKeyToShardIdMap.emplace(key, i % numOfComms);
         i++;
     }
 }
@@ -186,12 +186,12 @@ void DirectoryService::AppendSharingSetupToShardingStructure(
     LOG_MARKER();
 
     LOG_EPOCH(INFO, to_string(m_mediator.m_currentEpochNum).c_str(),
-              "debug " << m_mediator.m_DSCommitteeNetworkInfo.size() << " "
+              "debug " << m_mediator.m_DSCommittee.size() << " "
                        << TX_SHARING_CLUSTER_SIZE);
 
     uint32_t num_ds_nodes
-        = (m_mediator.m_DSCommitteeNetworkInfo.size() < TX_SHARING_CLUSTER_SIZE)
-        ? m_mediator.m_DSCommitteeNetworkInfo.size()
+        = (m_mediator.m_DSCommittee.size() < TX_SHARING_CLUSTER_SIZE)
+        ? m_mediator.m_DSCommittee.size()
         : TX_SHARING_CLUSTER_SIZE;
     Serializable::SetNumber<uint32_t>(sharding_structure, curr_offset,
                                       num_ds_nodes, sizeof(uint32_t));
@@ -201,10 +201,10 @@ void DirectoryService::AppendSharingSetupToShardingStructure(
 
     for (unsigned int i = 0; i < m_consensusMyID; i++)
     {
-        m_mediator.m_DSCommitteeNetworkInfo.at(i).Serialize(sharding_structure,
-                                                            curr_offset);
+        m_mediator.m_DSCommittee.at(i).second.Serialize(sharding_structure,
+                                                        curr_offset);
         LOG_EPOCH(INFO, to_string(m_mediator.m_currentEpochNum).c_str(),
-                  m_mediator.m_DSCommitteeNetworkInfo.at(i));
+                  m_mediator.m_DSCommittee.at(i).second);
         curr_offset += IP_SIZE + PORT_SIZE;
     }
 
@@ -217,10 +217,10 @@ void DirectoryService::AppendSharingSetupToShardingStructure(
 
     for (unsigned int i = m_consensusMyID + 1; i < num_ds_nodes; i++)
     {
-        m_mediator.m_DSCommitteeNetworkInfo.at(i).Serialize(sharding_structure,
-                                                            curr_offset);
+        m_mediator.m_DSCommittee.at(i).second.Serialize(sharding_structure,
+                                                        curr_offset);
         LOG_EPOCH(INFO, to_string(m_mediator.m_currentEpochNum).c_str(),
-                  m_mediator.m_DSCommitteeNetworkInfo.at(i));
+                  m_mediator.m_DSCommittee.at(i).second);
         curr_offset += IP_SIZE + PORT_SIZE;
     }
 
@@ -323,11 +323,11 @@ void DirectoryService::AppendSharingSetupToShardingStructure(
     {
         m_sharingAssignment.clear();
 
-        for (unsigned int i = num_ds_nodes;
-             i < m_mediator.m_DSCommitteeNetworkInfo.size(); i++)
+        for (unsigned int i = num_ds_nodes; i < m_mediator.m_DSCommittee.size();
+             i++)
         {
-            m_sharingAssignment.push_back(
-                m_mediator.m_DSCommitteeNetworkInfo.at(i));
+            m_sharingAssignment.emplace_back(
+                m_mediator.m_DSCommittee.at(i).second);
         }
     }
 }
@@ -373,8 +373,7 @@ bool DirectoryService::RunConsensusOnShardingWhenDSPrimary()
 
     m_consensusObject.reset(new ConsensusLeader(
         consensusID, m_consensusBlockHash, m_consensusMyID,
-        m_mediator.m_selfKey.first, m_mediator.m_DSCommitteePubKeys,
-        m_mediator.m_DSCommitteeNetworkInfo,
+        m_mediator.m_selfKey.first, m_mediator.m_DSCommittee,
         static_cast<unsigned char>(DIRECTORY),
         static_cast<unsigned char>(SHARDINGCONSENSUS),
         std::function<bool(const vector<unsigned char>&, unsigned int,
@@ -457,7 +456,7 @@ void DirectoryService::SaveTxnBodySharingAssignment(
     for (uint32_t i = 0; i < num_ds_nodes; i++)
     {
         // TODO: Handle exceptions
-        ds_receivers.push_back(Peer(sharding_structure, curr_offset));
+        ds_receivers.emplace_back(sharding_structure, curr_offset);
         curr_offset += IP_SIZE + PORT_SIZE;
 
         LOG_EPOCH(INFO, to_string(m_mediator.m_currentEpochNum).c_str(),
@@ -474,10 +473,9 @@ void DirectoryService::SaveTxnBodySharingAssignment(
     m_sharingAssignment.clear();
 
     if ((i_am_forwarder == true)
-        && (m_mediator.m_DSCommitteeNetworkInfo.size() > num_ds_nodes))
+        && (m_mediator.m_DSCommittee.size() > num_ds_nodes))
     {
-        for (unsigned int i = 0; i < m_mediator.m_DSCommitteeNetworkInfo.size();
-             i++)
+        for (unsigned int i = 0; i < m_mediator.m_DSCommittee.size(); i++)
         {
             bool is_a_receiver = false;
 
@@ -485,7 +483,7 @@ void DirectoryService::SaveTxnBodySharingAssignment(
             {
                 for (unsigned int j = 0; j < ds_receivers.size(); j++)
                 {
-                    if (m_mediator.m_DSCommitteeNetworkInfo.at(i)
+                    if (m_mediator.m_DSCommittee.at(i).second
                         == ds_receivers.at(j))
                     {
                         is_a_receiver = true;
@@ -497,8 +495,8 @@ void DirectoryService::SaveTxnBodySharingAssignment(
 
             if (is_a_receiver == false)
             {
-                m_sharingAssignment.push_back(
-                    m_mediator.m_DSCommitteeNetworkInfo.at(i));
+                m_sharingAssignment.emplace_back(
+                    m_mediator.m_DSCommittee.at(i).second);
             }
         }
     }
@@ -544,7 +542,7 @@ bool DirectoryService::ShardingValidator(
 
     for (unsigned int i = 0; i < numOfComms; i++)
     {
-        m_shards.push_back(map<PubKey, Peer>());
+        m_shards.emplace_back();
 
         // 4-byte committee size
         uint32_t shard_size = Serializable::GetNumber<uint32_t>(
@@ -591,8 +589,8 @@ bool DirectoryService::ShardingValidator(
             }
 
             // To-do: Should we check for a public key that's been assigned to more than 1 shard?
-            m_shards.back().insert(make_pair(memberPubkey, memberPeer->second));
-            m_publicKeyToShardIdMap.insert(make_pair(memberPubkey, i));
+            m_shards.back().emplace(memberPubkey, memberPeer->second);
+            m_publicKeyToShardIdMap.emplace(memberPubkey, i);
 
             LOG_EPOCH(INFO, to_string(m_mediator.m_currentEpochNum).c_str(),
                       " PubKey = "
@@ -635,8 +633,7 @@ bool DirectoryService::RunConsensusOnShardingWhenDSBackup()
 
     m_consensusObject.reset(new ConsensusBackup(
         consensusID, m_consensusBlockHash, m_consensusMyID, m_consensusLeaderID,
-        m_mediator.m_selfKey.first, m_mediator.m_DSCommitteePubKeys,
-        m_mediator.m_DSCommitteeNetworkInfo,
+        m_mediator.m_selfKey.first, m_mediator.m_DSCommittee,
         static_cast<unsigned char>(DIRECTORY),
         static_cast<unsigned char>(SHARDINGCONSENSUS), func));
 
@@ -678,9 +675,9 @@ void DirectoryService::RunConsensusOnSharding()
     {
         if (!RunConsensusOnShardingWhenDSPrimary())
         {
-            LOG_EPOCH(
-                WARNING, to_string(m_mediator.m_currentEpochNum).c_str(),
-                "Exception encountered with running sharding on ds leader");
+            LOG_EPOCH(WARNING, to_string(m_mediator.m_currentEpochNum).c_str(),
+                      "Error encountered with running sharding consensus "
+                      "as ds leader");
             // throw exception();
             return;
         }
@@ -689,25 +686,28 @@ void DirectoryService::RunConsensusOnSharding()
     {
         if (!RunConsensusOnShardingWhenDSBackup())
         {
-            LOG_EPOCH(
-                INFO, to_string(m_mediator.m_currentEpochNum).c_str(),
-                "Exception encountered with running sharding on ds backup")
+            LOG_EPOCH(INFO, to_string(m_mediator.m_currentEpochNum).c_str(),
+                      "Error encountered with running sharding consensus "
+                      "as ds backup")
             // throw exception();
             return;
         }
     }
 
     SetState(SHARDING_CONSENSUS);
+    cv_shardingConsensusObject.notify_all();
 
+    // View change will wait for timeout. If conditional variable is notified before timeout, the thread will return
+    // without triggering view change.
     std::unique_lock<std::mutex> cv_lk(m_MutexCVViewChangeSharding);
-
     if (cv_viewChangeSharding.wait_for(cv_lk,
                                        std::chrono::seconds(VIEWCHANGE_TIME))
         == std::cv_status::timeout)
     {
         LOG_EPOCH(INFO, to_string(m_mediator.m_currentEpochNum).c_str(),
                   "Initiated sharding structure consensus view change. ");
-        RunConsensusOnViewChange();
+        auto func = [this]() -> void { RunConsensusOnViewChange(); };
+        DetachedFunction(1, func);
     }
 }
 #endif // IS_LOOKUP_NODE
