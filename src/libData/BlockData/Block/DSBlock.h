@@ -36,6 +36,7 @@ public:
     /// Default constructor.
     DSBlock(); // creates a dummy invalid placeholder block -- blocknum is maxsize of uint256
 
+    void dump();
     /// Constructor for loading DS block information from a byte stream.
     DSBlock(const std::vector<unsigned char>& src, unsigned int offset);
 

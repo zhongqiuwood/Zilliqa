@@ -42,6 +42,7 @@ public:
     /// Default constructor.
     TxBlock(); // creates a dummy invalid placeholder block -- blocknum is maxsize of uint256
 
+    void dump();
     /// Constructor for loading Tx block information from a byte stream.
     TxBlock(const std::vector<unsigned char>& src, unsigned int offset);
 

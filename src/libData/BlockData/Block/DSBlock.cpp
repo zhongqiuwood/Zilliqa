@@ -60,10 +60,21 @@ unsigned int DSBlock::Serialize(vector<unsigned char>& dst,
     return size_needed;
 }
 
+void DSBlock::dump()
+{
+    LOG_GENERAL(INFO, "------------------------------------------------");
+    LOG_GENERAL(INFO, "DSBlock Num: " << m_header.GetBlockNum());
+    LOG_GENERAL(INFO, "GetMinerPubKey: " << m_header.GetMinerPubKey());
+    LOG_GENERAL(INFO, "GetLeaderPubKey: " << m_header.GetLeaderPubKey());
+    LOG_GENERAL(INFO, "GetDifficulty: " << m_header.GetDifficulty());
+    LOG_GENERAL(INFO, "GetNonce: " << m_header.GetNonce());
+    LOG_GENERAL(INFO, "GetPrevHash: " << m_header.GetPrevHash());
+    LOG_GENERAL(INFO, "GetTimestamp: " << m_header.GetTimestamp());
+}
+
 int DSBlock::Deserialize(const vector<unsigned char>& src, unsigned int offset)
 {
     // LOG_MARKER();
-
     try
     {
         DSBlockHeader header;

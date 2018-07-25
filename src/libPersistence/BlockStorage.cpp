@@ -257,7 +257,6 @@ bool BlockStorage::GetAllDSBlocks(std::list<DSBlockSharedPtr>& blocks)
     {
         string bns = it->key().ToString();
         boost::multiprecision::uint256_t blockNum(bns);
-        LOG_GENERAL(INFO, "blockNum: " << blockNum);
 
         string blockString = it->value().ToString();
         if (blockString.empty())
@@ -266,11 +265,13 @@ bool BlockStorage::GetAllDSBlocks(std::list<DSBlockSharedPtr>& blocks)
             delete it;
             return false;
         }
+        LOG_GENERAL(INFO, "DS blockNum: " << blockNum << ", block size: " << blockString.length());
 
         DSBlockSharedPtr block = DSBlockSharedPtr(new DSBlock(
             std::vector<unsigned char>(blockString.begin(), blockString.end()),
             0));
         blocks.push_back(block);
+
     }
 
     delete it;
@@ -294,7 +295,6 @@ bool BlockStorage::GetAllTxBlocks(std::list<TxBlockSharedPtr>& blocks)
     {
         string bns = it->key().ToString();
         boost::multiprecision::uint256_t blockNum(bns);
-        LOG_GENERAL(INFO, "blockNum: " << blockNum);
 
         string blockString = it->value().ToString();
         if (blockString.empty())
@@ -303,9 +303,12 @@ bool BlockStorage::GetAllTxBlocks(std::list<TxBlockSharedPtr>& blocks)
             delete it;
             return false;
         }
+        LOG_GENERAL(INFO, "Tx blockNum: " << blockNum << ", block size: " << blockString.length());
+
         TxBlockSharedPtr block = TxBlockSharedPtr(new TxBlock(
             std::vector<unsigned char>(blockString.begin(), blockString.end()),
             0));
+
         blocks.push_back(block);
     }
 
