@@ -66,8 +66,7 @@ void DirectoryService::StoreDSBlockToStorage()
         m_pendingDSBlock->GetHeader().GetBlockNum(), serializedDSBlock);
     BlockStorage::GetBlockStorage().PushBackTxBodyDB(
         m_pendingDSBlock->GetHeader().GetBlockNum());
-    m_latestActiveDSBlockNum
-        = m_pendingDSBlock->GetHeader().GetBlockNum().convert_to<uint64_t>();
+    m_latestActiveDSBlockNum = m_pendingDSBlock->GetHeader().GetBlockNum();
     BlockStorage::GetBlockStorage().PutMetadata(
         LATESTACTIVEDSBLOCKNUM,
         DataConversion::StringToCharArray(to_string(m_latestActiveDSBlockNum)));
@@ -298,17 +297,21 @@ void DirectoryService::ScheduleShardingConsensus(const unsigned int wait_window)
 }
 
 void DirectoryService::ProcessDSBlockConsensusWhenDone(
-    const vector<unsigned char>& message, unsigned int offset)
+    [[gnu::unused]] const vector<unsigned char>& message,
+    [[gnu::unused]] unsigned int offset)
 {
     LOG_EPOCH(INFO, to_string(m_mediator.m_currentEpochNum).c_str(),
               "DS block consensus is DONE!!!");
 
     if (m_mode == PRIMARY_DS)
     {
-        LOG_STATE("[DSCON]["
-                  << setw(15) << left
-                  << m_mediator.m_selfPeer.GetPrintableIPAddress() << "]["
-                  << m_mediator.m_txBlockChain.GetBlockCount() << "] DONE");
+        LOG_STATE("[DSCON][" << setw(15) << left
+                             << m_mediator.m_selfPeer.GetPrintableIPAddress()
+                             << "]["
+                             << m_mediator.m_txBlockChain.GetLastBlock()
+                                    .GetHeader()
+                                    .GetBlockNum()
+                      + 1 << "] DONE");
     }
 
     {
@@ -325,7 +328,8 @@ void DirectoryService::ProcessDSBlockConsensusWhenDone(
         m_pendingDSBlock->SetCoSignatures(*m_consensusObject);
 
         if (m_pendingDSBlock->GetHeader().GetBlockNum()
-            == m_mediator.m_dsBlockChain.GetBlockCount() + 1)
+            > m_mediator.m_dsBlockChain.GetLastBlock().GetHeader().GetBlockNum()
+                + 1)
         {
             LOG_EPOCH(WARNING, to_string(m_mediator.m_currentEpochNum).c_str(),
                       "We are missing some blocks. What to do here?");
@@ -367,10 +371,13 @@ void DirectoryService::ProcessDSBlockConsensusWhenDone(
                                   my_pownodes_cluster_lo,
                                   my_pownodes_cluster_hi);
 
-    LOG_STATE("[DSBLK][" << setw(15) << left
-                         << m_mediator.m_selfPeer.GetPrintableIPAddress()
-                         << "][" << m_mediator.m_txBlockChain.GetBlockCount()
-                         << "] BEFORE SENDING DSBLOCK");
+    LOG_STATE(
+        "[DSBLK]["
+        << setw(15) << left << m_mediator.m_selfPeer.GetPrintableIPAddress()
+        << "]["
+        << m_mediator.m_txBlockChain.GetLastBlock().GetHeader().GetBlockNum()
+            + 1
+        << "] BEFORE SENDING DSBLOCK");
 
     // Too few target nodes - avoid asking all DS clusters to send
     if ((my_DS_cluster_num + 1) <= m_allPoWConns.size())
@@ -379,10 +386,13 @@ void DirectoryService::ProcessDSBlockConsensusWhenDone(
                              my_pownodes_cluster_hi);
     }
 
-    LOG_STATE("[DSBLK][" << setw(15) << left
-                         << m_mediator.m_selfPeer.GetPrintableIPAddress()
-                         << "][" << m_mediator.m_txBlockChain.GetBlockCount()
-                         << "] AFTER SENDING DSBLOCK");
+    LOG_STATE(
+        "[DSBLK]["
+        << setw(15) << left << m_mediator.m_selfPeer.GetPrintableIPAddress()
+        << "]["
+        << m_mediator.m_txBlockChain.GetLastBlock().GetHeader().GetBlockNum()
+            + 1
+        << "] AFTER SENDING DSBLOCK");
 
     {
         lock_guard<mutex> g(m_mutexAllPOW);
@@ -418,7 +428,8 @@ void DirectoryService::ProcessDSBlockConsensusWhenDone(
 #endif // IS_LOOKUP_NODE
 
 bool DirectoryService::ProcessDSBlockConsensus(
-    const vector<unsigned char>& message, unsigned int offset, const Peer& from)
+    [[gnu::unused]] const vector<unsigned char>& message,
+    [[gnu::unused]] unsigned int offset, [[gnu::unused]] const Peer& from)
 {
 #ifndef IS_LOOKUP_NODE
     LOG_MARKER();
@@ -501,7 +512,11 @@ bool DirectoryService::ProcessDSBlockConsensus(
 
     lock_guard<mutex> g(m_mutexConsensus);
 
-    bool result = m_consensusObject->ProcessMessage(message, offset, from);
+    if (!m_consensusObject->ProcessMessage(message, offset, from))
+    {
+        return false;
+    }
+
     ConsensusCommon::State state = m_consensusObject->GetState();
 
     if (state == ConsensusCommon::State::DONE)
@@ -526,9 +541,6 @@ bool DirectoryService::ProcessDSBlockConsensus(
                   "Consensus state = " << m_consensusObject->GetStateString());
         cv_processConsensusMessage.notify_all();
     }
-
-    return result;
-#else // IS_LOOKUP_NODE
-    return true;
 #endif // IS_LOOKUP_NODE
+    return true;
 }

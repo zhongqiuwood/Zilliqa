@@ -28,6 +28,7 @@
 #include <shared_mutex>
 #include <vector>
 
+#include "DSBlockMessage.h"
 #include "common/Broadcastable.h"
 #include "common/Executable.h"
 #include "libConsensus/Consensus.h"
@@ -60,14 +61,7 @@ class DirectoryService : public Executable, public Broadcastable
         PROCESS_VIEWCHANGECONSENSUS
     };
 
-    std::atomic<bool> m_requesting_last_ds_block;
-    unsigned int BUFFER_TIME_BEFORE_DS_BLOCK_REQUEST = 5;
-
     std::mutex m_mutexConsensus;
-
-    bool m_hasAllPoWconns = true;
-    std::condition_variable cv_allPowConns;
-    std::mutex m_MutexCVAllPowConn;
 
     // Sharding committee members
     std::vector<std::map<PubKey, Peer>> m_shards;
@@ -75,6 +69,9 @@ class DirectoryService : public Executable, public Broadcastable
 
     // Transaction sharing assignments
     std::vector<unsigned char> m_txnSharingMessage;
+    std::vector<Peer> m_DSReceivers;
+    std::vector<std::vector<Peer>> m_shardReceivers;
+    std::vector<std::vector<Peer>> m_shardSenders;
 
     std::mutex m_MutexScheduleFinalBlockConsensus;
     std::condition_variable cv_scheduleFinalBlockConsensus;
@@ -163,10 +160,6 @@ class DirectoryService : public Executable, public Broadcastable
                                      unsigned int offset, const Peer& from);
     bool ProcessFinalBlockConsensus(const std::vector<unsigned char>& message,
                                     unsigned int offset, const Peer& from);
-    bool ProcessAllPoWConnRequest(const vector<unsigned char>& message,
-                                  unsigned int offset, const Peer& from);
-    bool ProcessAllPoWConnResponse(const vector<unsigned char>& message,
-                                   unsigned int offset, const Peer& from);
     bool ProcessViewChangeConsensus(const vector<unsigned char>& message,
                                     unsigned int offset, const Peer& from);
     // To block certain types of incoming message for certain states
@@ -183,28 +176,24 @@ class DirectoryService : public Executable, public Broadcastable
     SetupMulticastConfigForShardingStructure(unsigned int& my_DS_cluster_num,
                                              unsigned int& my_shards_lo,
                                              unsigned int& my_shards_hi);
-    void SendingShardingStructureToShard(
-        vector<std::map<PubKey, Peer>>::iterator& p);
+    void SendEntireShardingStructureToShardNodes(unsigned int my_shards_lo,
+                                                 unsigned int my_shards_hi);
 
     // PoW (DS block) consensus functions
     void RunConsensusOnDSBlock(bool isRejoin = false);
     void ComposeDSBlock();
 
     // internal calls from RunConsensusOnSharding
-    void
-    SerializeShardingStructure(vector<unsigned char>& sharding_structure) const;
     bool RunConsensusOnShardingWhenDSPrimary();
     bool RunConsensusOnShardingWhenDSBackup();
 
     // internal calls from ProcessShardingConsensus
-    unsigned int
-    SerializeEntireShardingStructure(vector<unsigned char>& sharding_message,
-                                     unsigned int curr_offset);
     bool SendEntireShardingStructureToLookupNodes();
 
     // PoW2 (sharding) consensus functions
     void RunConsensusOnSharding();
     void ComputeSharding();
+    void ComputeTxnSharingAssignments();
 
     // internal calls from RunConsensusOnDSBlock
     bool RunConsensusOnDSBlockWhenDSPrimary();
@@ -246,18 +235,13 @@ class DirectoryService : public Executable, public Broadcastable
     vector<unsigned char> ComposeFinalBlockMessage();
     bool ParseMessageAndVerifyPOW(const vector<unsigned char>& message,
                                   unsigned int offset, const Peer& from);
-    void AppendSharingSetupToShardingStructure(
-        vector<unsigned char>& sharding_structure, unsigned int curr_offset);
-    bool CheckWhetherDSBlockIsFresh(
-        const boost::multiprecision::uint256_t dsblock_num);
-    bool CheckWhetherMaxSubmissionsReceived(Peer peer, PubKey key);
+    bool CheckWhetherDSBlockIsFresh(const uint64_t dsblock_num);
     bool VerifyPoWSubmission(const vector<unsigned char>& message,
                              const Peer& from, PubKey& key,
                              unsigned int curr_offset, uint32_t& portNo,
                              uint64_t& nonce, array<unsigned char, 32>& rand1,
                              array<unsigned char, 32>& rand2,
-                             unsigned int& difficulty,
-                             boost::multiprecision::uint256_t& block_num);
+                             unsigned int& difficulty, uint64_t& block_num);
     void ExtractDataFromMicroblocks(
         TxnHash& microblockTxnTrieRoot, StateHash& microblockDeltaTrieRoot,
         std::vector<MicroBlockHashSet>& microblockHashes,
@@ -303,7 +287,6 @@ class DirectoryService : public Executable, public Broadcastable
     // void StoreMicroBlocksToDisk();
 
     // Used to reconsile view of m_AllPowConn is different.
-    void RequestAllPoWConn();
     void LastDSBlockRequest();
 
     bool ProcessLastDSBlockRequest(const vector<unsigned char>& message,

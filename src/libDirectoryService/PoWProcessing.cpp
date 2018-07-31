@@ -39,30 +39,11 @@ using namespace std;
 using namespace boost::multiprecision;
 
 #ifndef IS_LOOKUP_NODE
-bool DirectoryService::CheckWhetherMaxSubmissionsReceived(Peer peer, PubKey key)
-{
-    lock(m_mutexAllPOW, m_mutexAllPoWConns);
-    lock_guard<mutex> g(m_mutexAllPOW, adopt_lock);
-    lock_guard<mutex> g2(m_mutexAllPoWConns, adopt_lock);
-
-    if (m_allPoWs.size() >= MAX_POW_WINNERS)
-    {
-        LOG_EPOCH(INFO, to_string(m_mediator.m_currentEpochNum).c_str(),
-                  "Already validated maximum number of PoW submissions - "
-                  "dropping this submission but noting down the IP of "
-                  "submitter");
-        m_allPoWConns.emplace(key, peer);
-        return true;
-    }
-
-    return false;
-}
-
 bool DirectoryService::VerifyPoWSubmission(
     const vector<unsigned char>& message, const Peer& from, PubKey& key,
     unsigned int curr_offset, uint32_t& portNo, uint64_t& nonce,
     array<unsigned char, 32>& rand1, array<unsigned char, 32>& rand2,
-    unsigned int& difficulty, uint256_t& block_num)
+    unsigned int& difficulty, uint64_t& block_num)
 {
     // 8-byte nonce
     nonce = Serializable::GetNumber<uint64_t>(message, curr_offset,
@@ -105,7 +86,9 @@ bool DirectoryService::VerifyPoWSubmission(
     difficulty
         = POW_DIFFICULTY; // TODO: Need to get the latest blocknum, diff, rand1, rand2
     // Verify nonce
-    block_num = m_mediator.m_dsBlockChain.GetBlockCount();
+    block_num
+        = m_mediator.m_dsBlockChain.GetLastBlock().GetHeader().GetBlockNum()
+        + 1;
     LOG_EPOCH(INFO, to_string(m_mediator.m_currentEpochNum).c_str(),
               "dsblock_num            = " << block_num);
 
@@ -126,10 +109,10 @@ bool DirectoryService::ParseMessageAndVerifyPOW(
 {
     unsigned int curr_offset = offset;
 
-    // 32-byte block number
-    uint256_t DSBlockNum = Serializable::GetNumber<uint256_t>(
-        message, curr_offset, UINT256_SIZE);
-    curr_offset += UINT256_SIZE;
+    // 8-byte block number
+    uint64_t DSBlockNum = Serializable::GetNumber<uint64_t>(
+        message, curr_offset, sizeof(uint64_t));
+    curr_offset += sizeof(uint64_t);
 
     // Check block number
     if (!CheckWhetherDSBlockIsFresh(DSBlockNum))
@@ -165,11 +148,6 @@ bool DirectoryService::ParseMessageAndVerifyPOW(
 
     // Todo: Reject PoW submissions from existing members of DS committee
 
-    if (CheckWhetherMaxSubmissionsReceived(peer, key))
-    {
-        return false;
-    }
-
     if (!CheckState(VERIFYPOW))
     {
         LOG_EPOCH(INFO, to_string(m_mediator.m_currentEpochNum).c_str(),
@@ -191,7 +169,7 @@ bool DirectoryService::ParseMessageAndVerifyPOW(
     array<unsigned char, 32> rand1;
     array<unsigned char, 32> rand2;
     unsigned int difficulty;
-    uint256_t block_num;
+    uint64_t block_num;
     bool result
         = VerifyPoWSubmission(message, from, key, curr_offset, portNo, nonce,
                               rand1, rand2, difficulty, block_num);
@@ -215,16 +193,6 @@ bool DirectoryService::ParseMessageAndVerifyPOW(
             lock_guard<mutex> g2(m_mutexAllPoWConns, adopt_lock);
 
             m_allPoWConns.emplace(key, peer);
-
-            if (m_allPoWs.size() >= MAX_POW_WINNERS)
-            {
-                LOG_EPOCH(INFO, to_string(m_mediator.m_currentEpochNum).c_str(),
-                          "Already validated maximum number of PoW "
-                          "submissions - dropping this submission but "
-                          "noting down the IP of submitter");
-                return false;
-            }
-
             m_allPoWs.emplace_back(key, nonce);
         }
     }
@@ -245,10 +213,11 @@ bool DirectoryService::ParseMessageAndVerifyPOW(
 #endif // IS_LOOKUP_NODE
 
 bool DirectoryService::ProcessPoWSubmission(
-    const vector<unsigned char>& message, unsigned int offset, const Peer& from)
+    [[gnu::unused]] const vector<unsigned char>& message,
+    [[gnu::unused]] unsigned int offset, [[gnu::unused]] const Peer& from)
 {
 #ifndef IS_LOOKUP_NODE
-    // Message = [32-byte block number] [4-byte listening port] [33-byte public key] [8-byte nonce] [32-byte resulting hash]
+    // Message = [8-byte block number] [4-byte listening port] [33-byte public key] [8-byte nonce] [32-byte resulting hash]
     //[32-byte mixhash] [64-byte Sign]
     LOG_MARKER();
 
@@ -277,9 +246,9 @@ bool DirectoryService::ProcessPoWSubmission(
 
     if (IsMessageSizeInappropriate(
             message.size(), offset,
-            UINT256_SIZE + sizeof(uint32_t) + PUB_KEY_SIZE + sizeof(uint64_t)
-                + BLOCK_HASH_SIZE + BLOCK_HASH_SIZE + SIGNATURE_CHALLENGE_SIZE
-                + SIGNATURE_RESPONSE_SIZE))
+            sizeof(uint64_t) + sizeof(uint32_t) + PUB_KEY_SIZE
+                + sizeof(uint64_t) + BLOCK_HASH_SIZE + BLOCK_HASH_SIZE
+                + SIGNATURE_CHALLENGE_SIZE + SIGNATURE_RESPONSE_SIZE))
     {
         LOG_GENERAL(WARNING, "Pow message size Inappropriate ");
         return false;

@@ -47,7 +47,6 @@ DirectoryService::DirectoryService(Mediator& mediator)
     cv_POWSubmission.notify_all();
 #endif // IS_LOOKUP_NODE
     m_mode = IDLE;
-    m_requesting_last_ds_block = false;
     m_consensusLeaderID = 0;
     m_consensusID = 1;
     m_viewChangeCounter = 0;
@@ -88,9 +87,17 @@ void DirectoryService::StartSynchronization()
         while (m_mediator.m_lookup->m_syncType != SyncType::NO_SYNC)
         {
             m_synchronizer.FetchLatestDSBlocks(
-                m_mediator.m_lookup, m_mediator.m_dsBlockChain.GetBlockCount());
+                m_mediator.m_lookup,
+                m_mediator.m_dsBlockChain.GetLastBlock()
+                        .GetHeader()
+                        .GetBlockNum()
+                    + 1);
             m_synchronizer.FetchLatestTxBlocks(
-                m_mediator.m_lookup, m_mediator.m_txBlockChain.GetBlockCount());
+                m_mediator.m_lookup,
+                m_mediator.m_txBlockChain.GetLastBlock()
+                        .GetHeader()
+                        .GetBlockNum()
+                    + 1);
             this_thread::sleep_for(chrono::seconds(NEW_NODE_SYNC_INTERVAL));
         }
     };
@@ -142,8 +149,9 @@ bool DirectoryService::CheckState(Action action)
 }
 #endif // IS_LOOKUP_NODE
 
-bool DirectoryService::ProcessSetPrimary(const vector<unsigned char>& message,
-                                         unsigned int offset, const Peer& from)
+bool DirectoryService::ProcessSetPrimary(
+    [[gnu::unused]] const vector<unsigned char>& message,
+    [[gnu::unused]] unsigned int offset, [[gnu::unused]] const Peer& from)
 {
 #ifndef IS_LOOKUP_NODE
     // Note: This function should only be invoked during bootstrap sequence
@@ -245,7 +253,10 @@ bool DirectoryService::ProcessSetPrimary(const vector<unsigned char>& message,
     }
     m_consensusLeaderID = 0;
     LOG_EPOCH(INFO, to_string(m_mediator.m_currentEpochNum).c_str(),
-              "START OF EPOCH " << m_mediator.m_dsBlockChain.GetBlockCount());
+              "START OF EPOCH " << m_mediator.m_dsBlockChain.GetLastBlock()
+                                       .GetHeader()
+                                       .GetBlockNum()
+                      + 1);
 
     if (primary == m_mediator.m_selfPeer)
     {
@@ -274,19 +285,19 @@ bool DirectoryService::ProcessSetPrimary(const vector<unsigned char>& message,
 }
 
 #ifndef IS_LOOKUP_NODE
-bool DirectoryService::CheckWhetherDSBlockIsFresh(const uint256_t dsblock_num)
+bool DirectoryService::CheckWhetherDSBlockIsFresh(const uint64_t dsblock_num)
 {
     // uint256_t latest_block_num_in_blockchain = m_mediator.m_dsBlockChain.GetLastBlock().GetHeader().GetBlockNum();
-    uint256_t latest_block_num_in_blockchain
-        = m_mediator.m_dsBlockChain.GetBlockCount();
+    uint64_t latest_block_num_in_blockchain
+        = m_mediator.m_dsBlockChain.GetLastBlock().GetHeader().GetBlockNum();
 
-    if (dsblock_num < latest_block_num_in_blockchain)
+    if (dsblock_num < latest_block_num_in_blockchain + 1)
     {
         LOG_EPOCH(WARNING, to_string(m_mediator.m_currentEpochNum).c_str(),
                   "We are processing duplicated blocks");
         return false;
     }
-    else if (dsblock_num > latest_block_num_in_blockchain)
+    else if (dsblock_num > latest_block_num_in_blockchain + 1)
     {
         LOG_EPOCH(INFO, to_string(m_mediator.m_currentEpochNum).c_str(),
                   "Warning: We are missing of some DS blocks. Cur: "
@@ -305,9 +316,9 @@ void DirectoryService::SetState(DirState state)
               "DS State is now " << GetStateString());
 }
 
-vector<Peer>
-DirectoryService::GetBroadcastList(unsigned char ins_type,
-                                   const Peer& broadcast_originator)
+vector<Peer> DirectoryService::GetBroadcastList(
+    [[gnu::unused]] unsigned char ins_type,
+    [[gnu::unused]] const Peer& broadcast_originator)
 {
     // LOG_MARKER();
 
@@ -315,257 +326,10 @@ DirectoryService::GetBroadcastList(unsigned char ins_type,
     return vector<Peer>();
 }
 
-void DirectoryService::RequestAllPoWConn()
-{
-    LOG_MARKER();
-    LOG_EPOCH(INFO, to_string(m_mediator.m_currentEpochNum).c_str(),
-              "I am requeesting AllPowConn");
-    // message: [listening port]
-
-    // In this implementation, we are only requesting it from ds leader only.
-    vector<unsigned char> requestAllPoWConnMsg
-        = {MessageType::DIRECTORY, DSInstructionType::AllPoWConnRequest};
-    unsigned int cur_offset = MessageOffset::BODY;
-
-    Serializable::SetNumber<uint32_t>(requestAllPoWConnMsg, cur_offset,
-                                      m_mediator.m_selfPeer.m_listenPortHost,
-                                      sizeof(uint32_t));
-    cur_offset += sizeof(uint32_t);
-
-    P2PComm::GetInstance().SendMessage(m_mediator.m_DSCommittee.front().second,
-                                       requestAllPoWConnMsg);
-
-    // TODO: Request from a total of 20 ds members
-}
-
-#endif // IS_LOOKUP_NODE
-
-// Current this is only used by ds. But ideally, 20 ds nodes should
-bool DirectoryService::ProcessAllPoWConnRequest(
-    const vector<unsigned char>& message, unsigned int offset, const Peer& from)
-{
-    LOG_MARKER();
-    LOG_EPOCH(INFO, to_string(m_mediator.m_currentEpochNum).c_str(),
-              "I am sending AllPowConn to requester");
-
-    uint32_t requesterListeningPort
-        = Serializable::GetNumber<uint32_t>(message, offset, sizeof(uint32_t));
-
-    //  Contruct the message and send to the requester
-    //  Message: [size of m_allPowConn] [pub key, peer][pub key, peer] ....
-    vector<unsigned char> allPowConnMsg
-        = {MessageType::DIRECTORY, DSInstructionType::AllPoWConnResponse};
-    unsigned int cur_offset = MessageOffset::BODY;
-
-    Serializable::SetNumber<uint32_t>(allPowConnMsg, cur_offset,
-                                      m_allPoWConns.size(), sizeof(uint32_t));
-    cur_offset += sizeof(uint32_t);
-
-    unsigned int offset_to_increment;
-    for (auto& kv : m_allPoWConns)
-    {
-        if (kv.first == m_mediator.m_selfKey.second)
-        {
-            m_mediator.m_selfKey.second.Serialize(allPowConnMsg, cur_offset);
-            cur_offset += PUB_KEY_SIZE;
-            offset_to_increment
-                = m_mediator.m_selfPeer.Serialize(allPowConnMsg, cur_offset);
-            cur_offset += offset_to_increment;
-        }
-        else
-        {
-            kv.first.Serialize(allPowConnMsg, cur_offset);
-            cur_offset += PUB_KEY_SIZE;
-            offset_to_increment
-                = kv.second.Serialize(allPowConnMsg, cur_offset);
-            cur_offset += offset_to_increment;
-        }
-    }
-
-    Peer peer(from.m_ipAddress, requesterListeningPort);
-    P2PComm::GetInstance().SendMessage(peer, allPowConnMsg);
-    return true;
-}
-
-bool DirectoryService::ProcessAllPoWConnResponse(
-    const vector<unsigned char>& message, unsigned int offset, const Peer& from)
-{
-    LOG_MARKER();
-    LOG_EPOCH(INFO, to_string(m_mediator.m_currentEpochNum).c_str(),
-              "Updating AllPowConn");
-
-    unsigned int cur_offset = offset;
-    // 32-byte block number
-    uint32_t sizeeOfAllPowConn = Serializable::GetNumber<uint32_t>(
-        message, cur_offset, sizeof(uint32_t));
-    cur_offset += sizeof(uint32_t);
-
-    std::map<PubKey, Peer> allPowConn;
-
-    for (uint32_t i = 0; i < sizeeOfAllPowConn; i++)
-    {
-        // PubKey key(message, cur_offset);
-        PubKey key;
-        if (key.Deserialize(message, cur_offset) != 0)
-        {
-            LOG_GENERAL(WARNING, "We failed to deserialize PubKey.");
-            return false;
-        }
-        cur_offset += PUB_KEY_SIZE;
-
-        // Peer peer(message, cur_offset);
-        Peer peer;
-        if (peer.Deserialize(message, cur_offset) != 0)
-        {
-            LOG_GENERAL(WARNING, "We failed to deserialize Peer.");
-            return false;
-        }
-
-        cur_offset += IP_SIZE + PORT_SIZE;
-        LOG_EPOCH(INFO, to_string(m_mediator.m_currentEpochNum).c_str(),
-                  "updating = " << peer.GetPrintableIPAddress() << ":"
-                                << peer.m_listenPortHost);
-
-        if (m_allPoWConns.find(key) == m_allPoWConns.end())
-        {
-            m_allPoWConns.emplace(key, peer);
-        }
-    }
-
-    {
-        std::unique_lock<std::mutex> lk(m_MutexCVAllPowConn);
-        m_hasAllPoWconns = true;
-    }
-    cv_allPowConns.notify_all();
-    return true;
-}
-
-#ifndef IS_LOOKUP_NODE
-
-void DirectoryService::LastDSBlockRequest()
-{
-    LOG_MARKER();
-    if (m_requesting_last_ds_block)
-    {
-        // Already requesting for last ds block. Should re-request again.
-        LOG_EPOCH(INFO, to_string(m_mediator.m_currentEpochNum).c_str(),
-                  "DEBUG: I am already waiting for the last ds block from "
-                  "ds leader.");
-    }
-
-    LOG_EPOCH(INFO, to_string(m_mediator.m_currentEpochNum).c_str(),
-              "DEBUG: I am requesting the last ds block from ds leader.");
-
-    // message: [listening port]
-    // In this implementation, we are only requesting it from ds leader only.
-    vector<unsigned char> requestAllPoWConnMsg
-        = {MessageType::DIRECTORY, DSInstructionType::LastDSBlockRequest};
-    unsigned int cur_offset = MessageOffset::BODY;
-
-    Serializable::SetNumber<uint32_t>(requestAllPoWConnMsg, cur_offset,
-                                      m_mediator.m_selfPeer.m_listenPortHost,
-                                      sizeof(uint32_t));
-    cur_offset += sizeof(uint32_t);
-
-    P2PComm::GetInstance().SendMessage(m_mediator.m_DSCommittee.front().second,
-                                       requestAllPoWConnMsg);
-    // TODO: Request from a total of 20 ds members
-}
-
-bool DirectoryService::ProcessLastDSBlockRequest(
-    const vector<unsigned char>& message, unsigned int offset, const Peer& from)
-{
-    LOG_MARKER();
-
-    LOG_EPOCH(INFO, to_string(m_mediator.m_currentEpochNum).c_str(),
-              "DEBUG: I am sending the last ds block to the requester.");
-
-    // Deserialize the message and get the port
-    uint32_t requesterListeningPort
-        = Serializable::GetNumber<uint32_t>(message, offset, sizeof(uint32_t));
-
-    // Craft the last block message
-    vector<unsigned char> lastDSBlockMsg
-        = {MessageType::DIRECTORY, DSInstructionType::LastDSBlockResponse};
-    unsigned int cur_offset = MessageOffset::BODY;
-
-    m_mediator.m_dsBlockChain.GetLastBlock().Serialize(lastDSBlockMsg,
-                                                       cur_offset);
-
-    Peer peer(from.m_ipAddress, requesterListeningPort);
-    P2PComm::GetInstance().SendMessage(peer, lastDSBlockMsg);
-
-    return true;
-}
-
-bool DirectoryService::ProcessLastDSBlockResponse(
-    const vector<unsigned char>& message, unsigned int offset, const Peer& from)
-{
-    LOG_MARKER();
-
-    if (m_state != DirectoryService::DSBLOCK_CONSENSUS
-        and m_requesting_last_ds_block)
-    {
-        // This recovery stage is meant for nodes that may get stuck in ds block consensus only.
-        // Only proceed if I still need the last ds block
-        return false;
-    }
-
-    // TODO: Should check whether ds block chain contain this block or not.
-    LOG_EPOCH(INFO, to_string(m_mediator.m_currentEpochNum).c_str(),
-              "DEBUG: I received the last ds block from ds leader.");
-    m_requesting_last_ds_block = false;
-    unsigned int cur_offset = offset;
-
-    DSBlock dsblock;
-    if (dsblock.Deserialize(message, cur_offset) != 0)
-    {
-        LOG_GENERAL(WARNING, "We failed to deserialize dsblock.");
-        return false;
-    }
-    int result = m_mediator.m_dsBlockChain.AddBlock(dsblock);
-    LOG_EPOCH(INFO, to_string(m_mediator.m_currentEpochNum).c_str(),
-              "Storing DS Block Number: "
-                  << dsblock.GetHeader().GetBlockNum()
-                  << " with Nonce: " << dsblock.GetHeader().GetNonce()
-                  << ", Difficulty: " << dsblock.GetHeader().GetDifficulty()
-                  << ", Timestamp: " << dsblock.GetHeader().GetTimestamp());
-
-    if (result == -1)
-    {
-        LOG_EPOCH(WARNING, to_string(m_mediator.m_currentEpochNum).c_str(),
-                  "We failed to add dsblock to dsblockchain.");
-        return false;
-    }
-
-    vector<unsigned char> serializedDSBlock;
-    dsblock.Serialize(serializedDSBlock, 0);
-    BlockStorage::GetBlockStorage().PutDSBlock(
-        dsblock.GetHeader().GetBlockNum(), serializedDSBlock);
-    BlockStorage::GetBlockStorage().PushBackTxBodyDB(
-        dsblock.GetHeader().GetBlockNum());
-
-    if (TEST_NET_MODE)
-    {
-        LOG_GENERAL(INFO, "Updating shard whitelist");
-        Whitelist::GetInstance().UpdateShardWhitelist();
-    }
-
-    SetState(POW2_SUBMISSION);
-    NotifyPOW2Submission();
-    ScheduleShardingConsensus(BACKUP_POW2_WINDOW_IN_SECONDS
-                              - BUFFER_TIME_BEFORE_DS_BLOCK_REQUEST);
-    return true;
-}
-
 bool DirectoryService::CleanVariables()
 {
     LOG_MARKER();
-    m_requesting_last_ds_block = false;
-    {
-        std::lock_guard<mutex> lock(m_MutexCVAllPowConn);
-        m_hasAllPoWconns = true;
-    }
+
     m_shards.clear();
     m_publicKeyToShardIdMap.clear();
     m_allPoWConns.clear();
@@ -651,7 +415,7 @@ bool DirectoryService::FinishRejoinAsDS()
 }
 #endif // IS_LOOKUP_NODE
 
-bool DirectoryService::ToBlockMessage(unsigned char ins_byte)
+bool DirectoryService::ToBlockMessage([[gnu::unused]] unsigned char ins_byte)
 {
     if (m_mediator.m_lookup->m_syncType != SyncType::NO_SYNC)
     {
@@ -679,10 +443,6 @@ bool DirectoryService::Execute(const vector<unsigned char>& message,
            &DirectoryService::ProcessShardingConsensus,
            &DirectoryService::ProcessMicroblockSubmission,
            &DirectoryService::ProcessFinalBlockConsensus,
-           &DirectoryService::ProcessAllPoWConnRequest,
-           &DirectoryService::ProcessAllPoWConnResponse,
-           &DirectoryService::ProcessLastDSBlockRequest,
-           &DirectoryService::ProcessLastDSBlockResponse,
            &DirectoryService::ProcessViewChangeConsensus};
 #else
     InstructionHandler ins_handlers[]
@@ -692,9 +452,7 @@ bool DirectoryService::Execute(const vector<unsigned char>& message,
            &DirectoryService::ProcessPoW2Submission,
            &DirectoryService::ProcessShardingConsensus,
            &DirectoryService::ProcessMicroblockSubmission,
-           &DirectoryService::ProcessFinalBlockConsensus,
-           &DirectoryService::ProcessAllPoWConnRequest,
-           &DirectoryService::ProcessAllPoWConnResponse};
+           &DirectoryService::ProcessFinalBlockConsensus};
 #endif // IS_LOOKUP_NODE
 
     const unsigned char ins_byte = message.at(offset);

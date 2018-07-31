@@ -52,7 +52,7 @@ void addBalanceToGenesisAccount()
 {
     LOG_MARKER();
 
-    const uint256_t bal{100000000000};
+    const uint256_t bal{std::numeric_limits<uint64_t>::max()};
     const uint256_t nonce{0};
 
     for (auto& walletHexStr : GENESIS_WALLETS)
@@ -140,15 +140,13 @@ void Node::Prepare(bool runInitializeGenesisBlocks)
 {
     LOG_MARKER();
     m_mediator.m_currentEpochNum
-        = (uint64_t)m_mediator.m_txBlockChain.GetLastBlock()
-              .GetHeader()
-              .GetBlockNum()
+        = m_mediator.m_txBlockChain.GetLastBlock().GetHeader().GetBlockNum()
         + 1;
     m_mediator.UpdateDSBlockRand(runInitializeGenesisBlocks);
     m_mediator.UpdateTxBlockRand(runInitializeGenesisBlocks);
     SetState(POW_SUBMISSION);
     POW::GetInstance().EthashConfigureLightClient(
-        (uint64_t)m_mediator.m_dsBlockChain.GetBlockCount());
+        m_mediator.m_dsBlockChain.GetLastBlock().GetHeader().GetBlockNum() + 1);
 }
 
 bool Node::StartRetrieveHistory()
@@ -294,8 +292,9 @@ bool Node::CheckState(Action action)
     return true;
 }
 
-vector<Peer> Node::GetBroadcastList(unsigned char ins_type,
-                                    const Peer& broadcast_originator)
+vector<Peer>
+    Node::GetBroadcastList([[gnu::unused]] unsigned char ins_type,
+                           [[gnu::unused]] const Peer& broadcast_originator)
 {
     // LOG_MARKER();
 
@@ -473,8 +472,9 @@ vector<Transaction> GenTransactionBulk(PrivKey& fromPrivKey, PubKey& fromPubKey,
 ///
 /// XXX The message format below is no ignored
 ///     Message = [33-byte from pubkey] [33-byte to pubkey] [32-byte amount]
-bool Node::ProcessCreateTransaction(const vector<unsigned char>& message,
-                                    unsigned int offset, const Peer& from)
+bool Node::ProcessCreateTransaction(
+    [[gnu::unused]] const vector<unsigned char>& message,
+    [[gnu::unused]] unsigned int offset, [[gnu::unused]] const Peer& from)
 {
 #ifndef IS_LOOKUP_NODE
     LOG_MARKER();
@@ -531,7 +531,8 @@ bool Node::ProcessCreateTransaction(const vector<unsigned char>& message,
 
 #ifndef IS_LOOKUP_NODE
 bool Node::ProcessSubmitMissingTxn(const vector<unsigned char>& message,
-                                   unsigned int offset, const Peer& from)
+                                   unsigned int offset,
+                                   [[gnu::unused]] const Peer& from)
 {
     unsigned int cur_offset = offset;
 
@@ -562,8 +563,7 @@ bool Node::ProcessSubmitMissingTxn(const vector<unsigned char>& message,
         if (m_mediator.m_validator->CheckCreatedTransaction(
                 submittedTransaction))
         {
-            boost::multiprecision::uint256_t blockNum
-                = (uint256_t)m_mediator.m_currentEpochNum;
+            uint64_t blockNum = m_mediator.m_currentEpochNum;
             lock_guard<mutex> g(m_mutexReceivedTransactions);
             auto& receivedTransactions = m_receivedTransactions[blockNum];
 
@@ -580,7 +580,8 @@ bool Node::ProcessSubmitMissingTxn(const vector<unsigned char>& message,
 }
 
 bool Node::ProcessSubmitTxnSharing(const vector<unsigned char>& message,
-                                   unsigned int offset, const Peer& from)
+                                   unsigned int offset,
+                                   [[gnu::unused]] const Peer& from)
 {
     //LOG_MARKER();
 
@@ -642,10 +643,9 @@ bool Node::ProcessSubmitTxnSharing(const vector<unsigned char>& message,
         if (m_mediator.m_validator->CheckCreatedTransaction(
                 submittedTransaction))
         {
-            boost::multiprecision::uint256_t blockNum
-                = (uint256_t)m_mediator.m_currentEpochNum;
             lock_guard<mutex> g(m_mutexReceivedTransactions);
-            auto& receivedTransactions = m_receivedTransactions[blockNum];
+            auto& receivedTransactions
+                = m_receivedTransactions[m_mediator.m_currentEpochNum];
 
             receivedTransactions.emplace(submittedTransaction.GetTranID(),
                                          submittedTransaction);
@@ -658,8 +658,9 @@ bool Node::ProcessSubmitTxnSharing(const vector<unsigned char>& message,
 }
 #endif // IS_LOOKUP_NODE
 
-bool Node::ProcessSubmitTransaction(const vector<unsigned char>& message,
-                                    unsigned int offset, const Peer& from)
+bool Node::ProcessSubmitTransaction(
+    [[gnu::unused]] const vector<unsigned char>& message,
+    [[gnu::unused]] unsigned int offset, [[gnu::unused]] const Peer& from)
 {
 #ifndef IS_LOOKUP_NODE
     // This message is sent by my shard peers
@@ -692,7 +693,8 @@ bool Node::ProcessSubmitTransaction(const vector<unsigned char>& message,
 }
 
 bool Node::ProcessCreateTransactionFromLookup(
-    const vector<unsigned char>& message, unsigned int offset, const Peer& from)
+    [[gnu::unused]] const vector<unsigned char>& message,
+    [[gnu::unused]] unsigned int offset, [[gnu::unused]] const Peer& from)
 {
 #ifndef IS_LOOKUP_NODE
 
@@ -792,11 +794,6 @@ void Node::SetState(NodeState state)
 void Node::AddBlock(const TxBlock& block)
 {
     m_mediator.m_txBlockChain.AddBlock(block);
-
-    if (block.GetHeader().GetBlockNum() == m_latestForwardBlockNum)
-    {
-        m_cvForwardBlockNumSync.notify_all();
-    }
 }
 
 #ifndef IS_LOOKUP_NODE
@@ -805,8 +802,7 @@ void Node::SubmitTransactions()
     //LOG_MARKER();
 
     unsigned int txn_sent_count = 0;
-    boost::multiprecision::uint256_t blockNum
-        = (uint256_t)m_mediator.m_currentEpochNum;
+    uint64_t blockNum = m_mediator.m_currentEpochNum;
 
     unsigned int cur_offset = 0;
 
@@ -1009,7 +1005,6 @@ bool Node::CleanVariables()
         m_mediator.m_lookup->m_fetchedOfflineLookups = false;
     }
     m_mediator.m_lookup->m_startedPoW2 = false;
-    m_latestForwardBlockNum = 0;
 
     return true;
 }
@@ -1021,8 +1016,9 @@ void Node::CleanCreatedTransaction()
 }
 #endif // IS_LOOKUP_NODE
 
-bool Node::ProcessDoRejoin(const std::vector<unsigned char>& message,
-                           unsigned int offset, const Peer& from)
+bool Node::ProcessDoRejoin(
+    [[gnu::unused]] const std::vector<unsigned char>& message,
+    [[gnu::unused]] unsigned int offset, [[gnu::unused]] const Peer& from)
 {
 #ifndef IS_LOOKUP_NODE
 
@@ -1068,7 +1064,7 @@ bool Node::ProcessDoRejoin(const std::vector<unsigned char>& message,
     return true;
 }
 
-bool Node::ToBlockMessage(unsigned char ins_byte)
+bool Node::ToBlockMessage([[gnu::unused]] unsigned char ins_byte)
 {
     if (m_mediator.m_lookup->m_syncType != SyncType::NO_SYNC)
 #ifndef IS_LOOKUP_NODE

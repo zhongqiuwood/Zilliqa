@@ -69,7 +69,8 @@ private:
                                       unsigned int offset,
                                       const vector<unsigned char>& errorMsg);
     bool ProcessMessageConsensusFailure(
-        const vector<unsigned char>& consensusFailure, unsigned int offset);
+        [[gnu::unused]] const vector<unsigned char>& consensusFailure,
+        [[gnu::unused]] unsigned int offset);
     bool GenerateCommitMessage(std::vector<unsigned char>& commit,
                                unsigned int offset);
     bool ProcessMessageChallengeCore(
@@ -119,6 +120,10 @@ public:
     /// Function to process any consensus message received.
     bool ProcessMessage(const std::vector<unsigned char>& message,
                         unsigned int offset, const Peer& from);
+
+private:
+    static std::map<Action, std::string> ActionStrings;
+    std::string GetActionString(Action action) const;
 };
 
 #endif // __CONSENSUSBACKUP_H__
