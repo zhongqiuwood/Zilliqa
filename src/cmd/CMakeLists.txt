@@ -29,3 +29,13 @@ add_custom_command(TARGET zilliqa
     COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:genkeypair> ${CMAKE_BINARY_DIR}/tests/Zilliqa)
 target_include_directories(genkeypair PUBLIC ${CMAKE_SOURCE_DIR}/src)
 target_link_libraries(genkeypair PUBLIC Crypto)
+
+
+############################################################################################
+add_executable(dbscan dbscan.cpp)
+add_custom_command(TARGET zilliqa
+        POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:dbscan> ${CMAKE_BINARY_DIR}/tests/Zilliqa)
+target_include_directories(dbscan PUBLIC ${CMAKE_SOURCE_DIR}/src)
+
+target_link_libraries(dbscan PUBLIC Consensus Network Utils Zilliqa DirectoryService Node Validator NAT)

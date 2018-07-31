@@ -87,6 +87,9 @@ public:
 
     /// Greater-than comparison operator.
     bool operator>(const TxBlock& block) const;
+
+    void dump();
+
 };
 
 #endif // __TXBLOCK_H__

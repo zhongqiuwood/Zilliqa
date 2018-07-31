@@ -239,3 +239,27 @@ bool TxBlock::operator>(const TxBlock& block) const
 {
     return !((*this == block) || (*this < block));
 }
+
+
+void TxBlock::dump()
+{
+    LOG_GENERAL(INFO, "------------------------------------------------");
+    LOG_GENERAL(INFO, "TxBlock Num: " << m_header.GetBlockNum());
+    LOG_GENERAL(INFO, "GetTxRootHash: " << m_header.GetTimestamp());
+    LOG_GENERAL(INFO, "GetPrevHash: " << m_header.GetPrevHash());
+    LOG_GENERAL(INFO, "GetBlockNum: " << m_header.GetBlockNum());
+    LOG_GENERAL(INFO, "GetMinerPubKey: " << m_header.GetMinerPubKey());
+    LOG_GENERAL(INFO, "GetDeltaRootHash: " << m_header.GetDeltaRootHash());
+    LOG_GENERAL(INFO, "GetDSBlockHeader: " << m_header.GetDSBlockHeader());
+    LOG_GENERAL(INFO, "GetDSBlockNum: " << m_header.GetDSBlockNum());
+    LOG_GENERAL(INFO, "GetGasLimit: " << m_header.GetGasLimit());
+    LOG_GENERAL(INFO, "GetGasUsed: " << m_header.GetGasUsed());
+    LOG_GENERAL(INFO, "GetNumMicroBlockHashes: " << m_header.GetNumMicroBlockHashes());
+    LOG_GENERAL(INFO, "GetNumTxs: " << m_header.GetNumTxs());
+    LOG_GENERAL(INFO, "GetStateRootHash: " << m_header.GetStateRootHash());
+    LOG_GENERAL(INFO, "GetTxRootHash: " << m_header.GetTxRootHash());
+    LOG_GENERAL(INFO, "GetType: " << m_header.GetType());
+    LOG_GENERAL(INFO, "m_shardIDs size: " << this->m_shardIDs.size());
+    LOG_GENERAL(INFO, "m_isMicroBlockEmpty size: " << this->m_isMicroBlockEmpty.size());
+    LOG_GENERAL(INFO, "m_microBlockHashes size: " << this->m_microBlockHashes.size());
+}
